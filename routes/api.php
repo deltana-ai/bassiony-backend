@@ -3,6 +3,10 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\Api\Auth\ClientAuthController;
+use App\Http\Controllers\Api\Auth\PharmacistAuthController;
+use App\Http\Controllers\Api\Auth\DriverAuthController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,8 +27,48 @@ Route::middleware([])->group(function () {
     Route::apiResource('category', CategoryController::class);
 });
 
-//////////////////////////////////////// logo company ////////////////////////////////
 
+
+//////////////////////////////////////// logo company ////////////////////////////////
+Route::prefix('client')->group(function () {
+    Route::post('/register', [ClientAuthController::class, 'clientRegister']);
+    Route::post('/login', [ClientAuthController::class, 'clientLogin']);
+    Route::post('/verify-otp', [ClientAuthController::class, 'clientVerify']);
+    Route::post('/forgot-password', [ClientAuthController::class, 'clientForgotPassword']);
+    Route::post('/reset-password', [ClientAuthController::class, 'clientResetPassword']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [ClientAuthController::class, 'logout']);
+        Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
+    });
+});
+///////////////////////////////////////////////////////////////////////////
+Route::prefix('pharmacist')->group(function () {
+    Route::post('/register', [PharmacistAuthController::class, 'pharmacistRegister']);
+    Route::post('/login', [PharmacistAuthController::class, 'pharmacistLogin']);
+    Route::post('/verify-otp', [PharmacistAuthController::class, 'pharmacistVerify']);
+    Route::post('/forgot-password', [PharmacistAuthController::class, 'pharmacistForgotPassword']);
+    Route::post('/reset-password', [PharmacistAuthController::class, 'pharmacistResetPassword']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [PharmacistAuthController::class, 'logout']);
+        Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
+    });
+});
+/////////////////////////////////////////////////////////////////////////////////
+Route::prefix('driver')->group(function () {
+    Route::post('/register', [DriverAuthController::class, 'driverRegister']);
+    Route::post('/login', [DriverAuthController::class, 'driverLogin']);
+    Route::post('/verify-otp', [DriverAuthController::class, 'driverVerify']);
+    Route::post('/forgot-password', [DriverAuthController::class, 'driverForgotPassword']);
+    Route::post('/reset-password', [DriverAuthController::class, 'driverResetPassword']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [DriverAuthController::class, 'logout']);
+        Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
+    });
+});
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 Route::group(['middleware' => []], static function () {
     Route::get('/media', [MediaController::class, 'index']);

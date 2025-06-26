@@ -7,6 +7,10 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Request;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -26,6 +30,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Schema::defaultStringLength(191);
+        $locale = request()->header('Accept-Language');
+
+        if ($locale && in_array($locale, ['en', 'ar'])) {
+             App::setLocale($locale);
+        }
         Route::aliasMiddleware('admin', AdminMiddleware::class);
 
         ResetPassword::createUrlUsing(static function (object $notifiable, string $token) {
