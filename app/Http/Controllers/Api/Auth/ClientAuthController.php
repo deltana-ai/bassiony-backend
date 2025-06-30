@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Otp;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -43,10 +44,10 @@ class ClientAuthController extends Controller
     }
 
 
-    public function logout(Request $request)
+    public function clientLogout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json(['message' => __('auth.logout_success')]);
+        //return  auth()->guard('client')->user();
+        //return  auth('sanctum')->user();
+        return $this->logout($request ,"client");
     }
 }

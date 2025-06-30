@@ -36,10 +36,16 @@ Route::prefix('client')->group(function () {
     Route::post('/verify-otp', [ClientAuthController::class, 'clientVerify']);
     Route::post('/forgot-password', [ClientAuthController::class, 'clientForgotPassword']);
     Route::post('/reset-password', [ClientAuthController::class, 'clientResetPassword']);
+  //  Route::post('/logout1', [ClientAuthController::class, 'clientLogout']);
+    Route::get('/debug', function (Request $request) {
+        return response()->json(['user' => $request->all()]);
+    });
+    // ['auth:sanctum', 'abilities:client']
+    Route::middleware(['resolve.guard','ensure.guard:App\Models\User'])->group(function () {
+        Route::post('/logout', [ClientAuthController::class, 'clientLogout']);
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', [ClientAuthController::class, 'logout']);
-        Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
+
+       Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
     });
 });
 ///////////////////////////////////////////////////////////////////////////
@@ -50,8 +56,8 @@ Route::prefix('pharmacist')->group(function () {
     Route::post('/forgot-password', [PharmacistAuthController::class, 'pharmacistForgotPassword']);
     Route::post('/reset-password', [PharmacistAuthController::class, 'pharmacistResetPassword']);
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', [PharmacistAuthController::class, 'logout']);
+    Route::middleware(['resolve.guard','ensure.guard:App\Models\Pharmacist'])->group(function () {
+        Route::post('/logout', [PharmacistAuthController::class, 'pharmacistLogout']);
         Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
     });
 });
@@ -63,8 +69,8 @@ Route::prefix('driver')->group(function () {
     Route::post('/forgot-password', [DriverAuthController::class, 'driverForgotPassword']);
     Route::post('/reset-password', [DriverAuthController::class, 'driverResetPassword']);
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', [DriverAuthController::class, 'logout']);
+    Route::middleware(['resolve.guard','ensure.guard:App\Models\Driver'])->group(function () {
+        Route::post('/logout', [DriverAuthController::class, 'driverLogout']);
         Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
     });
 });

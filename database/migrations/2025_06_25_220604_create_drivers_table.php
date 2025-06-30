@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone')->nullable();
+            $table->text('address')->nullable();
+            $table->softDeletes();
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->string('password');
@@ -29,6 +31,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('users', function (Blueprint $table) {
+          $table->dropSoftDeletes();
+
+        });
         Schema::dropIfExists('drivers');
     }
 };
