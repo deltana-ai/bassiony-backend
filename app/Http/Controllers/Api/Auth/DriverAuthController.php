@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Traits\MultiAuth;
+use Illuminate\Support\Facades\Auth;
 
 class DriverAuthController extends Controller
 {
@@ -41,10 +42,8 @@ class DriverAuthController extends Controller
     }
 
 
-    public function logout(Request $request)
+    public function driverLogout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json(['message' => __('auth.logout_success')]);
+        return $this->logout($request,"driver");
     }
 }

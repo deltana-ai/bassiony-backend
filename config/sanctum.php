@@ -34,7 +34,7 @@ return [
     |
     */
 
-    'guard' => array_keys(config('auth.guards')),
+    'guard' => ['client','pharmacist','driver'],
 
     /*
     |--------------------------------------------------------------------------

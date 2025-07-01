@@ -43,20 +43,19 @@
     <div class="container">
         <img class="logo" src="{{ asset('logo.png') }}" alt="Logo">
 
-        <h2>رمز التحقق الخاص بك</h2>
-        <p>يرجى استخدام رمز التحقق التالي لتأكيد حسابك. هذا الرمز صالح لمدة 10 دقائق فقط.</p>
-        <div class="otp">{{ $code }}</div>
-        <p>إذا لم تطلب هذا الرمز، يرجى تجاهل هذه الرسالة.</p>
+        <h2>تم ارسال رسالة اتصال من  {{$contact->name}}</h2>
+        <p> البريد الالكتروني : {{$contact->email}} </p>
+        <p> الرسالة: {{$contact->message}}</p>
 
         <hr style="margin: 40px 0;">
 
-        <h2>Your Verification Code</h2>
-        <p>Please use the code below to verify your account. This code is valid for 10 minutes only.</p>
-        <div class="otp">{{ $code }}</div>
-        <p>If you didn’t request this code, you can safely ignore this email.</p>
+        <h2> new message has been sent from  {{$contact->name}} </h2>
+        <p> Email : {{$contact->email}}</p>
+        <p> Message : {{$contact->message}}</p>
 
+      
         <div class="footer">
-            © {{ date('Y') }} {{__('lang.'.config('app.name'))}} All rights reserved.
+            © {{ date('Y') }} {{__('lang.'.config('app.name'))}}. All rights reserved.
         </div>
     </div>
 </body>

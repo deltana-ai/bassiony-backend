@@ -3,9 +3,8 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MediaController;
-use App\Http\Controllers\Api\Auth\ClientAuthController;
-use App\Http\Controllers\Api\Auth\PharmacistAuthController;
-use App\Http\Controllers\Api\Auth\DriverAuthController;
+use App\Http\Controllers\Api\Auth\{ClientAuthController,PharmacistAuthController,DriverAuthController};
+use App\Http\Controllers\Api\Profile\{ClientProfileController,PharmacistProfileController,DriverProfileController};
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -36,16 +35,12 @@ Route::prefix('client')->group(function () {
     Route::post('/verify-otp', [ClientAuthController::class, 'clientVerify']);
     Route::post('/forgot-password', [ClientAuthController::class, 'clientForgotPassword']);
     Route::post('/reset-password', [ClientAuthController::class, 'clientResetPassword']);
-  //  Route::post('/logout1', [ClientAuthController::class, 'clientLogout']);
-    Route::get('/debug', function (Request $request) {
-        return response()->json(['user' => $request->all()]);
-    });
-    // ['auth:sanctum', 'abilities:client']
+
     Route::middleware(['resolve.guard','ensure.guard:App\Models\User'])->group(function () {
         Route::post('/logout', [ClientAuthController::class, 'clientLogout']);
+        Route::get('/profile', [ClientProfileController::class, 'get']);
+        Route::put('/profile-update', [ClientProfileController::class, 'update']);
 
-
-       Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
     });
 });
 ///////////////////////////////////////////////////////////////////////////
@@ -58,8 +53,8 @@ Route::prefix('pharmacist')->group(function () {
 
     Route::middleware(['resolve.guard','ensure.guard:App\Models\Pharmacist'])->group(function () {
         Route::post('/logout', [PharmacistAuthController::class, 'pharmacistLogout']);
-        Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
-    });
+        Route::get('/profile', [PharmacistProfileController::class, 'get']);
+        Route::put('/profile-update', [PharmacistProfileController::class, 'update']);    });
 });
 /////////////////////////////////////////////////////////////////////////////////
 Route::prefix('driver')->group(function () {
@@ -71,7 +66,8 @@ Route::prefix('driver')->group(function () {
 
     Route::middleware(['resolve.guard','ensure.guard:App\Models\Driver'])->group(function () {
         Route::post('/logout', [DriverAuthController::class, 'driverLogout']);
-        Route::get('/profile', fn() => response()->json(['user' => auth()->user()]));
+        Route::get('/profile', [DriverProfileController::class, 'get']);
+        Route::put('/profile-update', [DriverProfileController::class, 'update']);
     });
 });
 ///////////////////////////////////////////////////////////////////////////////////////////////

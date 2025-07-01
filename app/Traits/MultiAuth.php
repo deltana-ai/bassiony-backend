@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use App\Traits\OtpAuthenticates;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\PersonalAccessToken;
 
 trait MultiAuth
 {
@@ -33,7 +36,7 @@ trait MultiAuth
 
         $this->generateAndSendOtp($model->email, $model->name ,$guard);
 
-        return response()->json(['message' => __('auth.OTP verification required '),403]);
+        return response()->json(['message' => 'OTP verification required',403]);
     }
     //////////////////////////////////////////////////////////////////////////////
     /*
@@ -50,13 +53,13 @@ trait MultiAuth
         $model = $modelClass::where('email', $data['email'])->first();
 
         if (!$model || !Hash::check($data['password'], $model->password)) {
-            return response()->json(['message' => __('auth.Invalid credentials')], 401);
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
 
         $this->generateAndSendOtp($model->email, $model->name ,$guard);
 
-        return response()->json(['message' => __('auth.OTP verification required '),403]);
+        return response()->json(['message' => 'OTP verification required ',403]);
     }
     /////////////////////////////////////////////////////////////////////////////////////////
     /*
@@ -69,11 +72,11 @@ trait MultiAuth
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
         ]);
         $model = $modelClass::where('email', $data['email'])->first();
-        if (!$model) return response()->json(['message' => __('auth.Email not found')], 404);
+        if (!$model) return response()->json(['message' => 'Email not found'], 404);
 
         $this->generateAndSendOtp($model->email, $model->name ,$guard);
 
-        return response()->json(['message' => __('auth.Reset OTP sent to your email')]);
+        return response()->json(['message' =>'Reset OTP sent to your email']);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -81,15 +84,15 @@ trait MultiAuth
     * reset password  client or  pharmacist, driver
     * return JsonResponse
     */
-    public function resetPassword($request ,$modelClass,$guard)
+    public function resetPassword( $request ,$modelClass, $guard )
     {
         $data = $request->validate([
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
             'otp' => ['required','numeric','min:1000','max:9999'],
-            'new_password' => ['required', Rules\Password::defaults()],
+            'new_password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $result = $this->checkOtp($request->email, $request->otp,$guard);
+        $result = $this->checkOtp( $request->email, $request->otp, $guard );
 
         if (!$result['success']) {
             return response()->json(['message' => $result['message']], 400);
@@ -104,9 +107,9 @@ trait MultiAuth
     /*
     * verify otp
     */
-    public function verifyOtp( $request ,$modelClass,$guard)
+    public function verifyOtp( $request, $modelClass, $guard )
     {
-        $result = $this->checkOtp($request->email, $request->otp,$guard);
+        $result = $this->checkOtp( $request->email, $request->otp, $guard );
 
         if (!$result['success']) {
             return response()->json(['message' => $result['message']], 400);
@@ -114,16 +117,40 @@ trait MultiAuth
 
         $model = $modelClass::where('email', $request->email)->first();
         $model->update(['is_verified' => true]);
-        $token = $model->createToken(class_basename($modelClass) .'-token')->plainTextToken;
+        $token = $model->createToken($guard .'-token',[$guard])->plainTextToken;
 
         return response()->json([
-            'message' => __('auth.verification successfully'),
+            'message' => 'verification successfully',
             'token' => $token,
             'user' => $model
         ]);
     }
 
     ///////////////////////////////////////////////////////////////////////////
+
+    public function logout( $request,$guard)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        $token = $request->bearerToken();
+
+        if (!$token) {
+            return response()->json(['message' => 'No token provided'], 401);
+        }
+
+        $accessToken = PersonalAccessToken::findToken($token);
+
+        if (!$accessToken) {
+            return response()->json(['message' => 'Invalid token'], 401);
+        }
+
+        $accessToken->delete();
+
+        return response()->json(['message' => 'logout_success']);
+    }
 
 
 

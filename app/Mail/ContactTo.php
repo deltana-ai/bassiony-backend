@@ -8,26 +8,27 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-class SendOtpCode extends Mailable
+use App\Models\Contact;
+
+class ContactTo extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-   public string $code;
+    public function __construct()
+    {
+        //
+    }
 
-   public function __construct(string $code)
-   {
-       $this->code = $code;
-   }
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-          subject: __('auth.your code')
+            subject: 'Contact To',
         );
     }
 
@@ -36,12 +37,12 @@ class SendOtpCode extends Mailable
      */
     public function content(): Content
     {
-        return new Content(
-           view: 'emails.otp',
-           with: [
-               'code' => $this->code,
-           ]
-        );
+      return new Content(
+         view: 'emails.contact_to',
+         with: [
+             'data' => $this->data,
+         ]
+      );
     }
 
     /**
