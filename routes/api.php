@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\Api\Auth\{ClientAuthController,PharmacistAuthController,DriverAuthController};
 use App\Http\Controllers\Api\Profile\{ClientProfileController,PharmacistProfileController,DriverProfileController};
+use App\Http\Controllers\Api\Point\UserPointController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,17 +16,23 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 
 
-//////////////////////////////////////// team ////////////////////////////////
 
-Route::middleware([])->group(function () {
-    Route::post('/category/index', [CategoryController::class, 'index']);
-    Route::post('category/restore', [CategoryController::class, 'restore']);
-    Route::delete('category/delete', [CategoryController::class, 'destroy']);
-    Route::delete('category/force-delete', [CategoryController::class, 'forceDelete']);
-    Route::put('/category/{id}/{column}', [CategoryController::class, 'toggle']);
-    Route::apiResource('category', CategoryController::class);
+//////////////////////////////////////// team ////////////////////////////////
+// الصيادلة
+Route::middleware(['resolve.guard', 'ensure.guard:App\Models\Pharmacist'])->group(function () {
+    Route::get('/pharmacist/points/summary', [UserPointController::class, 'getPointsSummary']);
+    Route::get('/pharmacist/points/earned', [UserPointController::class, 'getEarnedPoints']);
+    Route::get('/pharmacist/points/spent', [UserPointController::class, 'getSpentPoints']);
+    Route::get('/pharmacist/points/expired', [UserPointController::class, 'getExpiredPoints']);
 });
 
+// العملاء
+Route::middleware(['resolve.guard', 'ensure.guard:App\Models\User'])->group(function () {
+    Route::get('/client/points/summary', [UserPointController::class, 'getPointsSummary']);
+    Route::get('/client/points/earned', [UserPointController::class, 'getEarnedPoints']);
+    Route::get('/client/points/spent', [UserPointController::class, 'getSpentPoints']);
+    Route::get('/client/points/expired', [UserPointController::class, 'getExpiredPoints']);
+});
 
 
 //////////////////////////////////////// logo company ////////////////////////////////
