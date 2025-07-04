@@ -12,6 +12,11 @@ return [
     | these language lines according to your application's requirements.
     |
     */
+    'from' =>'من',
+    'to' =>'إلى',
+    'driver' =>'موصل الطلبات',
+    'pharmacist' =>'صيدلي',
+    'client' =>'عميل',
     'welcome' => 'مرحبًا :name، رمز التحقق الخاص بك هو :otp',
 
     'logout_success'=>"تم تسجيل الخروج بنجاح",
