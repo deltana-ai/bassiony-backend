@@ -11,16 +11,16 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Services\FirebaseAuthService;
-
+use App\Traits\HttpResponses;
 trait MultiAuth
 {
 
-   use OtpAuthenticates;
+   use HttpResponses;
 
    /*
    * register as client or  pharmacist, driver
    * return JsonResponse
-   
+
 
     public function register($request, $modelClass,$guard)
     {
@@ -44,10 +44,10 @@ trait MultiAuth
     /*
     * login as client or  pharmacist, driver
     * return JsonResponse
-    
+
     public function login($request , $modelClass,$guard)
     {
-      
+
         $data = $request->validate([
            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
            'password' => ['required', Rules\Password::defaults()],
@@ -68,7 +68,7 @@ trait MultiAuth
     /*
     * forgotPassword  client or  pharmacist, driver
     * return JsonResponse
-   
+
     public function forgotPassword( $request ,$modelClass ,$guard)
     {
         $data = $request->validate([
@@ -86,7 +86,7 @@ trait MultiAuth
     /*
     * reset password  client or  pharmacist, driver
     * return JsonResponse
-    
+
     public function resetPassword( $request ,$modelClass, $guard )
     {
         $data = $request->validate([
@@ -109,7 +109,7 @@ trait MultiAuth
     ////////////////////////////////////////////////////////////////////////////////
     /*
     * verify otp
-    
+
     public function verifyOtp( $request, $modelClass, $guard )
     {
         $result = $this->checkOtp( $request->email, $request->otp, $guard );
@@ -135,113 +135,114 @@ trait MultiAuth
     {
         $user = auth()->user();
         if (!$user) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
+            return $this->error(null, "Unauthenticated",  401);
         }
 
         $token = $request->bearerToken();
 
         if (!$token) {
-            return response()->json(['message' => 'No token provided'], 401);
+          return $this->error(null, "No token provided",  401);
         }
 
         $accessToken = PersonalAccessToken::findToken($token);
 
         if (!$accessToken) {
-            return response()->json(['message' => 'Invalid token'], 401);
+            return $this->error(null, "Invalid token",  401);
+
         }
 
         $accessToken->delete();
+        return $this->success(null, "logout_success",  200);
 
 
-
-        return response()->json(['message' => 'logout_success']);
     }
 
 
 /////////////////////////////////////////////////////////////////////////
     public function login($request, $modelClass, $guard)
-{
+    {
 
-    
-    $request->validate([
-        'firebase_token' => 'required|string',
-    ]);
-    $firebaseAuth = new FirebaseAuthService(app('firebase.auth')) ;
-    $firebaseUser = $firebaseAuth->verifyToken($request->firebase_token);
 
-    
-    if (!$firebaseUser || !$firebaseUser['phone']) {
-        return response()->json(['message' => 'Invalid Firebase token or missing phone number'], 401);
+        $request->validate([
+            'firebase_token' => 'required|string',
+        ]);
+        $firebaseAuth = new FirebaseAuthService(app('firebase.auth')) ;
+        $firebaseUser = $firebaseAuth->verifyToken($request->firebase_token);
+
+
+        if (!$firebaseUser || !$firebaseUser['phone']) {
+
+          return $this->error(null, "Invalid Firebase token or missing phone number",  401);
+
+        }
+
+        $uid = $firebaseUser['uid'];
+        $phone = $firebaseUser['phone'];
+        $name = $firebaseUser['name'] ?? 'new user';
+
+        $model = $modelClass::where('firebase_uid', $uid)->first();
+
+        if (!$model) {
+          return $this->error(null, "User not found, please register first",  404);
+        }
+
+        $token = $model->createToken($guard . '-token', [$guard])->plainTextToken;
+        $data['token'] = $token;
+        $data['user'] = $model;
+        return $this->success($data, "Logged in successfully",  200);
+
+
     }
 
-    $uid = $firebaseUser['uid'];
-    $phone = $firebaseUser['phone'];
-    $name = $firebaseUser['name'] ?? 'new user';
+    //////////////////////////////////////////////////////////
+    public function register(Request $request, $modelClass, $guard)
+    {
+        $firebaseAuth = new FirebaseAuthService ;
 
-    $model = $modelClass::where('firebase_uid', $uid)->first();
+        $request->validate([
+            'firebase_token' => 'required|string',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:' . (new $modelClass)->getTable(),
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
 
-    if (!$model) {
-        return response()->json(['message' => 'User not found, please register first'], 404);
+        $firebaseUser = $firebaseAuth->verifyToken($request->firebase_token);
+
+        if (!$firebaseUser || !$firebaseUser['phone']) {
+
+          return $this->error(null, "Invalid Firebase token or missing phone number",  401);
+
+        }
+
+        $model = $modelClass::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $firebaseUser['phone'],
+            'firebase_uid' => $firebaseUser['uid'],
+            'is_verified' => true,
+        ]);
+
+        $token = $model->createToken($guard . '-token', [$guard])->plainTextToken;
+        $data['token'] = $token;
+        $data['user'] = $model;
+        return $this->success($data, "Account created successfully",  200);
+
     }
 
-    $token = $model->createToken($guard . '-token', [$guard])->plainTextToken;
+    ////////////////////////////////////////////////////////////////////////////////
+    public function logoutAll(Request $request)
+    {
+        $user = auth()->user();
 
-    return response()->json([
-        'message' => 'Logged in successfully',
-        'token' => $token,
-        'user' => $model,
-    ]);
-}
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
 
-//////////////////////////////////////////////////////////
-public function register(Request $request, $modelClass, $guard)
-{
-    $firebaseAuth = new FirebaseAuthService ;
+        $user->tokens()->delete();
 
-    $request->validate([
-        'firebase_token' => 'required|string',
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:' . (new $modelClass)->getTable(),
-        'password' => ['required', 'confirmed', Rules\Password::defaults()],
-    ]);
-
-    $firebaseUser = $firebaseAuth->verifyToken($request->firebase_token);
-
-    if (!$firebaseUser || !$firebaseUser['phone']) {
-        return response()->json(['message' => 'Invalid Firebase token or missing phone number'], 401);
+        return response()->json(['message' => 'Logged out from all devices']);
     }
-
-    $model = $modelClass::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'phone' => $firebaseUser['phone'],
-        'firebase_uid' => $firebaseUser['uid'],
-        'is_verified' => true,
-    ]);
-
-    $token = $model->createToken($guard . '-token', [$guard])->plainTextToken;
-
-    return response()->json([
-        'message' => 'Account created successfully',
-        'token' => $token,
-        'user' => $model,
-    ]);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-public function logoutAll(Request $request)
-{
-    $user = auth()->user();
-
-    if (!$user) {
-        return response()->json(['message' => 'Unauthenticated'], 401);
-    }
-
-    $user->tokens()->delete(); // يمسح كل التوكنات من جدول personal_access_tokens
-
-    return response()->json(['message' => 'Logged out from all devices']);
-}
 
 
 

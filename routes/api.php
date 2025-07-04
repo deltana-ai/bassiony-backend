@@ -5,8 +5,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\Api\Auth\{ClientAuthController,PharmacistAuthController,DriverAuthController};
 use App\Http\Controllers\Api\Profile\{ClientProfileController,PharmacistProfileController,DriverProfileController};
-use App\Http\Controllers\Api\Point\UserPointController;
 use App\Http\Controllers\Api\Contact\{ClientContactController,PharmacistContactController,DriverContactController};
+use App\Http\Controllers\Api\Point\UserPointController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

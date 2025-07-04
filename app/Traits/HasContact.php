@@ -6,9 +6,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\{ContactFrom,ContactTo};
+use App\Traits\HttpResponses;
 
 trait HasContact
 {
+  use HttpResponses;
 
   ////////////////////////////////////////////////////////////////////////////////
   public function contact( $request, $modelClass )
@@ -16,7 +18,7 @@ trait HasContact
       $user = auth()->user();
 
       if (!$user) {
-          return response()->json(['message' => 'Unauthenticated'], 401);
+          return $this->error(null, "Unauthenticated",  401);
       }
       $data = $request->validate([
           'name' => ['required', 'string', 'max:255'],
@@ -28,11 +30,8 @@ trait HasContact
       $contact = Contact::create($data);
       Mail::to($data['email'])->send(new ContactFrom($contact));
       Mail::to("zeinabyounes099@gmail.com")->send(new ContactTo($contact));
+      return $this->success($contact, "contact information sent successfully",  200);
 
-      return response()->json([
-        'message'=>'contact information sent successfully',
-         'data' =>$contact,
-      ]);
   }
 
 }

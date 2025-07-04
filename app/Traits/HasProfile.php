@@ -6,21 +6,22 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\{Rule,Rules};
+use App\Traits\HttpResponses;
 
 trait HasProfile
 {
+  use HttpResponses;
+
   public function getProfile( $request)
   {
       $user = auth()->user();
 
       if (!$user) {
-          return response()->json(['message' => 'Unauthenticated'], 401);
+        return $this->error(null, "Unauthenticated",  401);
       }
+      return $this->success($user, "profile information",  200);
 
-      return response()->json([
-        'message'=>'profile information',
-        'user' => $user,
-      ]);
+
   }
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -29,7 +30,7 @@ trait HasProfile
       $user = auth()->user();
 
       if (!$user) {
-          return response()->json(['message' => 'Unauthenticated'], 401);
+        return $this->error(null, "Unauthenticated",  401);
       }
       $request->validate([
           'name' => ['sometimes', 'string', 'max:255'],
@@ -43,10 +44,7 @@ trait HasProfile
         $data['password'] = Hash::make($request->password);
       }
       $user->update($data);
-      return response()->json([
-        'message'=>'profile information updated successfully',
-        'user' => $user,
-      ]);
+      return $this->success($user, "profile information updated successfully",  200);
   }
 
 }
