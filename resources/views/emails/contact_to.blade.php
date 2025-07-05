@@ -42,8 +42,20 @@
 <body>
     <div class="container">
         <img class="logo" src="{{ asset('logo.png') }}" alt="Logo">
+        <h1>
+          {{__('auth.from')}}
+          @if($contact->contactable_type ==="App\Models\Driver")
+          {{__('auth.driver')}}
+          @elseif($contact->contactable_type ==="App\Models\Pharmacist")
+          {{__('auth.pharmacist')}}
+          @elseif($contact->contactable_type ==="App\Models\User")
+          {{__('auth.client')}}
+          @endif
+        </h1>
 
-        <h2>تم ارسال رسالة اتصال من  {{$contact->name}}</h2>
+        <h2>تم ارسال رسالة اتصال من
+
+           {{$contact->name}}</h2>
         <p> البريد الالكتروني : {{$contact->email}} </p>
         <p> الرسالة: {{$contact->message}}</p>
 
@@ -53,7 +65,7 @@
         <p> Email : {{$contact->email}}</p>
         <p> Message : {{$contact->message}}</p>
 
-      
+
         <div class="footer">
             © {{ date('Y') }} {{__('lang.'.config('app.name'))}}. All rights reserved.
         </div>

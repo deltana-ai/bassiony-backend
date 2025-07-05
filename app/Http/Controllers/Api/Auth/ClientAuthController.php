@@ -28,26 +28,10 @@ class ClientAuthController extends Controller
        return $this->login($request, User::class ,"client");
     }
 
-    public function clientForgotPassword(Request $request)
-    {
-      return $this->forgotPassword($request, User::class,"client");
-    }
-
-    public function clientResetPassword(Request $request)
-    {
-       return $this->resetPassword($request, User::class ,"client");
-    }
-
-    public function clientVerify(Request $request)
-    {
-       return $this->verifyOtp($request, User::class,"client");
-    }
-
 
     public function clientLogout(Request $request)
     {
-        //return  auth()->guard('client')->user();
-        //return  auth('sanctum')->user();
+
         return $this->logout($request ,"client");
     }
 }

@@ -24,20 +24,7 @@ class PharmacistAuthController extends Controller
         return $this->login($request, Pharmacist::class,"pharmacist");
     }
 
-    public function pharmacistForgotPassword(Request $request)
-    {
-       return $this->forgotPassword($request, Pharmacist::class,"pharmacist");
-    }
-
-    public function pharmacistResetPassword(Request $request)
-    {
-       return $this->resetPassword($request, Pharmacist::class,"pharmacist");
-    }
-
-    public function pharmacistVerify(Request $request)
-    {
-       return $this->verifyOtp($request, Pharmacist::class,"pharmacist");
-    }
+  
 
 
     public function logout(Request $request)
