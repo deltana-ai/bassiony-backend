@@ -3,15 +3,14 @@
 namespace App\Models;
 
 use App\Traits\HasMedia;
+use Illuminate\Database\Eloquent\Model;
 
-
-class Category extends BaseModel
+class Brand extends BaseModel
 {
     use HasMedia;
     protected $with = [
         'media',
     ];
-
     protected $casts = [
         'active' => 'boolean',
         'show_home' => 'boolean',
