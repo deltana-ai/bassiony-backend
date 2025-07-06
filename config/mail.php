@@ -112,5 +112,9 @@ return [
         'address' => env('MAIL_FROM_ADDRESS', 'info@lnfederation.com'),
         'name' => env('MAIL_FROM_NAME', 'LNF'),
     ],
+    'from' => [
+        'address' => env('MAIL_TO_ADDRESS', 'info@lnfederation.com'),
+        'name' => env('MAIL_TO_NAME', 'LNF'),
+    ],
 
 ];

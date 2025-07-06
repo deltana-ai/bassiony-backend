@@ -44,26 +44,26 @@
         <img class="logo" src="{{ asset('logo.png') }}" alt="Logo">
         <h1>
           {{__('auth.from')}}
-          @if($contact->contactable_type ==="App\Models\Driver")
+          @if($data->contactable_type ==="App\Models\Driver")
           {{__('auth.driver')}}
-          @elseif($contact->contactable_type ==="App\Models\Pharmacist")
+          @elseif($data->contactable_type ==="App\Models\Pharmacist")
           {{__('auth.pharmacist')}}
-          @elseif($contact->contactable_type ==="App\Models\User")
+          @elseif($data->contactable_type ==="App\Models\User")
           {{__('auth.client')}}
           @endif
         </h1>
 
         <h2>تم ارسال رسالة اتصال من
 
-           {{$contact->name}}</h2>
-        <p> البريد الالكتروني : {{$contact->email}} </p>
-        <p> الرسالة: {{$contact->message}}</p>
+           {{$data->name}}</h2>
+        <p> البريد الالكتروني : {{$data->email}} </p>
+        <p> الرسالة: {{$data->message}}</p>
 
         <hr style="margin: 40px 0;">
 
-        <h2> new message has been sent from  {{$contact->name}} </h2>
-        <p> Email : {{$contact->email}}</p>
-        <p> Message : {{$contact->message}}</p>
+        <h2> new message has been sent from  {{$data->name}} </h2>
+        <p> Email : {{$data->email}}</p>
+        <p> Message : {{$data->message}}</p>
 
 
         <div class="footer">

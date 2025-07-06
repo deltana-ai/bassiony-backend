@@ -43,15 +43,15 @@
     <div class="container">
         <img class="logo" src="{{ asset('logo.png') }}" alt="Logo">
 
-        <h2>شكرا لتواصلك معنا يا {{$contact->name}}</h2>
+        <h2>شكرا لتواصلك معنا يا {{$data->name}}</h2>
         <p> تم ارسال رسالتك بنجاح</p>
-        <p> رسالتك : {{$contact->message}}</p>
+        <p> رسالتك : {{$data->message}}</p>
 
         <hr style="margin: 40px 0;">
 
-        <h2>Thanks to contact us {{$contact->name}} </h2>
+        <h2>Thanks to contact us {{$data->name}} </h2>
         <p> your message has been sent successfully </p>
-        <p>your message : {{$contact->message}}</p>
+        <p>your message : {{$data->message}}</p>
 
         <div class="footer">
             © {{ date('Y') }} {{__('lang.'.config('app.name'))}} All rights reserved.

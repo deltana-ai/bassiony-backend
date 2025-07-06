@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\{ContactFrom,ContactTo};
 use App\Traits\HttpResponses;
-
+use App\Models\Contact;
 trait HasContact
 {
   use HttpResponses;
@@ -29,7 +29,7 @@ trait HasContact
       $data['contactable_id'] = $user->id;
       $contact = Contact::create($data);
       Mail::to($data['email'])->send(new ContactFrom($contact));
-      Mail::to("zeinabyounes099@gmail.com")->send(new ContactTo($contact));
+      Mail::to("zeinabagban93@gmail.com")->send(new ContactTo($contact));
       return $this->success($contact, "contact information sent successfully",  200);
 
   }
