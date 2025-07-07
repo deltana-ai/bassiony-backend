@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Services\FirebaseAuthService;
 use App\Traits\HttpResponses;
+use App\Helpers\JsonResponse;
 trait MultiAuth
 {
 
@@ -173,7 +174,7 @@ trait MultiAuth
         if (!$firebaseUser || !$firebaseUser['phone']) {
 
           return $this->error(null, "Invalid Firebase token or missing phone number",  401);
-
+         
         }
 
         $uid = $firebaseUser['uid'];

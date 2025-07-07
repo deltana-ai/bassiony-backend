@@ -13,7 +13,7 @@ class ClientProfileController extends Controller
 
     public function get(Request $request)
     {
-        dd(auth()->user());
+      
       return $this->getProfile($request);
     }
 

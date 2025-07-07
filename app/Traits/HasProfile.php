@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\{Rule,Rules};
 use App\Traits\HttpResponses;
-
+use App\Helpers\JsonResponse;
 trait HasProfile
 {
   use HttpResponses;
@@ -19,7 +19,9 @@ trait HasProfile
       if (!$user) {
         return $this->error(null, "Unauthenticated",  401);
       }
-      return $this->success($user, "profile information",  200);
+
+      //return JsonResponse::respondSuccess("profile information", $user,  200);
+       return $this->success($user, "profile information",  200);
 
 
   }

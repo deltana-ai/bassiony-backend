@@ -138,7 +138,7 @@ Route::prefix('client')->group(function () {
     // Route::post('/forgot-password', [ClientAuthController::class, 'clientForgotPassword']);
     // Route::post('/reset-password', [ClientAuthController::class, 'clientResetPassword']);
 
-    Route::middleware(['resolve.guard', 'ensure.guard:App\Models\User'])->group(function () {
+    Route::middleware(['auth:client'])->group(function () {
         Route::post('/logout', [ClientAuthController::class, 'clientLogout']);
         Route::get('/profile', [ClientProfileController::class, 'get']);
         Route::put('/profile-update', [ClientProfileController::class, 'update']);
@@ -154,7 +154,7 @@ Route::prefix('pharmacist')->group(function () {
     // Route::post('/forgot-password', [PharmacistAuthController::class, 'pharmacistForgotPassword']);
     // Route::post('/reset-password', [PharmacistAuthController::class, 'pharmacistResetPassword']);
 
-    Route::middleware(['resolve.guard', 'ensure.guard:App\Models\Pharmacist'])->group(function () {
+    Route::middleware(['auth:pharmacist'])->group(function () {
         Route::post('/logout', [PharmacistAuthController::class, 'pharmacistLogout']);
         Route::get('/profile', [PharmacistProfileController::class, 'get']);
         Route::put('/profile-update', [PharmacistProfileController::class, 'update']);
@@ -169,7 +169,7 @@ Route::prefix('driver')->group(function () {
     // Route::post('/forgot-password', [DriverAuthController::class, 'driverForgotPassword']);
     // Route::post('/reset-password', [DriverAuthController::class, 'driverResetPassword']);
 
-    Route::middleware(['resolve.guard', 'ensure.guard:App\Models\Driver'])->group(function () {
+    Route::middleware(['auth:driver'])->group(function () {
         Route::post('/logout', [DriverAuthController::class, 'driverLogout']);
         Route::get('/profile', [DriverProfileController::class, 'get']);
         Route::put('/profile-update', [DriverProfileController::class, 'update']);
