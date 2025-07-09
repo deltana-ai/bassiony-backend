@@ -6,7 +6,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\Api\Auth\{ClientAuthController,PharmacistAuthController,DriverAuthController};
 use App\Http\Controllers\Api\Profile\{ClientProfileController,PharmacistProfileController,DriverProfileController};
 use App\Http\Controllers\Api\Point\UserPointController;
-use App\Http\Controllers\Api\DosesController;
+use App\Http\Controllers\Api\DosageReminder\DosesController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

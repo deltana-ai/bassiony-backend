@@ -26,13 +26,11 @@ class CheckWeeklyIntake extends Command
                 ->exists();
 
             if ($hasIntakes) {
-                // هنا في التطبيق الحقيقي تقدر تبعت إشعار أو بريد إلكتروني للمستخدم
-                // أو تسجل الطلب في جدول pending_intakes
+                
 
                 Log::info("Medicine {$medicine->id} needs user confirmation to continue next week.");
 
-                // في التطبيق، انتظر موافقة المستخدم، ولو مفيش رد احذف القديم
-                // هنا افترضنا انه لم يرد، نحذف:
+           
                 $expired = MedicineIntake::where('medicine_id', $medicine->id)
                     ->whereBetween('scheduled_time', [$startOfWeek, $endOfWeek])
                     ->delete();
