@@ -17,9 +17,4 @@ class Category extends BaseModel
         'show_home' => 'boolean',
     ];
     protected $guarded = ['id'];
-
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
 }

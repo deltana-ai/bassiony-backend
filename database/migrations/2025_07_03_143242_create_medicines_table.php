@@ -11,20 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('admins', function (Blueprint $table) {
+       schema::create('medicines', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->boolean('is_verified')->default(false);
-            $table->string('password');
-            $table->rememberToken();
+            $table->text('notes')->nullable();
+            $table->string('dosage_per_intake');
+            $table->string('image_path')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
-
-
-      
     }
 
     /**
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('admins');
+        Schema::dropIfExists('medicines');
     }
 };

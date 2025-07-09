@@ -12,12 +12,6 @@ return [
     | these language lines according to your application's requirements.
     |
     */
-    'from' =>'From',
-    'to' =>'To',
-    'driver' =>'Driver',
-    'pharmacist' =>'Pharmacist',
-    'client' =>'customer',
-
     'welcome' => 'Welcome :name، this is your verification code :otp',
 
     'login_success'=>"Login successful",

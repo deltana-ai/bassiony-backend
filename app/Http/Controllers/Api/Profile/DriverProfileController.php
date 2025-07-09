@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Profile;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Driver;
-use App\Traits\HasProfile;
 
 class DriverProfileController extends Controller
 {

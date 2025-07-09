@@ -9,18 +9,17 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Contact;
-use Illuminate\Mail\Mailables\Address;
 
 class ContactFrom extends Mailable
 {
     use Queueable, SerializesModels;
-    public $data;
+
     /**
      * Create a new message instance.
      */
-    public function __construct($data)
+    public function __construct()
     {
-         $this->data = $data;
+        //
     }
 
     /**
@@ -28,12 +27,9 @@ class ContactFrom extends Mailable
      */
     public function envelope(): Envelope
     {
-      return new Envelope(
-          from: new Address(config('mail.from.address'), config('app.name')),
-          replyTo: [new Address($this->data['email'],$this->data['email'])],
-
-          subject: 'new contact from contact form '
-      );
+        return new Envelope(
+            subject: 'Contact From',
+        );
     }
 
     /**
@@ -42,10 +38,8 @@ class ContactFrom extends Mailable
     public function content(): Content
     {
         return new Content(
-          view: 'emails.contact_from',
-          with: ['data' => $this->data]
+            view: 'view.name',
         );
-
     }
 
     /**

@@ -15,6 +15,15 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
 
+protected function schedule(Schedule $schedule)
+{
+    $schedule->command('medicines:check-weekly')->fridays()->at('21:00'); // كل جمعة الساعة 9 مساءً
+}
+
+protected $commands = [
+    \App\Console\Commands\WeeklyIntakeCleaner::class,
+];
+
     protected $middlewareGroups = [
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,

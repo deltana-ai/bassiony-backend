@@ -26,20 +26,20 @@ class DriverAuthController extends Controller
        return $this->login($request, Driver::class ,"driver");
     }
 
-    // public function driverForgotPassword(Request $request)
-    // {
-    //   return  $this->forgotPassword($request, Driver::class,"driver");
-    // }
-    //
-    // public function driverResetPassword(Request $request)
-    // {
-    //    return $this->resetPassword($request, Driver::class,"driver");
-    // }
-    //
-    // public function driverVerify(Request $request)
-    // {
-    //    return $this->verifyOtp($request, Driver::class,"driver");
-    // }
+    public function driverForgotPassword(Request $request)
+    {
+      return  $this->forgotPassword($request, Driver::class,"driver");
+    }
+
+    public function driverResetPassword(Request $request)
+    {
+       return $this->resetPassword($request, Driver::class,"driver");
+    }
+
+    public function driverVerify(Request $request)
+    {
+       return $this->verifyOtp($request, Driver::class,"driver");
+    }
 
 
     public function driverLogout(Request $request)

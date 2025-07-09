@@ -127,17 +127,6 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-
-
-    public function favorites()
-    {
-        return $this->hasMany(Favorite::class);
-    }
-
-    public function favoriteProducts()
-    {
-        return $this->belongsToMany(Product::class, 'favorites')->withTimestamps();
-    }
     public function points(): HasMany
 {
     return $this->hasMany(\App\Models\Point::class);

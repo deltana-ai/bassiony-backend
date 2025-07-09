@@ -129,15 +129,4 @@ class CategoryController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
-
-
-    public function fetchCategory(Request $request)
-    {
-        try {
-            $CategoryData = Category::get();
-            return CategoryResource::collection($CategoryData)->additional(JsonResponse::success());
-        } catch (Exception $e) {
-            return JsonResponse::respondError($e->getMessage());
-        }
-    }
 }

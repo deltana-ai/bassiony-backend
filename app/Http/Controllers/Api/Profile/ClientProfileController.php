@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Api\Profile;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Pharmacist;
+use App\Traits\HasProfile;
+use App\Models\User;
 
-class PharmacistProfileController extends Controller
+class ClientProfileController extends Controller
 {
     use HasProfile;
 
@@ -17,6 +18,6 @@ class PharmacistProfileController extends Controller
 
     public function update(Request $request)
     {
-      return $this->updateProfile( $request, Pharmacist::class );
+      return $this->updateProfile( $request, User::class );
     }
 }
