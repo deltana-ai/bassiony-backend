@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace Modules\ClientModule\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Otp;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;

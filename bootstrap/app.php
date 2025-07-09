@@ -26,8 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'api' => ForceJsonResponse::class,
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
-            'resolve.guard' => \App\Http\Middleware\ResolveSanctumGuard::class,
-            'ensure.guard' => \App\Http\Middleware\EnsureGuardMatchesToken::class,
+            //'resolve.guard' => \App\Http\Middleware\ResolveSanctumGuard::class,
+            //'ensure.guard' => \App\Http\Middleware\EnsureGuardMatchesToken::class,
 
 
         ]);

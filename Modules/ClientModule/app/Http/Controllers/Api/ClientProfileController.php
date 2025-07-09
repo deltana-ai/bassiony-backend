@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Profile;
+namespace Modules\ClientModule\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,7 +13,7 @@ class ClientProfileController extends Controller
 
     public function get(Request $request)
     {
-      
+
       return $this->getProfile($request);
     }
 

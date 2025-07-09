@@ -15,11 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            
+
             $table->text('address')->nullable();
             $table->softDeletes();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('firebase_uid')->nullable()->unique();
+            $table->foreignId('pharmacy_id')->nullable();
+            $table->timestamp('last_login_at')->nullable();
 
             $table->string('phone')->nullable()->unique();
             $table->boolean('is_verified')->default(true);

@@ -10,6 +10,7 @@ use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
+use Kreait\Firebase\Factory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(TelescopeServiceProvider::class);
 
         }
+        
     }
 
     /**

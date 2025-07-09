@@ -8,9 +8,9 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\Api\Auth\{ClientAuthController,PharmacistAuthController,DriverAuthController};
-use App\Http\Controllers\Api\Profile\{ClientProfileController,PharmacistProfileController,DriverProfileController};
-use App\Http\Controllers\Api\Contact\{ClientContactController,PharmacistContactController,DriverContactController};
+use App\Http\Controllers\Api\Auth\{PharmacistAuthController,DriverAuthController};
+use App\Http\Controllers\Api\Profile\{PharmacistProfileController,DriverProfileController};
+use App\Http\Controllers\Api\Contact\{PharmacistContactController,DriverContactController};
 use App\Http\Controllers\Api\Point\UserPointController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -131,21 +131,7 @@ Route::middleware(['resolve.guard', 'ensure.guard:App\Models\User'])->group(func
 
 
 //////////////////////////////////////// logo company ////////////////////////////////
-Route::prefix('client')->group(function () {
-    Route::post('/register', [ClientAuthController::class, 'clientRegister']);
-    Route::post('/login', [ClientAuthController::class, 'clientLogin']);
-    // Route::post('/verify-otp', [ClientAuthController::class, 'clientVerify']);
-    // Route::post('/forgot-password', [ClientAuthController::class, 'clientForgotPassword']);
-    // Route::post('/reset-password', [ClientAuthController::class, 'clientResetPassword']);
 
-    Route::middleware(['auth:client'])->group(function () {
-        Route::post('/logout', [ClientAuthController::class, 'clientLogout']);
-        Route::get('/profile', [ClientProfileController::class, 'get']);
-        Route::put('/profile-update', [ClientProfileController::class, 'update']);
-        Route::post('/contact-us', [ClientContactController::class, 'store']);
-
-    });
-});
 ///////////////////////////////////////////////////////////////////////////
 Route::prefix('pharmacist')->group(function () {
     Route::post('/register', [PharmacistAuthController::class, 'pharmacistRegister']);

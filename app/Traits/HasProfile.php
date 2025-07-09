@@ -34,12 +34,14 @@ trait HasProfile
       if (!$user) {
         return $this->error(null, "Unauthenticated",  401);
       }
+      
       $request->validate([
           'name' => ['sometimes', 'string', 'max:255'],
           'email' => ['sometimes', 'string', 'lowercase', 'email', 'max:255', Rule::unique((new $modelClass)->getTable())->ignore($user->id)],
           'phone' => ['sometimes', 'regex:/^[0-9]{10,15}$/', Rule::unique((new $modelClass)->getTable())->ignore($user->id)],
           'password' => ['sometimes', 'confirmed', Rules\Password::defaults()],
           'address' => ['sometimes', 'string', 'max:255'],
+       
       ]);
       $data = $request->only(['name','email','phone','address']);
       if ($request->filled('password')) {

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-          
+
             $table->text('address')->nullable();
             $table->softDeletes();
             $table->timestamp('email_verified_at')->nullable();
@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('phone')->nullable()->unique();
             $table->boolean('is_verified')->default(true);
             $table->string('password');
+            $table->timestamp('last_login_at')->nullable();
+
             //$table->rememberToken();
             $table->timestamps();
         });
