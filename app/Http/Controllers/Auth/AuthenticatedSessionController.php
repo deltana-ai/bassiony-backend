@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Owner\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
@@ -10,12 +10,15 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthenticatedSessionController extends Controller
 {
+
+    protected string $guard = 'web';
+    protected string $redirectTo = '/dashboard';
     /**
      * Handle an incoming authentication request.
      */
     public function store(LoginRequest $request): Response
     {
-        $request->authenticate();
+        $request->authenticate($this->guard);
 
         $request->session()->regenerate();
 
@@ -27,7 +30,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): Response
     {
-        Auth::guard('web')->logout();
+        Auth::guard($this->guard)->logout();
 
         $request->session()->invalidate();
 

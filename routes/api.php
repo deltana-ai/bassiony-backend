@@ -37,47 +37,8 @@ Route::middleware(['resolve.guard', 'ensure.guard:App\Models\User'])->group(func
 
 
 //////////////////////////////////////// logo company ////////////////////////////////
-Route::prefix('client')->group(function () {
-    Route::post('/register', [ClientAuthController::class, 'clientRegister']);
-    Route::post('/login', [ClientAuthController::class, 'clientLogin']);
-    Route::post('/verify-otp', [ClientAuthController::class, 'clientVerify']);
-    Route::post('/forgot-password', [ClientAuthController::class, 'clientForgotPassword']);
-    Route::post('/reset-password', [ClientAuthController::class, 'clientResetPassword']);
 
-    Route::middleware(['resolve.guard','ensure.guard:App\Models\User'])->group(function () {
-        Route::post('/logout', [ClientAuthController::class, 'clientLogout']);
-        Route::get('/profile', [ClientProfileController::class, 'get']);
-        Route::put('/profile-update', [ClientProfileController::class, 'update']);
 
-    });
-});
-///////////////////////////////////////////////////////////////////////////
-Route::prefix('pharmacist')->group(function () {
-    Route::post('/register', [PharmacistAuthController::class, 'pharmacistRegister']);
-    Route::post('/login', [PharmacistAuthController::class, 'pharmacistLogin']);
-    Route::post('/verify-otp', [PharmacistAuthController::class, 'pharmacistVerify']);
-    Route::post('/forgot-password', [PharmacistAuthController::class, 'pharmacistForgotPassword']);
-    Route::post('/reset-password', [PharmacistAuthController::class, 'pharmacistResetPassword']);
-
-    Route::middleware(['resolve.guard','ensure.guard:App\Models\Pharmacist'])->group(function () {
-        Route::post('/logout', [PharmacistAuthController::class, 'pharmacistLogout']);
-        Route::get('/profile', [PharmacistProfileController::class, 'get']);
-        Route::put('/profile-update', [PharmacistProfileController::class, 'update']);    });
-});
-/////////////////////////////////////////////////////////////////////////////////
-Route::prefix('driver')->group(function () {
-    Route::post('/register', [DriverAuthController::class, 'driverRegister']);
-    Route::post('/login', [DriverAuthController::class, 'driverLogin']);
-    Route::post('/verify-otp', [DriverAuthController::class, 'driverVerify']);
-    Route::post('/forgot-password', [DriverAuthController::class, 'driverForgotPassword']);
-    Route::post('/reset-password', [DriverAuthController::class, 'driverResetPassword']);
-
-    Route::middleware(['resolve.guard','ensure.guard:App\Models\Driver'])->group(function () {
-        Route::post('/logout', [DriverAuthController::class, 'driverLogout']);
-        Route::get('/profile', [DriverProfileController::class, 'get']);
-        Route::put('/profile-update', [DriverProfileController::class, 'update']);
-    });
-});
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 Route::group(['middleware' => []], static function () {
@@ -106,5 +67,3 @@ Route::middleware(['resolve.guard', 'ensure.guard:App\Models\User'])->group(func
     Route::post('/medicines/continue-week', [DosesController::class, 'continueNextWeek']);
 
 });
-
-

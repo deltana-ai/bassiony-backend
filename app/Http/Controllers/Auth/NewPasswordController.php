@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Owner\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\PasswordReset;
@@ -14,6 +14,10 @@ use Illuminate\Validation\ValidationException;
 
 class NewPasswordController extends Controller
 {
+
+  protected string $guard = 'web';
+  protected string $broker = 'users';
+  protected string $redirectTo = '/dashboard';
     /**
      * Handle an incoming new password request.
      *
@@ -30,7 +34,7 @@ class NewPasswordController extends Controller
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
+        $status = Password::broker($this->broker)->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) use ($request) {
                 $user->forceFill([

@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'web'),
-        'passwords' => env('AUTH_PASSWORD_BROKER', 'admins'),
+        'guard' => 'web-owner',
+        'passwords' => 'owners',
     ],
 
     /*
@@ -36,10 +36,21 @@ return [
     */
 
     'guards' => [
-        'web' => [
+      //web guards
+        'web-owner' => [
             'driver' => 'session',
-            'provider' => 'admins',
+            'provider' => 'owners',
         ],
+        'web-manager' => [
+            'driver' => 'session',
+            'provider' => 'web_managers',
+        ],
+        'web-pharmacist' => [
+            'driver' => 'session',
+            'provider' => 'web_pharmacist',
+        ],
+
+        //mobile guards
         'client' => [
             'driver' => 'sanctum',
             'provider' => 'clients',
@@ -72,11 +83,21 @@ return [
     */
 
     'providers' => [
-        'admins' => [
+      //web guards
+        'owners' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\Admin::class),
+            'model' => App\Models\Owner::class,
+        ],
+        'web_managers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\CompanyManager::class,
+        ],
+        'web_pharmacist' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Pharmacist::class,
         ],
 
+         //mobile guards
         'clients' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
@@ -111,38 +132,33 @@ return [
     */
 
     'passwords' => [
-        // 'users' => [
-        //     'provider' => 'users',
-        //     'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-        //     'expire' => 60,
-        //     'throttle' => 60,
-        // ],
-        'admins' => [
-            'provider' => 'admins',
+
+        'owners' => [
+            'provider' => 'owners',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],
-        'clients' => [
-             'provider' => 'clients',
-             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+        'web_managers' => [
+             'provider' => 'web_managers',
+             'table' =>  'password_reset_tokens',
              'expire' => 60,
              'throttle' => 60,
          ],
 
-         'pharmacists' => [
-             'provider' => 'pharmacists',
-             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+         'web_pharmacist' => [
+             'provider' => 'web_pharmacist',
+             'table' =>  'password_reset_tokens',
              'expire' => 60,
              'throttle' => 60,
          ],
 
-         'drivers' => [
-             'provider' => 'drivers',
-             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-             'expire' => 60,
-             'throttle' => 60,
-   ],
+         // 'drivers' => [
+         //     'provider' => 'drivers',
+         //     'table' =>  'password_reset_tokens',
+         //     'expire' => 60,
+         //     'throttle' => 60,
+         // ],
 
     ],
 

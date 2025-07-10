@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Owner\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -10,6 +10,11 @@ use Illuminate\Validation\ValidationException;
 
 class PasswordResetLinkController extends Controller
 {
+
+  protected string $guard = 'web';
+  protected string $broker = 'users';
+
+  protected string $redirectTo = '/dashboard';
     /**
      * Handle an incoming password reset link request.
      *
@@ -24,7 +29,7 @@ class PasswordResetLinkController extends Controller
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
+        $status = Password::broker($this->broker)->sendResetLink(
             $request->only('email')
         );
 

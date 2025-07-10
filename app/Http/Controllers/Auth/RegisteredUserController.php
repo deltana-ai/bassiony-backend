@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Owner\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -13,6 +13,10 @@ use Illuminate\Validation\Rules;
 
 class RegisteredUserController extends Controller
 {
+
+  protected string $guard = 'web';
+  protected string $model = \App\Models\User::class;
+  protected string $redirectTo = '/dashboard';
     /**
      * Handle an incoming registration request.
      *
@@ -22,11 +26,11 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . (new $this->model)->getTable() . ',email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
+        $user = $model::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->string('password')),
@@ -34,7 +38,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+        Auth::guard($this->guard)->login($user);
 
         return response()->noContent();
     }

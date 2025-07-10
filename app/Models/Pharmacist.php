@@ -17,10 +17,12 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
-class Pharmacist extends Authenticatable
+// use Spatie\Activitylog\LogOptions;
+// use Spatie\Activitylog\Models\Activity;
+// use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+class Pharmacist extends Authenticatable implements MustVerifyEmail
 {
   use HasFactory, Notifiable, HasApiTokens, HasMedia, SoftDeletes;
 
@@ -37,6 +39,9 @@ class Pharmacist extends Authenticatable
    *
    * @var array<int, string>
    */
+   protected $casts = [
+       'email_verified_at' => 'datetime',
+   ];
   protected $hidden = [
       'password',
       'remember_token',

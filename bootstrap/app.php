@@ -7,6 +7,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+use Illuminate\Routing\Router;
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -14,6 +16,47 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withRouting(function (Router $router) {
+         //Web: Owner Panel (React - Session Based)
+         $router->group([
+             'middleware' => 'web',
+             'prefix' => 'owner',
+         ], function () {
+             require base_path('routes/web/owner.php');
+         });
+
+         // Web: Company Panel (React - Session Based)
+         $router->group([
+             'middleware' => 'web',
+             'prefix' => 'company',
+         ], function () {
+             require base_path('routes/web/company.php');
+         });
+
+         // API: Client (Mobile - Token Based)
+         $router->group([
+             'middleware' => 'api',
+             'prefix' => 'api/client',
+         ], function () {
+             require base_path('routes/api/client.php');
+         });
+
+         // API: Pharmacy (React + Mobile)
+         $router->group([
+             'middleware' => 'api',
+             'prefix' => 'api/pharmacy',
+         ], function () {
+             require base_path('routes/api/pharmacy.php');
+         });
+
+         // API: Delivery (React + Mobile)
+         $router->group([
+             'middleware' => 'api',
+             'prefix' => 'api/delivery',
+         ], function () {
+             require base_path('routes/api/delivery.php');
+         });
+     })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
           //  \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
