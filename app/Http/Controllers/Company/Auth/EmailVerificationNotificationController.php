@@ -15,6 +15,6 @@ class EmailVerificationNotificationController extends Controller
      */
     public function store(Request $request)
     {
-        return $this->makeStore( $request ,"web-manager" , "/company/dashboard");
+        return $this->makeStore( $request ,"web-manager" , "company.verification.verify");
     }
 }

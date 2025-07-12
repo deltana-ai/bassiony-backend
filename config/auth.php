@@ -133,13 +133,13 @@ return [
 
     'passwords' => [
 
-        'owners' => [
+        'owner' => [
             'provider' => 'owners',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],
-        'web_managers' => [
+        'web_manager' => [
              'provider' => 'web_managers',
              'table' =>  'password_reset_tokens',
              'expire' => 60,

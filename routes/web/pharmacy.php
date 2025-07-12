@@ -7,6 +7,7 @@ use App\Http\Controllers\Pharmacy\Auth\NewPasswordController;
 use App\Http\Controllers\Pharmacy\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Pharmacy\Auth\RegisteredUserController;
  use App\Http\Controllers\Pharmacy\Auth\VerifyEmailController;
+ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
     Route::middleware('guest:web-pharmacist')->group(function () {

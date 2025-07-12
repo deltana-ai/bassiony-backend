@@ -7,6 +7,7 @@ use App\Http\Controllers\Owner\Auth\NewPasswordController;
 use App\Http\Controllers\Owner\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Owner\Auth\RegisteredUserController;
 // use App\Http\Controllers\Owner\Auth\VerifyEmailController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
     Route::middleware('guest:web-owner')->group(function () {

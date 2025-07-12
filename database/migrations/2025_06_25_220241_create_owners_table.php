@@ -17,11 +17,13 @@ return new class extends Migration
           $table->string('email')->unique();
           $table->text('address')->nullable();
           $table->timestamp('email_verified_at')->nullable();
-          $table->string('firebase_uid')->nullable()->unique();
+          // $table->string('firebase_uid')->nullable()->unique();
           $table->string('phone')->nullable()->unique();
-          $table->boolean('is_verified')->default(true);
+          // $table->boolean('is_verified')->default(true);
+          $table->softDeletes();
+
           $table->string('password');
-          $table->timestamp('last_login_at')->nullable();
+          // $table->timestamp('last_login_at')->nullable();
           $table->rememberToken();
           $table->timestamps();
         });

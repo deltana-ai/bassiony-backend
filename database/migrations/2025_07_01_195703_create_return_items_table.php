@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->decimal('refund_amount',10,2);
             $table->string('return_reason')->nullable();
-            $table->enum('refund_status'['pending','refunded','rejected'])->default('pending');
+            $table->enum('refund_status',['pending','refunded','rejected'])->default('pending');
 
             $table->timestamp('refunded_at')->nullable();
         });

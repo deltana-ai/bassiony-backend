@@ -7,23 +7,37 @@ use App\Http\Controllers\Company\Auth\NewPasswordController;
 use App\Http\Controllers\Company\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Company\Auth\RegisteredUserController;
 use App\Http\Controllers\Company\Auth\VerifyEmailController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
     Route::middleware('guest:web-manager')->group(function () {
+
         Route::post('/login', [AuthenticatedSessionController::class, 'store']);
         Route::post('/register', [RegisteredUserController::class, 'store']);
         Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
         Route::post('/reset-password', [NewPasswordController::class, 'store']);
     });
+    Route::get('/test', function () {
 
-    Route::middleware('auth:web-manager')->group(function () {
+        return view('test');
+    });
+    Route::middleware(['auth:web-manager'])->group(function () {
         Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-            ->middleware(['signed', 'throttle:6,1']);
+            ->middleware(['signed', 'throttle:6,1'])->name('company.verification.verify');
 
         Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-            ->middleware(['throttle:6,1']);
+            ->middleware(['throttle:6,1'])->name('company.verification.send');
+
+            Route::get('/user', function () {
+
+                return view('user');
+            });
+
+    });
+    Route::middleware(['auth:web-manager','verified'])->group(function () {
+
 
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
 
-        Route::get('/user', fn () => auth('web-manager')->user());
+
     });

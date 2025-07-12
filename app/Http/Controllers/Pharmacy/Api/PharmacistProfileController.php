@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pharmacy\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Pharmacist;
+use App\Traits\HasProfile;
 
 class PharmacistProfileController extends Controller
 {

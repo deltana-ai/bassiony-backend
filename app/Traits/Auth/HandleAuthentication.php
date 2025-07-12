@@ -19,6 +19,7 @@ trait HandleAuthentication
         $request->authenticate($guard);
 
         $request->session()->regenerate();
+      // dd(auth($guard)->check(), auth($guard)->user());
 
         return response()->noContent();
     }

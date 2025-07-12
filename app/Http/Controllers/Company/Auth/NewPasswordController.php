@@ -17,6 +17,6 @@ class NewPasswordController extends Controller
      */
     public function store(Request $request)
     {
-      return $this->makeStore( $request ,"web_managers");
+      return $this->makeStore( $request ,"web_manager");
     }
 }
