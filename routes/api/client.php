@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Client\Api\{ClientAuthController,ClientProfileController,ClientContactController};
+use App\Http\Controllers\Client\API\MedicationController;
+
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
+
 
     Route::post('/register', [ClientAuthController::class, 'clientRegister']);
     Route::post('/login', [ClientAuthController::class, 'clientLogin']);
@@ -13,3 +18,16 @@ use App\Http\Controllers\Client\Api\{ClientAuthController,ClientProfileControlle
         Route::post('/contact-us', [ClientContactController::class, 'store']);
 
     });
+
+
+RateLimiter::for('medications_limiter', function ($request) {
+    return Limit::perMinute(1)->by(optional($request->user())->id ?: $request->ip());
+});
+
+    Route::middleware(['auth:client', 'throttle:medications_limiter'])->group(function () {
+    Route::post('/medications', [MedicationController::class, 'store']);
+    Route::get('/medications/today', [MedicationController::class, 'today']);
+    Route::post('/medications/{id}/expire-decision', [MedicationController::class, 'handleExpiration']);
+     Route::delete('/medications/{id}', [MedicationController::class, 'destroy']);
+    Route::get('/medications/search', [MedicationController::class, 'search']);
+});

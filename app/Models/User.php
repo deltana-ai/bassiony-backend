@@ -16,7 +16,7 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
-
+use app\Models\Medication;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Activitylog\LogOptions;
@@ -130,5 +130,8 @@ class User extends Authenticatable
     public function points(): HasMany
 {
     return $this->hasMany(\App\Models\Point::class);
+}
+public function medications(){
+    return $this->hasMany(Medication::class);
 }
 }

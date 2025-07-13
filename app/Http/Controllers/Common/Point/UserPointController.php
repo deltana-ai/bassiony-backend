@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Point;
+namespace App\Http\Controllers\Common\Point;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;

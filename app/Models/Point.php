@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Point extends Model
+class Point extends BaseModel
 {
     protected $fillable = [
         'user_id', 'pharmacist_id', 'company_id', 'type',
