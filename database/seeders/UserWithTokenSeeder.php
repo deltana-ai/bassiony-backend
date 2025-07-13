@@ -22,7 +22,7 @@ class UserWithTokenSeeder extends Seeder
 
         ]);
         $user->tokens()->delete();
-        $usertoken = $user->createToken('client-token')->plainTextToken();
+        $usertoken = $user->createToken('client-token')->plainTextToken;
 
         $pharmacist = Pharmacist::firstOrCreate([
           'name' =>'pharmacist name',
@@ -34,7 +34,7 @@ class UserWithTokenSeeder extends Seeder
 
         ]);
         $pharmacist->tokens()->delete();
-        $pharmacistoken = $pharmacist->createToken('pharmacist-token')->plainTextToken();
+        $pharmacistoken = $pharmacist->createToken('pharmacist-token')->plainTextToken;
         $user->firebase_uid =$usertoken;
         $user->save();
         $pharmacist->firebase_uid =$pharmacistoken;
