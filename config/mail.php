@@ -113,4 +113,9 @@ return [
         'name' => env('MAIL_FROM_NAME', 'LNF'),
     ],
 
+    'admin' => [
+        'address' => env('MAIL_ADMIN_ADDRESS', 'admin@gmail.com'),
+        'name' => env('MAIL_ADMIN_NAME', 'Admin'),
+    ],
+
 ];

@@ -31,4 +31,15 @@ class PharmacyProduct extends BaseModel
     {
         return $this->hasOne(Offer::class);
     }
+
+    /////////////make by zeinab///////////////////////
+    public function priceAfterOffer()
+    {
+        if ($this->offer && $this->offer->isValid()) {
+          return $this->price - $this->offer->discount_price;
+        }
+        return $this->price;
+
+    }
+    //////////////////////////////////////////////////
 }

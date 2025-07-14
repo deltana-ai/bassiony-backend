@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->decimal('subtotal',10,2);
-            $table->foreignId('discount_id')->nullable()->nullOnDelete();
-            $table->decimal('total',10,2);
             $table->timestamps();
         });
     }

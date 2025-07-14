@@ -134,4 +134,8 @@ class User extends Authenticatable
 public function medications(){
     return $this->hasMany(Medication::class);
 }
+public function cart()
+{
+    return $this->hasOne(Cart::class);
+}
 }

@@ -23,4 +23,10 @@ class Offer extends BaseModel
     {
         return $this->belongsTo(PharmacyProduct::class);
     }
+
+    ////////////////////////made by zeinab////////////////////////////////////
+    public function isValid(){
+      return  now()->between($this->start_date,$this->end_date);
+    }
+    ///////////////////////////////////////////////////////////
 }

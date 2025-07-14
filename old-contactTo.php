@@ -19,13 +19,13 @@ class ContactTo extends Mailable
     /**
      * Create a new message instance.
      */
-    public $contact;
+    public $data;
     /**
      * Create a new message instance.
      */
     public function __construct($data)
     {
-         $this->contact = $data;
+         $this->data = $data;
     }
 
     /**
@@ -35,7 +35,7 @@ class ContactTo extends Mailable
     {
       return new Envelope(
           from: new Address(config('mail.from.address'), config('app.name')),
-          replyTo: [new Address(config('mail.admin.address'),config('mail.admin.name'))],
+          replyTo: [new Address('zeinabagban93@gmail.com',"zeinabAdmin")],
 
           subject: 'new contact from contact form '
       );
@@ -48,7 +48,7 @@ class ContactTo extends Mailable
     {
 		return new Content(
           view: 'emails.contact_to',
-          with: ['data' => $this->contact]
+          with: ['data' => $this->data]
         );
 
     }
