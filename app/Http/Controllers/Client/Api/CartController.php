@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\CartResource;
 use App\Interfaces\Client\CartRepositoryInterface;
 use App\Repositories\Client\CartRepository;
-use Exception;
+
 class CartController extends BaseController
 {
 
@@ -145,7 +145,7 @@ class CartController extends BaseController
 
              return JsonResponse::respondSuccess('Quantity Updated Successfully');
 
-         } catch (\Exception $e) {
+         } catch (Exception $e) {
              return JsonResponse::respondError($e->getMessage());
          }
      }
@@ -175,7 +175,7 @@ class CartController extends BaseController
 
              return JsonResponse::respondSuccess('Item Deleted Successfully');
 
-         } catch (\Exception $e) {
+         } catch (Exception $e) {
              return JsonResponse::respondError($e->getMessage());
          }
      }
