@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Owner\Api;
+namespace App\Http\Controllers\Owner\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -12,6 +12,6 @@ class OwnerContactController extends Controller
 
     public function store(Request $request)
     {
-      return $this->contact( $request, Owner::class );
+      return $this->contact( $request, Owner::class ,"web-owner");
     }
 }

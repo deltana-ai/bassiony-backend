@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Company\Api;
+namespace App\Http\Controllers\Company\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -12,6 +12,6 @@ class ManagerContactController extends Controller
 
     public function store(Request $request)
     {
-      return $this->contact( $request, CompanyManager::class );
+      return $this->contact( $request, CompanyManager::class ,"web-driver" );
     }
 }

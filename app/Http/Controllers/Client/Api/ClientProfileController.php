@@ -13,11 +13,11 @@ class ClientProfileController extends Controller
 
     public function get(Request $request)
     {
-      return $this->getProfile($request);
+      return $this->getProfile($request ,"client");
     }
 
     public function update(Request $request)
     {
-      return $this->updateProfile( $request, User::class );
+      return $this->updateProfile( $request, User::class ,"client");
     }
 }

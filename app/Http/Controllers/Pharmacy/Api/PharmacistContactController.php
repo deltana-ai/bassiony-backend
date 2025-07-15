@@ -12,6 +12,6 @@ class PharmacistContactController extends Controller
 
     public function store(Request $request)
     {
-      return $this->contact( $request, Pharmacist::class );
+      return $this->contact( $request, Pharmacist::class ,"pharmacist" );
     }
 }

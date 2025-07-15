@@ -16,11 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('pharmacy_id')->constrained()->onDelete('cascade');
             $table->enum('status',['pending','confirmed','returned','shipped','delivered','cancelled'])->default('pending');
-            $table->decimal('subtotal',10,2)->default(0);
             $table->decimal('order_discount',10,2)->default(0);
             $table->decimal('total',10,2)->default(0);
-            $table->decimal('paid_from_wallet',10,2)->default(0);
-            $table->decimal('paid_by_card',10,2)->default(0);
+            $table->decimal('paid_with_points',10,2)->default(0);
+            $table->decimal('paid_with_money',10,2)->default(0);
             $table->boolean('is_paid')->default(false);
 
             $table->enum('payment_type', ['direct', 'insurance'])->default('direct');

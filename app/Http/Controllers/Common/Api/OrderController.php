@@ -86,11 +86,11 @@ class OrderController extends Controller
     public function placeOrder()
     {
 
-      $request->validate([
-        'payment_type' => 'required',
-        'payment_method' => 'required',
-      ]);
-        $user = auth()->user();
+        $request->validate([
+          'payment_type' => 'required',
+          'payment_method' => 'required',
+        ]);
+        $user = auth('client')->user();
 
         try {
             DB::beginTransaction();
@@ -112,7 +112,8 @@ class OrderController extends Controller
 
               foreach ($group->items as $item) {
                   $product = $item->pharmacyProduct;
-
+                  $product->quantity -=$item->quantity;
+                  $product->save();
                   $originalPrice = $product->price;
                   $discountedPrice = $product->priceAfterOffer();
                   $quantity = $item->quantity;
@@ -124,24 +125,24 @@ class OrderController extends Controller
                   $totalDiscount += $discountValue;
               }
 
-              $pointResult = $this->applyPointsToOrderForUser($user, $orderTotal);
+            //  $pointResult = $this->applyPointsToOrderForUser($user, $orderTotal);
 
               $order = Order::create([
                   'user_id' => $user->id,
                   'pharmacy_id' => $group->pharmacy_id,
-                  'subtotal' => $orderTotal,
                   'order_discount' => $totalDiscount,
-                  'paid_from_wallet' => $pointResult['used_amount'],
-                  'paid_by_card' => 0, //will be change
-                  'is_paid' => $pointResult['payable'] == 0,
+                  'paid_with_points' => 0, //$pointResult['used_amount'],
+                  'paid_with_money' => 0, //will be change
+                  'is_paid' => false,      //$pointResult['payable'] == 0,
                   'payment_type' => $request->payment_type,
                   'payment_method' => $request->payment_method,
-                  'paid_amount' => $pointResult['used_amount'],
-                  'total' => $pointResult['payable'],
+                  'paid_amount' => 0, //$pointResult['used_amount'],
+                  'total' =>$orderTotal,
                   'status' => 'pending',
               ]);
 
               foreach ($group->items as $item) {
+
                   $product = $item->pharmacyProduct;
 
                   $discountedPrice = $product->priceAfterOffer();

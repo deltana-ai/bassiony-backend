@@ -8,6 +8,7 @@ use App\Http\Controllers\Company\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Company\Auth\RegisteredUserController;
 use App\Http\Controllers\Company\Auth\VerifyEmailController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Company\Web\ManagerProfileController;
 
 
     Route::middleware('guest:web-manager')->group(function () {
@@ -28,10 +29,9 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
         Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
             ->middleware(['throttle:6,1'])->name('company.verification.send');
 
-            Route::get('/user', function () {
+            Route::get('/profile', [ManagerProfileController::class, 'get']);
+            Route::put('/profile-update', [ManagerProfileController::class, 'update']);
 
-                return view('user');
-            });
 
     });
     Route::middleware(['auth:web-manager','verified'])->group(function () {

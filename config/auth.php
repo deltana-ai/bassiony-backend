@@ -49,6 +49,10 @@ return [
             'driver' => 'session',
             'provider' => 'web_pharmacist',
         ],
+        'web-driver' => [
+            'driver' => 'session',
+            'provider' => 'web_driver',
+        ],
 
         //mobile guards
         'client' => [
@@ -95,6 +99,10 @@ return [
         'web_pharmacist' => [
             'driver' => 'eloquent',
             'model' => App\Models\Pharmacist::class,
+        ],
+        'web_driver' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Driver::class,
         ],
 
          //mobile guards
@@ -148,6 +156,12 @@ return [
 
          'web_pharmacist' => [
              'provider' => 'web_pharmacist',
+             'table' =>  'password_reset_tokens',
+             'expire' => 60,
+             'throttle' => 60,
+         ],
+         'web_driver' => [
+             'provider' => 'web_driver',
              'table' =>  'password_reset_tokens',
              'expire' => 60,
              'throttle' => 60,

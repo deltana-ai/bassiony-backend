@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Company\Api;
+namespace App\Http\Controllers\Company\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,11 +13,11 @@ class ManagerProfileController extends Controller
 
     public function get(Request $request)
     {
-      return $this->getProfile($request);
+      return $this->getProfile($request,"web-manager");
     }
 
     public function update(Request $request)
     {
-      return $this->updateProfile( $request, CompanyManager::class );
+      return $this->updateProfile( $request, CompanyManager::class ,"web-manager");
     }
 }

@@ -110,7 +110,7 @@ class CartController extends BaseController
              $cart = $user->cart()->with('items')->first();
 
              if (!$cart) {
-                 return JsonResponse::respondError("Cart Doesn't Exist .");
+                 return JsonResponse::respondError("Cart Doesn't Exist.");
              }
 
              $item = $cart->items()->where('id', $id)->first();

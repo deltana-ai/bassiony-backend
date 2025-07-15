@@ -12,6 +12,6 @@ class DriverContactController extends Controller
 
     public function store(Request $request)
     {
-      return $this->contact( $request, Driver::class );
+      return $this->contact( $request, Driver::class ,"driver");
     }
 }

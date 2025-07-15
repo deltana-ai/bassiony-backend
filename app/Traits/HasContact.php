@@ -14,9 +14,9 @@ trait HasContact
 {
 
   ////////////////////////////////////////////////////////////////////////////////
-  public function contact( $request, $modelClass )
+  public function contact( $request, $modelClass,$guard )
   {
-      $user = auth()->user();
+      $user = auth($guard)->user();
 
       if (!$user) {
 

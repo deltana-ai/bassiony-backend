@@ -12,9 +12,9 @@ use Illuminate\Validation\{Rule,Rules};
 use App\Http\Resources\Common\AuthResource;
 trait HasProfile
 {
-  public function getProfile( $request)
+  public function getProfile( $request,$guard)
   {
-      $user = auth()->user();
+      $user = auth($guard)->user();
       if (!$user) {
 
         return JsonResponse::respondError('Unauthenticated',401);
@@ -29,9 +29,9 @@ trait HasProfile
   }
 
   ////////////////////////////////////////////////////////////////////////////////
-  public function updateProfile( $request, $modelClass )
+  public function updateProfile( $request, $modelClass ,,$guard)
   {
-      $user = auth()->user();
+    $user = auth($guard)->user();
 
       if (!$user) {
           return JsonResponse::respondError('Unauthenticated',401);

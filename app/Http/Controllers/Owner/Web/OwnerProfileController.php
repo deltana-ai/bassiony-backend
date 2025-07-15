@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Owner\Api;
+namespace App\Http\Controllers\Owner\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,11 +13,11 @@ class OwnerProfileController extends Controller
 
     public function get(Request $request)
     {
-      return $this->getProfile($request);
+      return $this->getProfile($request,"web-owner");
     }
 
     public function update(Request $request)
     {
-      return $this->updateProfile( $request, Owner::class );
+      return $this->updateProfile( $request, Owner::class ,"web-owner");
     }
 }

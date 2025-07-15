@@ -12,7 +12,7 @@ class ClientContactController extends Controller
 
     public function store(Request $request)
     {
-      return $this->contact( $request, User::class );
+      return $this->contact( $request, User::class ,"client");
     }
 
 }

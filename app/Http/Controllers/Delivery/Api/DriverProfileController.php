@@ -13,11 +13,11 @@ class DriverProfileController extends Controller
 
     public function get(Request $request)
     {
-      return $this->getProfile($request);
+      return $this->getProfile($request ,"driver");
     }
 
     public function update(Request $request)
     {
-      return $this->updateProfile( $request, Driver::class );
+      return $this->updateProfile( $request, Driver::class  ,"driver" );
     }
 }
