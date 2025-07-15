@@ -2,11 +2,11 @@
 namespace App\Repositories\Client;
 
 use App\Models\Cart;
-use App\Interfaces\CartRepositoryInterface;
-
+use App\Interfaces\Client\CartRepositoryInterface;
+use App\Repositories\CrudRepository;
 use Illuminate\Database\Eloquent\Model;
 
-class CartRepository extends CrudRepository
+class CartRepository extends CrudRepository implements CartRepositoryInterface
 {
   protected Model $model;
 

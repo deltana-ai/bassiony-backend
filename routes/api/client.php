@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Client\Api\{ClientAuthController,ClientProfileController,ClientContactController};
-use App\Http\Controllers\Client\API\MedicationController;
+use App\Http\Controllers\Client\Api\{MedicationController,CartController};
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\RateLimiter;
         Route::get('/profile', [ClientProfileController::class, 'get']);
         Route::put('/profile-update', [ClientProfileController::class, 'update']);
         Route::post('/contact-us', [ClientContactController::class, 'store']);
+        Route::post('/add-to-cart', [CartController::class, 'store']);
+        Route::get('/cart', [CartController::class, 'index']);
 
     });
 

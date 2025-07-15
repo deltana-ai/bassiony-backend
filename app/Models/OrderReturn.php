@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OrderReturn extends BaseModel
+class OrderReturn extends Model
 {
   protected $table = 'order_returns';
+  protected $guarded = ['id'];
 
 }

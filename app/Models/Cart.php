@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Cart extends BaseModel
+class Cart extends Model
 {
   protected $table = 'carts';
+  protected $guarded = ['id'];
 
   public function countCart(){
-    $item_count=  $this->cartItems->count();
-    return $item_count;
+    return $this->items ? $this->items->count() : 0;
+
   }
   public function groupCartItemsByPharmacy()
   {
