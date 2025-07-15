@@ -3,15 +3,13 @@
 namespace App\Services;
 
 use Kreait\Firebase\Contract\Auth;
-//use Kreait\Firebase\Auth;
 use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
-use Kreait\Firebase\Auth\SignInResult;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class FirebaseAuthService
 {
-    protected  $auth;
+    protected Auth $auth;
 
     public function __construct(Auth $auth)
     {
@@ -22,9 +20,9 @@ class FirebaseAuthService
      * Verify Firebase ID token and return UID and phone/email claims
      *
      * @param string $idToken
-     * @return array|null
+     * @return array{uid: string|null, phone: string|null, email: string|null, name: string|null}|null
      */
-    public function verifyToken(string $idToken)
+    public function verifyToken(string $idToken): ?array
     {
         try {
             $verifiedIdToken = $this->auth->verifyIdToken($idToken);

@@ -14,15 +14,24 @@ return new class extends Migration
         Schema::create('drivers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
-            $table->string('firebase_uid')->nullable()->unique();
+            $table->string('email')->nullable();
+            $table->unique('email');
 
+            $table->string('firebase_uid')->nullable();
+            $table->unique('firebase_uid');
             $table->timestamp('last_login_at')->nullable();
             $table->softDeletes();
             $table->boolean('is_verified')->default(false);
-            //$table->rememberToken();
+            $table->boolean('is_admin')->default(false);
+
+            $table->rememberToken();
+            $table->timestamp('email_verified_at')->nullable();
+
+            $table->string('password');
+
+            $table->rememberToken();
 
             $table->timestamps();
         });

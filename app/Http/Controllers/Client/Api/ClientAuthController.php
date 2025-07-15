@@ -5,17 +5,17 @@ namespace App\Http\Controllers\Client\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
 use App\Traits\MultiAuth;
+use App\Services\FirebaseAuthService;
 
 class ClientAuthController extends Controller
 {
 
     use MultiAuth;
+    public function __construct(FirebaseAuthService $firebaseAuth)
+    {
+        $this->setFirebaseAuth($firebaseAuth);
+    }
 
     public function clientRegister(Request $request)
     {

@@ -5,15 +5,17 @@ namespace App\Http\Controllers\Pharmacy\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Pharmacist;
-use App\Models\Otp;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
+
 use App\Traits\MultiAuth;
+use App\Services\FirebaseAuthService;
+
 class PharmacistAuthController extends Controller
 {
     use MultiAuth;
+    public function __construct(FirebaseAuthService $firebaseAuth)
+    {
+        $this->setFirebaseAuth($firebaseAuth);
+    }
     public function pharmacistRegister(Request $request)
     {
        return $this->register($request, Pharmacist::class,"pharmacist");
