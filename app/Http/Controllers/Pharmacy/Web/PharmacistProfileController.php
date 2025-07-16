@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Company\Web;
+namespace App\Http\Controllers\Pharmacy\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CompanyManager;
 use App\Traits\HasProfile;
 
-class ManagerProfileController extends Controller
+class PharmacistProfileController extends Controller
 {
     use HasProfile;
     public function __construct()
     {
-      $this->guard = 'web-manager';
+      $this->guard = 'pharmacist';
     }
     public function get(Request $request)
     {
-      return $this->getProfile($request,$this->guard );
+      return $this->getProfile($request,$this->guard);
     }
 
     public function update(Request $request)
     {
-      return $this->updateProfile( $request, CompanyManager::class ,$this->guard );
+      return $this->updateProfile( $request, Pharmacist::class ,$this->guard);
     }
 }

@@ -9,9 +9,12 @@ use App\Models\Owner;
 class OwnerContactController extends Controller
 {
     use HasContact;
-
+    public function __construct()
+    {
+      $this->guard = 'web-owner';
+    }
     public function store(Request $request)
     {
-      return $this->contact( $request, Owner::class ,"web-owner");
+      return $this->contact( $request, Owner::class ,$this->guard);
     }
 }

@@ -38,21 +38,21 @@ return [
     'guards' => [
       //web guards
         'web-owner' => [
-            'driver' => 'session',
+            'driver' => 'sanctum',
             'provider' => 'owners',
         ],
         'web-manager' => [
-            'driver' => 'session',
+            'driver' => 'sanctum',
             'provider' => 'web_managers',
         ],
-        'web-pharmacist' => [
-            'driver' => 'session',
-            'provider' => 'web_pharmacist',
-        ],
-        'web-driver' => [
-            'driver' => 'session',
-            'provider' => 'web_driver',
-        ],
+        // 'web-pharmacist' => [
+        //     'driver' => 'sanctum',
+        //     'provider' => 'web_pharmacist',
+        // ],
+        // 'web-driver' => [
+        //     'driver' => 'sanctum',
+        //     'provider' => 'web_driver',
+        // ],
 
         //mobile guards
         'client' => [

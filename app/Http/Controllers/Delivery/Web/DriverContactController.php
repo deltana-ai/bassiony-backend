@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Delivery\Api;
+namespace App\Http\Controllers\Delivery\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -15,6 +15,6 @@ class DriverContactController extends Controller
     }
     public function store(Request $request)
     {
-      return $this->contact( $request, Driver::class ,$this->guard);
+      return $this->contact( $request, Driver::class ,$this->guard );
     }
 }

@@ -15,6 +15,8 @@ class PharmacistAuthController extends Controller
     public function __construct(FirebaseAuthService $firebaseAuth)
     {
         $this->setFirebaseAuth($firebaseAuth);
+        $this->guard = 'pharmacist';
+
     }
     public function pharmacistRegister(Request $request)
     {

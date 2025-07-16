@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Traits\HasContact;
 use App\Models\CompanyManager;
-class ManagerContactController extends Controller
+class PharmacistContactController extends Controller
 {
     use HasContact;
-
+    public function __construct()
+    {
+      $this->guard = 'pharmacist';
+    }
     public function store(Request $request)
     {
-      return $this->contact( $request, CompanyManager::class ,"web-driver" );
+      return $this->contact( $request, Pharmacist::class ,$this->guard );
     }
 }

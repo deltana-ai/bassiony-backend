@@ -22,7 +22,7 @@ class CartItemResource extends JsonResource
           'pharmacyId' => $this->pharmacyProduct->pharmacy_id,
           'pharmacyName' => $this->pharmacyProduct->pharmacy->name,
           'price_before' => $this->pharmacyProduct->price,
-          'priceA_after' => $this->pharmacyProduct->priceAfterOffer(),
+          'price_after' => $this->pharmacyProduct->priceAfterOffer(),
           'quantity' => $this->quantity,
           'total' => $this->total,
           'createdAt' => $this->created_at ? $this->created_at->format('Y-M-d H:i:s A') : null,

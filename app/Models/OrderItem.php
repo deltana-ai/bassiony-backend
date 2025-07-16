@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class OrderItem extends Model
 {
   protected $table = 'order_items';
+  protected $timestamps = false;
+
   protected $guarded = ['id'];
 
   public function product()

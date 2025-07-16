@@ -10,14 +10,17 @@ use App\Traits\HasProfile;
 class OwnerProfileController extends Controller
 {
     use HasProfile;
-
+    public function __construct()
+    {
+      $this->guard = 'web-owner';
+    }
     public function get(Request $request)
     {
-      return $this->getProfile($request,"web-owner");
+      return $this->getProfile($request,$this->guard);
     }
 
     public function update(Request $request)
     {
-      return $this->updateProfile( $request, Owner::class ,"web-owner");
+      return $this->updateProfile( $request, Owner::class ,$this->guard);
     }
 }

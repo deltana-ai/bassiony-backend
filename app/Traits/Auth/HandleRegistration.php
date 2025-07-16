@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\Rule;
+use App\Helpers\JsonResponse;
+
 
 trait HandleRegistration
 {
@@ -18,7 +20,14 @@ trait HandleRegistration
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function makeStore($request ,$modelClass ,$guard): Response
+
+     public function makeCreate($request ,$modelClass ,$guard)
+     {
+       return JsonResponse::respondSuccess('Register successfully,But you need to verify yout email to continue');
+
+
+     }
+    public function makeStore($request ,$modelClass ,$guard)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:100'],
@@ -41,7 +50,6 @@ trait HandleRegistration
         event(new Registered($user));
 
         Auth::guard($guard)->login($user);
-
-        return response()->noContent();
+        return JsonResponse::respondSuccess('Register successfully,But you need to verify yout email to continue');
     }
 }

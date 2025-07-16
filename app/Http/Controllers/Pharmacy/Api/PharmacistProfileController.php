@@ -11,13 +11,20 @@ class PharmacistProfileController extends Controller
 {
     use HasProfile;
 
+    public function __construct()
+    {
+      $this->guard = 'pharmacist';
+
+    }
+
+
     public function get(Request $request)
     {
-      return $this->getProfile($request ,"pharmacist");
+      return $this->getProfile($request ,$this->guard);
     }
 
     public function update(Request $request)
     {
-      return $this->updateProfile( $request, Pharmacist::class ,"pharmacist");
+      return $this->updateProfile( $request, Pharmacist::class ,$this->guard);
     }
 }

@@ -12,6 +12,9 @@ use Illuminate\Validation\{Rule,Rules};
 use App\Http\Resources\Common\AuthResource;
 trait HasProfile
 {
+
+  protected $guard = 'web';
+
   public function getProfile( $request,$guard)
   {
       $user = auth($guard)->user();
@@ -29,7 +32,7 @@ trait HasProfile
   }
 
   ////////////////////////////////////////////////////////////////////////////////
-  public function updateProfile( $request, $modelClass ,,$guard)
+  public function updateProfile( $request, $modelClass ,$guard)
   {
     $user = auth($guard)->user();
 

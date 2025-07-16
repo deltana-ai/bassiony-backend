@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\{ContactFrom,ContactTo};
 trait HasContact
 {
+  protected $guard = 'web';
 
   ////////////////////////////////////////////////////////////////////////////////
   public function contact( $request, $modelClass,$guard )

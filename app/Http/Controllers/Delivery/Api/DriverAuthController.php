@@ -16,15 +16,17 @@ class DriverAuthController extends Controller
     public function __construct(FirebaseAuthService $firebaseAuth)
     {
         $this->setFirebaseAuth($firebaseAuth);
+        $this->guard = 'driver';
+
     }
     public function driverRegister(Request $request)
     {
-       return $this->register($request, Driver::class ,"driver");
+       return $this->register($request, Driver::class ,$this->guard);
     }
 
     public function driverLogin(Request $request)
     {
-       return $this->login($request, Driver::class ,"driver");
+       return $this->login($request, Driver::class ,$this->guard);
     }
 
 

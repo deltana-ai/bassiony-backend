@@ -11,6 +11,8 @@ use Exception;
 
 trait MultiAuth
 {
+  protected $guard = 'web';
+
     protected FirebaseAuthService $firebaseAuth;
 
     use HttpResponses;

@@ -16,17 +16,17 @@ class OrderResource extends JsonResource
     {
       return [
           'id' => $this->id,
+          'order_number'=>"ORD_105".$this->id;
           'pharmacyId' => $this->pharmacy_id,
           'pharmacyName' => $this->pharmacy->name ?? 'unknown',
           'status' => $this->status,
           'totalBeforeDiscount' => $this->total + $this->order_discount,
           'discount' => $this->order_discount,
           'finalTotal' => $this->total,
-          'paid_from_wallet' => $this->paid_from_wallet,
-          'paid_by_card' => $this->paid_by_card,
+          'paid_with_points' => $this->paid_with_points,
+          'paid_with_money' => $this->paid_with_money,
           'is_paid' => $this->is_paid,
           'payment_type' => $this->payment_type,
-          'due_date' => $this->due_date,
           'paid_amount' => $this->paid_amount,
           'remaining_amount' => $this->remaining_amount	,
           'createdAt' => $this->created_at?->format('Y-m-d H:i'),

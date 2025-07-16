@@ -19,18 +19,18 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(function (Router $router) {
          //Web: Owner Panel (React - Session Based)
          $router->group([
-             'middleware' => 'web',
-             'prefix' => 'owner',
+             'middleware' => 'api',
+             'prefix' => 'api/owner',
          ], function () {
-             require base_path('routes/web/owner.php');
+             require base_path('routes/api/owner.php');
          });
 
          // Web: Company Panel (React - Session Based)
          $router->group([
-             'middleware' => 'web',
-             'prefix' => 'company',
+             'middleware' => 'api',
+             'prefix' => 'api/company',
          ], function () {
-             require base_path('routes/web/company.php');
+             require base_path('routes/api/company.php');
          });
 
          // API: Client (Mobile - Token Based)
