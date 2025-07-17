@@ -23,16 +23,10 @@ use Illuminate\Support\Facades\RateLimiter;
         Route::post('/add-to-cart', [CartController::class, 'store']);
         Route::get('/cart', [CartController::class, 'index']);
         // Route::store('/order', [CartController::class, 'index']);
+        Route::post('/medications', [MedicationController::class, 'store']);
+        Route::get('/medications/today', [MedicationController::class, 'today']);
+        Route::post('/medications/{id}/expire-decision', [MedicationController::class, 'handleExpiration']);
+        Route::delete('/medications/{id}', [MedicationController::class, 'destroy']);
+        Route::get('/medications/search', [MedicationController::class, 'search']);
 
     });
-
-
-
-
-    Route::middleware(['auth:client', 'throttle:medications_limiter'])->group(function () {
-    Route::post('/medications', [MedicationController::class, 'store']);
-    Route::get('/medications/today', [MedicationController::class, 'today']);
-    Route::post('/medications/{id}/expire-decision', [MedicationController::class, 'handleExpiration']);
-    Route::delete('/medications/{id}', [MedicationController::class, 'destroy']);
-    Route::get('/medications/search', [MedicationController::class, 'search']);
-});

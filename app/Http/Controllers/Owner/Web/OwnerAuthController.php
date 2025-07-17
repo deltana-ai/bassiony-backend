@@ -11,14 +11,15 @@ use Illuminate\Http\Request;
 class OwnerAuthController extends Controller
 {
   use SPA_Auth;
+
   public function __construct()
   {
-    $this->guard = 'web-owner';
+      $this->useGuard('web-owner', Owner::class);
   }
 
   public function register(Request $request)
   {
-      return $this->publicRegister($request, Owner::class);
+      return $this->publicRegister($request);
   }
 
   public function login(Request $request)
@@ -36,16 +37,19 @@ class OwnerAuthController extends Controller
       return $this->publicResetPassword($request);
   }
 
-  public function invokeEmail(Request $request , $id, $hash)
+  public function invokeEmail(Request $request, $id, $hash)
   {
-      return $this->publicInvokeEmail( $request, $id, $hash,Owner::class);
+      return $this->publicInvokeEmail($request, $id, $hash);
+  }
+
+  public function resentEmail(Request $request)
+  {
+      return $this->publicResentEmail($request);
   }
 
   public function logout(Request $request)
   {
-
-      return $this->publicLogout($request ,$this->guard);
+      return $this->publicLogout($request);
   }
-
 
 }

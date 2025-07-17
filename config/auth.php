@@ -49,10 +49,7 @@ return [
         //     'driver' => 'sanctum',
         //     'provider' => 'web_pharmacist',
         // ],
-        // 'web-driver' => [
-        //     'driver' => 'sanctum',
-        //     'provider' => 'web_driver',
-        // ],
+      
 
         //mobile guards
         'client' => [
@@ -95,14 +92,6 @@ return [
         'web_managers' => [
             'driver' => 'eloquent',
             'model' => App\Models\CompanyManager::class,
-        ],
-        'web_pharmacist' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Pharmacist::class,
-        ],
-        'web_driver' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Driver::class,
         ],
 
          //mobile guards
@@ -154,8 +143,8 @@ return [
              'throttle' => 60,
          ],
 
-         'web_pharmacist' => [
-             'provider' => 'web_pharmacist',
+         'pharmacist' => [
+             'provider' => 'pharmacist',
              'table' =>  'password_reset_tokens',
              'expire' => 60,
              'throttle' => 60,

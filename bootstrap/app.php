@@ -17,7 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withRouting(function (Router $router) {
-         //Web: Owner Panel (React - Session Based)
+          $router->group([
+              'middleware' => 'api',
+          ], function () {
+              require base_path('routes/api.php');
+          });
+         $router->group([
+             'middleware' => 'web',
+         ], function () {
+             require base_path('routes/web.php');
+         });
          $router->group([
              'middleware' => 'api',
              'prefix' => 'api/owner',
