@@ -5,45 +5,49 @@ use App\Http\Controllers\Controller;
 use App\Traits\SPA_Auth;
 use App\Models\Driver;
 use Illuminate\Http\Request;
-class PharmacistAuthController extends Controller
+class DriverAuthController extends Controller
 {
-    use SPA_Auth;
-    public function __construct()
-    {
-      $this->guard = 'driver';
-    }
+  use SPA_Auth;
 
-    public function register(Request $request)
-    {
-        return $this->publicRegister($request, Driver::class);
-    }
+  public function __construct()
+  {
+      $this->useGuard('driver', Driver::class);
+  }
 
-    public function login(Request $request)
-    {
-        return $this->publicLogin($request);
-    }
+  public function register(Request $request)
+  {
+      return $this->publicRegister($request);
+  }
 
-    public function forgotPassword(Request $request)
-    {
-        return $this->publicForgotPassword($request);
-    }
+  public function login(Request $request)
+  {
+      return $this->publicLogin($request);
+  }
 
-    public function resetPassword(Request $request)
-    {
-        return $this->publicResetPassword($request);
-    }
+  public function forgotPassword(Request $request)
+  {
+      return $this->publicForgotPassword($request);
+  }
 
-    public function invokeEmail(Request $request , $id, $hash)
-    {
-        return $this->publicInvokeEmail( $request, $id, $hash,Driver::class);
-    }
+  public function resetPassword(Request $request)
+  {
+      return $this->publicResetPassword($request);
+  }
 
-    public function logout(Request $request)
-    {
+  public function invokeEmail(Request $request, $id, $hash)
+  {
+      return $this->publicInvokeEmail($request, $id, $hash);
+  }
 
-        return $this->publicLogout($request ,$this->guard);
-    }
+  public function resentEmail(Request $request)
+  {
+      return $this->publicResentEmail($request);
+  }
 
+  public function logout(Request $request)
+  {
+      return $this->publicLogout($request);
+  }
 
 
 }

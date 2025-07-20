@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Medication extends BaseModel
+class Medication extends Model
 {
 
-      protected $with = [
-        'media',
-    ];
+    //   protected $with = [
+    //     'media',
+    // ];
 
    protected $fillable = [
         'user_id', 'name', 'note', 'dose_amount',

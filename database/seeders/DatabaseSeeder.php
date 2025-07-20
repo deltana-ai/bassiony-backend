@@ -16,5 +16,12 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
 
+        $this->call([
+            // Add other seeders here
+            UserWithTokenSeeder::class,
+            UserSeeder::class,
+        ]);
+
+
     }
 }

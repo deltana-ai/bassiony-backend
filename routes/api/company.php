@@ -15,9 +15,12 @@ use Illuminate\Support\Facades\RateLimiter;
 
         Route::post('/register', [CompanyAuthController::class, 'register']);
         Route::post('/login', [CompanyAuthController::class, 'login']);
-        Route::get('/verify-email/{id}/{hash}',[CompanyAuthController::class, 'invokeEmail'])->middleware(['signed'])->name('verification.verify');
+        Route::post('/web-forgot-password', [CompanyAuthController::class, 'forgotPassword']);
+        Route::post('/web-reset-password', [CompanyAuthController::class, 'resetPassword']);
+        Route::get('/verify-email/{id}/{hash}',[CompanyAuthController::class, 'invokeEmail'])->middleware(['signed'])->name('verification.verify.web-manager');
     });
     Route::middleware(['auth:web-manager'])->group(function () {
+        Route::post('/email-resend', [CompanyAuthController::class, 'resentEmail']);
         Route::post('/logout', [CompanyAuthController::class, 'logout']);
         Route::get('/profile', [ManagerProfileController::class, 'get']);
         Route::put('/profile-update', [ManagerProfileController::class, 'update']);
