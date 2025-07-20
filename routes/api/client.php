@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Client\Api\{ClientAuthController,ClientProfileController,ClientContactController};
 use App\Http\Controllers\Client\Api\{MedicationController,CartController};
+use App\Http\Controllers\Common\Point\UserPointController;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
@@ -35,4 +36,13 @@ use Illuminate\Support\Facades\RateLimiter;
     Route::post('/medications/{id}/expire-decision', [MedicationController::class, 'handleExpiration']);
     Route::delete('/medications/{id}', [MedicationController::class, 'destroy']);
     Route::get('/medications/search', [MedicationController::class, 'search']);
+});
+
+
+// العملاء
+Route::middleware(['auth:client'])->group(function () {
+    Route::get('/points/summary', [UserPointController::class, 'getPointsSummary']);
+    Route::get('/points/earned', [UserPointController::class, 'getEarnedPoints']);
+    Route::get('/points/spent', [UserPointController::class, 'getSpentPoints']);
+    Route::get('/points/expired', [UserPointController::class, 'getExpiredPoints']);
 });

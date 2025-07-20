@@ -19,21 +19,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 
 //////////////////////////////////////// team ////////////////////////////////
-// الصيادلة
-Route::middleware(['resolve.guard', 'ensure.guard:App\Models\Pharmacist'])->group(function () {
-    Route::get('/pharmacist/points/summary', [UserPointController::class, 'getPointsSummary']);
-    Route::get('/pharmacist/points/earned', [UserPointController::class, 'getEarnedPoints']);
-    Route::get('/pharmacist/points/spent', [UserPointController::class, 'getSpentPoints']);
-    Route::get('/pharmacist/points/expired', [UserPointController::class, 'getExpiredPoints']);
-});
 
-// العملاء
-Route::middleware(['resolve.guard', 'ensure.guard:App\Models\User'])->group(function () {
-    Route::get('/client/points/summary', [UserPointController::class, 'getPointsSummary']);
-    Route::get('/client/points/earned', [UserPointController::class, 'getEarnedPoints']);
-    Route::get('/client/points/spent', [UserPointController::class, 'getSpentPoints']);
-    Route::get('/client/points/expired', [UserPointController::class, 'getExpiredPoints']);
-});
 
 
 //////////////////////////////////////// logo company ////////////////////////////////

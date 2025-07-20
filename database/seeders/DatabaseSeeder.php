@@ -18,8 +18,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             // Add other seeders here
-            UserWithTokenSeeder::class,
-            UserSeeder::class,
+            // UserWithTokenSeeder::class,
+            // UserSeeder::class,
+            PointsSeeder::class,
         ]);
 
 

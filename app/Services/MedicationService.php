@@ -24,7 +24,6 @@ class MedicationService
             $medication = $this->repo->create([
                 'user_id' => $userId,
                 'name' => $data['name'],
-               
                 'note' => $data['note'] ?? null,
                 'dose_amount' => $data['dose_amount'],
                 'times_per_day' => $data['times_per_day'],

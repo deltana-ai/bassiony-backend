@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Point extends BaseModel
 {
+    use SoftDeletes;
     protected $fillable = [
         'user_id', 'pharmacist_id', 'company_id', 'type',
         'amount', 'source_name', 'expires_at'
