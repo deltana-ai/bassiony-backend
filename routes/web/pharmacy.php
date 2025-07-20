@@ -18,7 +18,7 @@ use App\Http\Controllers\Pharmacy\Auth\RegisteredUserController;
     });
 
     Route::middleware('auth:web-pharmacist')->group(function () {
-        Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
+        Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class);
         //     ->middleware(['signed', 'throttle:6,1']);
         //
         // Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])

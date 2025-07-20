@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\RateLimiter;
 
 
 
-    Route::middleware(['auth:client', 'throttle:medications_limiter'])->group(function () {
+    Route::middleware(['auth:client',])->group(function () {
     Route::post('/medications', [MedicationController::class, 'store']);
     Route::get('/medications/today', [MedicationController::class, 'today']);
     Route::post('/medications/{id}/expire-decision', [MedicationController::class, 'handleExpiration']);
