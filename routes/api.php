@@ -6,7 +6,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\Api\Auth\{ClientAuthController,PharmacistAuthController,DriverAuthController};
 use App\Http\Controllers\Api\Profile\{ClientProfileController,PharmacistProfileController,DriverProfileController};
 use App\Http\Controllers\Common\Point\UserPointController;
-use App\Http\Controllers\Common\DosageReminder\DosesController;
+// use App\Http\Controllers\Common\DosageReminder\DosesController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -57,13 +57,13 @@ Route::post('/media-upload-many', [MediaController::class, 'storeMany']);
 
 
 
-Route::middleware(['resolve.guard', 'ensure.guard:App\Models\User'])->group(function () {
-    Route::post('/medicines', [DosesController::class, 'addMedicine']);
-    Route::post('/medicines-with-schedule', [DosesController::class, 'addMedicineWithSchedule']);
-    Route::post('/medicines/{medicine}/schedules', [DosesController::class, 'addSchedule']);
-    Route::post('/intakes/{intake}/mark-taken', [DosesController::class, 'markAsTaken']); // لن يُستخدم حالياً
-    Route::get('/intakes/by-day', [DosesController::class, 'getDosesByDay']); // اليوم المختار
-    Route::get('/intakes', [DosesController::class, 'getAllDoses']); // كل الأسبوع
-    Route::post('/medicines/continue-week', [DosesController::class, 'continueNextWeek']);
+// Route::middleware(['resolve.guard', 'ensure.guard:App\Models\User'])->group(function () {
+//     Route::post('/medicines', [DosesController::class, 'addMedicine']);
+//     Route::post('/medicines-with-schedule', [DosesController::class, 'addMedicineWithSchedule']);
+//     Route::post('/medicines/{medicine}/schedules', [DosesController::class, 'addSchedule']);
+//     Route::post('/intakes/{intake}/mark-taken', [DosesController::class, 'markAsTaken']); // لن يُستخدم حالياً
+//     Route::get('/intakes/by-day', [DosesController::class, 'getDosesByDay']); // اليوم المختار
+//     Route::get('/intakes', [DosesController::class, 'getAllDoses']); // كل الأسبوع
+//     Route::post('/medicines/continue-week', [DosesController::class, 'continueNextWeek']);
 
-});
+// });
