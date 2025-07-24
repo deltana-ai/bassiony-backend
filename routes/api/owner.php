@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Owner\Web\OwnerAuthController;
+use App\Http\Controllers\Owner\Web\OwnerContactController;
+use App\Http\Controllers\Owner\Web\OwnerProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Client\Web\{OwnerAuthController,OwnerProfileController,OwnerContactController};
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;

@@ -338,6 +338,83 @@
             "time": "2024-02-09T16:56:22+00:00"
         },
         {
+            "name": "cuyz/valinor",
+            "version": "2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CuyZ/Valinor.git",
+                "reference": "f51e9beebdefc968cbfcd4a2c561b40575288610"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CuyZ/Valinor/zipball/f51e9beebdefc968cbfcd4a2c561b40575288610",
+                "reference": "f51e9beebdefc968cbfcd4a2c561b40575288610",
+                "shasum": ""
+            },
+            "require": {
+                "composer-runtime-api": "^2.0",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
+            },
+            "conflict": {
+                "phpstan/phpstan": "<1.0 || >= 3.0",
+                "vimeo/psalm": "<5.0 || >=7.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.4",
+                "infection/infection": "^0.29",
+                "marcocesarato/php-conventional-changelog": "^1.12",
+                "mikey179/vfsstream": "^1.6.10",
+                "phpbench/phpbench": "^1.3",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^10.5",
+                "rector/rector": "^2.0",
+                "vimeo/psalm": "^6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CuyZ\\Valinor\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Romain Canon",
+                    "email": "romain.hydrocanon@gmail.com",
+                    "homepage": "https://github.com/romm"
+                }
+            ],
+            "description": "Library that helps to map any input into a strongly-typed value object structure.",
+            "homepage": "https://github.com/CuyZ/Valinor",
+            "keywords": [
+                "array",
+                "conversion",
+                "hydrator",
+                "json",
+                "mapper",
+                "mapping",
+                "object",
+                "tree",
+                "yaml"
+            ],
+            "support": {
+                "issues": "https://github.com/CuyZ/Valinor/issues",
+                "source": "https://github.com/CuyZ/Valinor/tree/2.1.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/romm",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-07-23T20:32:01+00:00"
+        },
+        {
             "name": "darkaonline/l5-swagger",
             "version": "9.0.1",
             "source": {
@@ -2080,22 +2157,23 @@
         },
         {
             "name": "kreait/firebase-php",
-            "version": "7.20.0",
+            "version": "7.21.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kreait/firebase-php.git",
-                "reference": "7b579b80a3465979c7eb0706d464ba9ea768e0ab"
+                "reference": "74d80b80263507a30da8b29fa84e0c84039c61ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kreait/firebase-php/zipball/7b579b80a3465979c7eb0706d464ba9ea768e0ab",
-                "reference": "7b579b80a3465979c7eb0706d464ba9ea768e0ab",
+                "url": "https://api.github.com/repos/kreait/firebase-php/zipball/74d80b80263507a30da8b29fa84e0c84039c61ab",
+                "reference": "74d80b80263507a30da8b29fa84e0c84039c61ab",
                 "shasum": ""
             },
             "require": {
                 "beste/clock": "^3.0",
                 "beste/in-memory-cache": "^1.3.1",
                 "beste/json": "^1.5.1",
+                "cuyz/valinor": "^2.0",
                 "ext-ctype": "*",
                 "ext-filter": "*",
                 "ext-json": "*",
@@ -2176,7 +2254,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-17T23:01:08+00:00"
+            "time": "2025-07-24T09:40:40+00:00"
         },
         {
             "name": "kreait/firebase-tokens",
@@ -2333,16 +2411,16 @@
         },
         {
             "name": "laravel/breeze",
-            "version": "v2.3.7",
+            "version": "v2.3.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/breeze.git",
-                "reference": "73149b5d84be3881b2fdda94b2ad289e7905c1a4"
+                "reference": "1a29c5792818bd4cddf70b5f743a227e02fbcfcd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/breeze/zipball/73149b5d84be3881b2fdda94b2ad289e7905c1a4",
-                "reference": "73149b5d84be3881b2fdda94b2ad289e7905c1a4",
+                "url": "https://api.github.com/repos/laravel/breeze/zipball/1a29c5792818bd4cddf70b5f743a227e02fbcfcd",
+                "reference": "1a29c5792818bd4cddf70b5f743a227e02fbcfcd",
                 "shasum": ""
             },
             "require": {
@@ -2390,7 +2468,7 @@
                 "issues": "https://github.com/laravel/breeze/issues",
                 "source": "https://github.com/laravel/breeze"
             },
-            "time": "2025-06-17T13:07:20+00:00"
+            "time": "2025-07-18T18:49:59+00:00"
         },
         {
             "name": "laravel/framework",
@@ -2668,16 +2746,16 @@
         },
         {
             "name": "laravel/sanctum",
-            "version": "v4.1.2",
+            "version": "v4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sanctum.git",
-                "reference": "e4c09e69aecd5a383e0c1b85a6bb501c997d7491"
+                "reference": "fd6df4f79f48a72992e8d29a9c0ee25422a0d677"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sanctum/zipball/e4c09e69aecd5a383e0c1b85a6bb501c997d7491",
-                "reference": "e4c09e69aecd5a383e0c1b85a6bb501c997d7491",
+                "url": "https://api.github.com/repos/laravel/sanctum/zipball/fd6df4f79f48a72992e8d29a9c0ee25422a0d677",
+                "reference": "fd6df4f79f48a72992e8d29a9c0ee25422a0d677",
                 "shasum": ""
             },
             "require": {
@@ -2728,7 +2806,7 @@
                 "issues": "https://github.com/laravel/sanctum/issues",
                 "source": "https://github.com/laravel/sanctum"
             },
-            "time": "2025-07-01T15:49:32+00:00"
+            "time": "2025-07-09T19:45:24+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -2793,16 +2871,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v5.10.0",
+            "version": "v5.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "fc0a8662682c0375b534033873debb780c003486"
+                "reference": "6d249d93ab06dc147ac62ea02b4272c2e7a24b72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/fc0a8662682c0375b534033873debb780c003486",
-                "reference": "fc0a8662682c0375b534033873debb780c003486",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/6d249d93ab06dc147ac62ea02b4272c2e7a24b72",
+                "reference": "6d249d93ab06dc147ac62ea02b4272c2e7a24b72",
                 "shasum": ""
             },
             "require": {
@@ -2856,9 +2934,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/telescope/issues",
-                "source": "https://github.com/laravel/telescope/tree/v5.10.0"
+                "source": "https://github.com/laravel/telescope/tree/v5.10.2"
             },
-            "time": "2025-07-07T14:47:19+00:00"
+            "time": "2025-07-24T05:26:13+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -8529,16 +8607,16 @@
         },
         {
             "name": "laravel/sail",
-            "version": "v1.43.1",
+            "version": "v1.44.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sail.git",
-                "reference": "3e7d899232a8c5e3ea4fc6dee7525ad583887e72"
+                "reference": "a09097bd2a8a38e23ac472fa6a6cf5b0d1c1d3fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/3e7d899232a8c5e3ea4fc6dee7525ad583887e72",
-                "reference": "3e7d899232a8c5e3ea4fc6dee7525ad583887e72",
+                "url": "https://api.github.com/repos/laravel/sail/zipball/a09097bd2a8a38e23ac472fa6a6cf5b0d1c1d3fe",
+                "reference": "a09097bd2a8a38e23ac472fa6a6cf5b0d1c1d3fe",
                 "shasum": ""
             },
             "require": {
@@ -8588,7 +8666,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-            "time": "2025-05-19T13:19:21+00:00"
+            "time": "2025-07-04T16:17:06+00:00"
         },
         {
             "name": "mockery/mockery",

@@ -13,7 +13,7 @@ class FavoriteController extends Controller
 {
     use HttpResponses;
 
-    public function index()
+    public function indexUser()
     {
         try {
             $user = auth()->user();
@@ -26,7 +26,7 @@ class FavoriteController extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function addFavorite(Request $request)
     {
         try {
             $request->validate([

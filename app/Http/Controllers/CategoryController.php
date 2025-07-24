@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Helpers\JsonResponse;
@@ -29,7 +28,6 @@ class CategoryController extends BaseController
         }
     }
 
-
     public function show(Category $category): ?\Illuminate\Http\JsonResponse
     {
         try {
@@ -51,7 +49,6 @@ class CategoryController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
-
 
     public function update(CategoryRequest $request, Category $category): ?\Illuminate\Http\JsonResponse
     {
@@ -78,7 +75,7 @@ class CategoryController extends BaseController
         }
     }
 
-    public function restore(Request $request): \Illuminate\Http\JsonResponse
+    public function restore(Request $request) : \Illuminate\Http\JsonResponse
     {
         try {
             $this->crudRepository->restoreItem(Category::class, $request['items']);
@@ -88,20 +85,17 @@ class CategoryController extends BaseController
         }
     }
 
-
-
-
     public function forceDelete(Request $request): \Illuminate\Http\JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'items' => 'required|array',
+            'items'   => 'required|array',
             'items.*' => 'integer|exists:teams,id',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation Error',
-                'errors' => $validator->errors()
+                'errors'  => $validator->errors(),
             ], 422);
         }
         try {
@@ -115,7 +109,7 @@ class CategoryController extends BaseController
 
             if ($softDeletedItems->isEmpty()) {
                 return response()->json([
-                    'message' => "One or more records do not exist or are not soft deleted. Please refresh the page."
+                    'message' => "One or more records do not exist or are not soft deleted. Please refresh the page.",
                 ], 404);
             }
 
@@ -125,6 +119,16 @@ class CategoryController extends BaseController
             }
 
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_FORCE_DELETED_SUCCESSFULLY));
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+    public function fetchCategory(Request $request)
+    {
+        try {
+            $CategoryData = Category::get();
+            return CategoryResource::collection($CategoryData)->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
