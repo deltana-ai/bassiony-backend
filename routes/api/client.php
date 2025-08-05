@@ -82,7 +82,9 @@ Route::get('/fetch-product', [ProductController::class, 'fetchProduct']);
 Route::get('/fetch-pharmacy', [PharmacyController::class, 'fetchPharmacy']);
 Route::get('/offer-products', [OfferController::class, 'getOfferProducts']);
 
+
 Route::middleware(['auth:client'])->group(function () {
-    Route::get('/add-favorites', [FavoriteController::class, 'indexUser']);
+    Route::post('/add-favorites', [FavoriteController::class, 'indexUser']);
     Route::get('/get-favorites', [FavoriteController::class, 'addFavorite']);
+
 });

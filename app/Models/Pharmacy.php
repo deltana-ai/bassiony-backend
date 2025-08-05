@@ -22,6 +22,12 @@ class Pharmacy extends BaseModel
             ->withTimestamps();
     }
 
+
+public function favoriteProducts()
+{
+    return $this->belongsToMany(Product::class, 'favorites', 'pharmacist_id', 'product_id');
+}
+
     public function pharmacyProducts()
     {
         return $this->hasMany(PharmacyProduct::class);

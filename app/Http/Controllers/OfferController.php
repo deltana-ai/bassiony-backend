@@ -7,6 +7,11 @@ use App\Http\Resources\OfferProductResource;
 use App\Models\Offer;
 use App\Models\PharmacyProduct;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreOfferRequest;
+
+
+
+
 
 class OfferController extends Controller
 {
@@ -21,10 +26,43 @@ class OfferController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
+public function createOffer(StoreOfferRequest $request)
+{
+    try {
+        $auth = auth('pharmacist')->user(); // استخدم guard المناسب
+
+        if (!$auth) {
+            return response()->json([
+                'message' => 'Unauthorized access. Please log in.',
+            ], 401);
+        }
+
+        $data = $request->validated();
+
+        $offer = Offer::create([
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'discount_percentage' => $data['discount_percentage'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+        ]);
+
+        // ربط المنتجات بالعرض
+        $offer->products()->attach($data['products']);
+
+        return response()->json([
+            'message' => 'Offer created successfully',
+            'data' => $offer->load('products'),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Something went wrong',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
+
 
     /**
      * Store a newly created resource in storage.
