@@ -2,6 +2,9 @@
 
 namespace App\Http;
 
+
+use Inertia\Middleware;
+
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Console\Scheduling\Schedule;
 
@@ -12,6 +15,7 @@ class Kernel extends HttpKernel
         \Illuminate\Http\Middleware\HandleCors::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+         \Inertia\Middleware::class,
     ];
 
 

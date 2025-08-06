@@ -56,4 +56,9 @@ class Pharmacist extends Authenticatable implements MustVerifyEmail
 {
     return $this->hasMany(\App\Models\Point::class);
 }
+
+public function favoriteProducts()
+{
+    return $this->belongsToMany(Product::class, 'favorites', 'pharmacist_id', 'product_id');
+}
 }

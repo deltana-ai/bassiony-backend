@@ -1,9 +1,6 @@
 <?php
-
 namespace Database\Seeders;
 
-use App\Models\ContactPeople;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,14 +12,11 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-
         $this->call([
             // Add other seeders here
-            // UserWithTokenSeeder::class,
-            // UserSeeder::class,
+            UserWithTokenSeeder::class,
+            UserSeeder::class,
             PointsSeeder::class,
         ]);
-
-
     }
 }

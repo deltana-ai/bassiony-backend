@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('pharmacist_id')->nullable()->constrained()->cascadeOnDelete(); // إضافة الصيدلي
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['user_id', 'product_id']);
+            $table->unique(['user_id', 'product_id', 'pharmacist_id']); // منع التكرار بناءً على الثلاثة أعمدة
         });
     }
 
