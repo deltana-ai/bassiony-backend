@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pharmacy_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('offer_id')->nullable();
+
             $table->decimal('price', 8, 2);
+            $table->decimal('tax_rate', 8, 2)->nullable();
             $table->integer('quantity')->default(0);
             $table->softDeletes();
             $table->timestamps();

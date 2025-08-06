@@ -87,6 +87,7 @@ class FullPharmacySeeder extends Seeder
                 $pharmacyProduct = PharmacyProduct::create([
                     'pharmacy_id' => $pharmacy->id,
                     'product_id' => $product->id,
+                    'tax_rate'=> rand(2, 40),
                     'price' => $price = rand(50, 200),
                     'quantity' => rand(10, 100),
                 ]);
@@ -96,10 +97,13 @@ class FullPharmacySeeder extends Seeder
 
             // 6. عروض (Offers)
             foreach ($pharmacyProducts as $pharmacyProduct) {
+              $pharmacy = $pharmacies->random();
+
                 if (rand(0, 1)) {
                     Offer::create([
-                        'pharmacy_product_id' => $pharmacyProduct->id,
-                        'discount_price' => rand(5, $pharmacyProduct->price - 1),
+                        'pharmacy_id' => $pharmacy->id,
+                        'discount_type' => "percentage",
+                        'value' => rand(5, $pharmacyProduct->price - 1),
                         'start_date' => Carbon::now()->subDays(rand(0, 5)),
                         'end_date' => Carbon::now()->addDays(rand(3, 10)),
                     ]);

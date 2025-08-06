@@ -31,6 +31,9 @@ Route::middleware(['auth:client'])->group(function () {
     Route::get('/profile', [ClientProfileController::class, 'get']);
     Route::put('/profile-update', [ClientProfileController::class, 'update']);
     Route::post('/contact-us', [ClientContactController::class, 'store']);
+    Route::apiResource('user-addresses', ClientAddressController::class)->except(['create','show','edit']);
+    Route::put('/profile-image/',[ClientProfileController::class,'updateImage'])->name('profile-image.update');
+    Route::put('/user-language/',[ClientProfileController::class,'updateLang'])->name('user-lang.update');
     Route::post('/add-to-cart', [CartController::class, 'store']);
     Route::get('/cart', [CartController::class, 'index']);
     // Route::store('/order', [CartController::class, 'index']);

@@ -18,7 +18,7 @@ class CartResource extends JsonResource
       return [
           'id' => $this->id,
           'countItems' => $this->countCart(),
-          'total' => $this->subtotal,
+          'total' => round($this->subtotal,2),
           'pharmacies' => PharmacyCartGroupResource::collection($this->groupCartItemsByPharmacy()),
           'createdAt' => $this->created_at ? $this->created_at->format('Y-M-d H:i:s A') : null,
           'updatedAt' => $this->updated_at ? $this->updated_at->format('Y-M-d H:i:s A') : null

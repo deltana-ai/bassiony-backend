@@ -16,7 +16,9 @@ class DatabaseSeeder extends Seeder
             // Add other seeders here
             UserWithTokenSeeder::class,
             UserSeeder::class,
+            FullPharmacySeeder::class,
             PointsSeeder::class,
+
         ]);
     }
 }

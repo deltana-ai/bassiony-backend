@@ -21,11 +21,11 @@ class Cart extends Model
 
       return $items->groupBy(function ($item) {
           return $item->pharmacyProduct->pharmacy_id;
-      })->map(function ($items, $pharmacyId) {
+                                                  })->map(function ($items, $pharmacyId) {
           $pharmacyName = $items->first()->pharmacyProduct->pharmacy->name ?? 'unknown';
 
           $subtotal = $items->sum(function ($item) {
-              return $item->quantity * $item->pharmacyProduct->priceAfterOffer();
+              return $item->quantity * $item->final_price;
           });
 
           return (object) [

@@ -25,7 +25,7 @@ class Order extends Model
 
     protected $casts = [
     'subtotal' => 'float',
-    'order_discount' => 'float',
+    'coupon_discount' => 'float',
     'total' => 'float',
     'paid_amount' => 'float',
     'remaining_amount' => 'float',

@@ -14,14 +14,12 @@ return new class extends Migration
         Schema::create('offers', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('pharmacy_product_id')
-                ->constrained('pharmacy_products')
-                ->cascadeOnDelete();
-
-            $table->decimal('discount_price', 8, 2);
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->softDeletes();
+            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');
+            $table->decimal('value', 10, 2);
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->foreignId('pharmacy_id')->constrained()->onDelete('cascade');
 
             $table->timestamps();
         });

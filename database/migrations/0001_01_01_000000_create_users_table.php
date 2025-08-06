@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('firebase_uid')->nullable();
             $table->unique('firebase_uid');
             $table->string('phone')->nullable();
+            $table->string('profile_image')->nullable();
+
             $table->unique('phone');
 
             $table->text('address')->nullable();

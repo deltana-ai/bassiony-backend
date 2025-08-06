@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('email')->nullable();
             $table->unique('email');
+            $table->string('profile_image')->nullable();
 
             $table->string('firebase_uid')->nullable();
             $table->unique('firebase_uid');
