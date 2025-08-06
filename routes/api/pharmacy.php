@@ -17,13 +17,14 @@ RateLimiter::for('medications_limiter', function ($request) {
     Route::post('/web-login', [WebPharmacistAuthController::class, 'login']);
     Route::post('/web-forgot-password', [WebPharmacistAuthController::class, 'forgotPassword']);
     Route::post('/web-reset-password', [WebPharmacistAuthController::class, 'resetPassword']);
-    Route::get('/verify-email/{id}/{hash}',[WebPharmacistAuthController::class, 'invokeEmail'])->middleware(['signed'])->name('verification.verify.pharmacist');
+    
 //************auth with mobile***************************************
     Route::post('/register', [PharmacistAuthController::class, 'pharmacistRegister']);
     Route::post('/login', [PharmacistAuthController::class, 'pharmacistLogin']);
 });
 Route::middleware(['auth:pharmacist'])->group(function () {
   //*********************auth with web***************************
+    Route::get('/verify-email/{id}/{hash}',[WebPharmacistAuthController::class, 'invokeEmail'])->middleware(['signed'])->name('verification.verify.pharmacist');
     Route::post('/email-resend', [WebPharmacistAuthController::class, 'resentEmail']);
     Route::post('/web-logout', [WebPharmacistAuthController::class, 'logout']);
  //*********************auth mobile*********************************************
