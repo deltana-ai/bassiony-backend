@@ -767,13 +767,11 @@ if (!function_exists('getCurrentNetwork')) {
     function getCurrentNetwork($networks)
     {
         $networkId = request()->header('X-Network-ID');
-
         foreach ($networks as $network) {
             if ($network->pivot->network_id == $networkId) {
                 return $network;
             }
         }
-
         return null;
     }
 }
@@ -817,6 +815,7 @@ if (!function_exists('getNetworkSlug')) {
         return Network::where('id', $networkId)->value('slug');
     }
 }
+
 
 if (!function_exists('getSlugOptions')) {
     function getSlugOptions(): SlugOptions

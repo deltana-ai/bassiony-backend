@@ -8,41 +8,41 @@ function dateCounter($date)
     $now = Carbon::now();
     // Parse the input date and time
     $date = Carbon::parse($date);
-    // Calculate the difference between the input date and the current date
 
-    $diff = $date->diff($now);
-    $isPast = $date->isPast();
+    // Calculate the difference in total months and days
+    $total_months = $date->diffInMonths($now);
+    $months_passed = $date->copy()->addMonths($total_months)->diffInMonths($now);
+    $days_passed = $date->copy()->addMonths($total_months)->diffInDays($now);
 
-   // Calculate the remaining years, months, and days
-    $years_left = floor($diff->days / 365);
-    $months_left = floor(($diff->days % 365) / 30);
-    $days_left = $diff->days % 30;
+    // Adjust the days_passed to include the last day of the month
+    if ($days_passed > 0) {
+        $months_passed--;
+        $days_passed = $now->copy()->addMonths($months_passed)->diffInDays($date);
+    }
 
+    // Construct a message displaying the time passed in months and days
     $message = '';
-    // Construct a message displaying the remaining time in years, months, and days
-    if ($years_left > 0) {
-        $message .= $years_left . ' Year';
-        if ($years_left > 1) {
+    if ($months_passed > 0) {
+        $message .= $months_passed . ' Month';
+        if ($months_passed > 1) {
             $message .= 's';
         }
         $message .= ', ';
     }
-    if ($months_left > 0) {
-        $message .= $months_left . ' Month';
-        if ($months_left > 1) {
-            $message .= 's';
-        }
-        $message .= ', ';
-    }
-    $message .= $days_left . ' Day';
-    if ($days_left > 1) {
+    $message .= $days_passed . ' Day';
+    if ($days_passed > 1) {
         $message .= 's';
     }
 
-     // Add "ago" if the date is in the past
-     if ($isPast) {
+    // Add "ago" if the date is in the past
+    if ($date < $now) {
         $message .= ' ago';
     }
 
     return $message;
 }
+
+
+
+
+

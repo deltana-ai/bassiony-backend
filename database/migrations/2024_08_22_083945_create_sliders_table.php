@@ -17,7 +17,6 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('button')->nullable();
             $table->string('button_link')->nullable();
-            $table->text('description')->nullable();
             $table->boolean('active')->default(1);
             $table->boolean('position')->nullable();
             $table->softDeletes();

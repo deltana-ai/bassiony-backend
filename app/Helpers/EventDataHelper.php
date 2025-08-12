@@ -4,77 +4,10 @@ namespace App\Helpers;
 
 use App\Models\Conference;
 use App\Models\Order;
-use App\Models\SettingEvent;
 use App\Models\User;
 
 class EventDataHelper
 {
-    /**
-     * Get the price based on type and user ID.
-     * @return bool The price.
-     */
-    public static function earlyBirdStatus(int $id): bool
-    {
-        $earlyBirdSetting = Conference::where('id', $id)->value('early_bird_active');
-        return (bool)$earlyBirdSetting;
-    }
-
-    /**
-     * Get the price based on type and user ID.
-     *
-     * @param string $type The type ('delegate' or 'spouse').
-     * @param int $userId The user ID.
-     * @return float The price.
-     */
-    public static function getPrice(string $type, int $userId, int $conferenceId): float
-    {
-        $earlyBird = self::earlyBirdStatus($conferenceId);
-
-        $company = User::find($userId);
-        $conference = Conference::find($conferenceId);
-        $companyMembershipType = $company->active_member; // true is a member, false no non-member
-
-        if ($type === 'delegate') {
-            if ($companyMembershipType) {
-                // Handle delegate price for a member $conference->value('value') event_earlybird_price_delegate   event_price_delegate
-                $price = $earlyBird ? (float)$conference->value('eb_member_delegate_price') : (float)$conference->value('member_delegate_price');
-            } else {
-                // Handle delegate price for a non-member $conference->value('event_earlybird_price_delegate')  event_earlybird_non_member_price_delegate  event_non_member_price_delegate
-                $price = $earlyBird ? (float)$conference->value('eb_non_member_delegate_price') : (float)$conference->value('non_member_delegate_price');
-            }
-        } else if ($type === 'spouse') {
-            if ($companyMembershipType) {
-                // Handle spouse price for a member
-                $price = $earlyBird ? (float)$conference->value('eb_member_spouse_price') : (float)$conference->value('member_spouse_price');
-            } else {
-                // Handle spouse price for a non-member
-                $price = $earlyBird ? (float)$conference->value('eb_non_member_spouse_price') : (float)$conference->value('non_member_spouse_price');
-            }
-        } else {
-            $price = 0;
-        }
-
-        return $price;
-    }
-
-
-    /**
-     * Get the price based on type and user ID.
-     * @param float $totalPrice
-     * @param float $discountValue
-     * @param string $discountType
-     * @return float The price.
-     */
-    public static function applyDiscount(float $totalPrice, float $discountValue, string $discountType): float
-    {
-        if ($discountType === 'percentage') {
-            $discountedPrice = $totalPrice * ($discountValue / 100);
-        } else {
-            $discountedPrice = $discountValue;
-        }
-        return max(0, $discountedPrice); // Ensure the price doesn't go below zero
-    }
-
     /**
      * @param int $id
      * @return void
@@ -83,7 +16,7 @@ class EventDataHelper
     {
         $order = Order::find($id);
         if ($order->status == "approved_online_payment" || $order->status == "approved_bank_transfer") {
-          return  ;
+            return;
         } else {
             $userCountApprovedOrders = User::ordersCount('approved')->find($order->user_id)->orders_count;
             $delegateFee = self::getPrice('delegate', $order->user_id, $order->conference_id);
@@ -135,7 +68,7 @@ class EventDataHelper
 
                 if (!$earlyBird) {
                     $priceUsed = $sponsorshipItem->price;
-                }else{
+                } else {
                     $priceUsed = $sponsorshipItem->earlybird_price;
                 }
                 $order->sponsorshipItems()->updateExistingPivot($sponsorshipItem->id, ['price_sponsorship_item' => $priceUsed]);
@@ -177,9 +110,6 @@ class EventDataHelper
             } else {
                 $totalAmount = $packagePrice + $totalDelegatesPrice + $totalSpousesPrice + $totalRoomsPrice + $totalSponsorshipItemsPrice;
             }
-
-
-
 
 
             if ($totalAmount === 0 && $userCountApprovedOrders === 0) {
@@ -279,5 +209,70 @@ class EventDataHelper
                 }
             }
         }
+    }
+
+    /**
+     * Get the price based on type and user ID.
+     *
+     * @param string $type The type ('delegate' or 'spouse').
+     * @param int $userId The user ID.
+     * @return float The price.
+     */
+    public static function getPrice(string $type, int $userId, int $conferenceId): float
+    {
+        $earlyBird = self::earlyBirdStatus($conferenceId);
+
+        $company = User::find($userId);
+        $conference = Conference::find($conferenceId);
+        $companyMembershipType = $company->active_member; // true is a member, false no non-member
+
+        if ($type === 'delegate') {
+            if ($companyMembershipType) {
+                // Handle delegate price for a member $conference->value('value') event_earlybird_price_delegate   event_price_delegate
+                $price = $earlyBird ? (float)$conference->value('eb_member_delegate_price') : (float)$conference->value('member_delegate_price');
+            } else {
+                // Handle delegate price for a non-member $conference->value('event_earlybird_price_delegate')  event_earlybird_non_member_price_delegate  event_non_member_price_delegate
+                $price = $earlyBird ? (float)$conference->value('eb_non_member_delegate_price') : (float)$conference->value('non_member_delegate_price');
+            }
+        } else if ($type === 'spouse') {
+            if ($companyMembershipType) {
+                // Handle spouse price for a member
+                $price = $earlyBird ? (float)$conference->value('eb_member_spouse_price') : (float)$conference->value('member_spouse_price');
+            } else {
+                // Handle spouse price for a non-member
+                $price = $earlyBird ? (float)$conference->value('eb_non_member_spouse_price') : (float)$conference->value('non_member_spouse_price');
+            }
+        } else {
+            $price = 0;
+        }
+
+        return $price;
+    }
+
+    /**
+     * Get the price based on type and user ID.
+     * @return bool The price.
+     */
+    public static function earlyBirdStatus(int $id): bool
+    {
+        $earlyBirdSetting = Conference::where('id', $id)->value('early_bird_active');
+        return (bool)$earlyBirdSetting;
+    }
+
+    /**
+     * Get the price based on type and user ID.
+     * @param float $totalPrice
+     * @param float $discountValue
+     * @param string $discountType
+     * @return float The price.
+     */
+    public static function applyDiscount(float $totalPrice, float $discountValue, string $discountType): float
+    {
+        if ($discountType === 'percentage') {
+            $discountedPrice = $totalPrice * ($discountValue / 100);
+        } else {
+            $discountedPrice = $discountValue;
+        }
+        return $discountedPrice; // Ensure the price doesn't go below zero
     }
 }

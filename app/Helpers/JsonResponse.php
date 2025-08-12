@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Response;
 class JsonResponse
 {
     const MSG_ADDED_SUCCESSFULLY = 'Item has been added successfully';
-    const MSG_ADDED_SUCCESSFULLY_APPLICATION = 'Application has been submitted successfully';
     const MSG_UPDATED_SUCCESSFULLY = "Item has been updated successfully";
     const MSG_DELETED_SUCCESSFULLY = "Item has been deleted successfully";
     const MSG_COUPON_REMOVED_SUCCESSFULLY = "Coupon Code has been removed successfully";
