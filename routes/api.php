@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
@@ -12,6 +14,21 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
+///////////////////////////////added by zeinab /////////////////////////////////////////
+//********************************** dashboard brands **************************
+Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+  Route::apiResource('brands', AdminBrandController::class)->except(['destroy']);
+  Route::delete('brands/delete', [AdminBrandController::class, 'destroy']);
+
+  Route::post('brands/restore', [AdminBrandController::class, 'restore']);
+  Route::delete('brands/force-delete', [AdminBrandController::class, 'forceDelete']);
+
+});
+//**************************application brands*************************************
+Route::get('brands/get', [BrandController::class, 'index']);
+Route::get('brands/show/{id}', [BrandController::class, 'show']);
+
+///////////////////////////////////////////////////////////////////////////////////////
 
 
 //////////////////////////////////////// user ////////////////////////////////
