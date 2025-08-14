@@ -19,13 +19,20 @@ class AdminRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+   public function rules(): array
     {
-        return [
+        $rules = [
             'name' => 'nullable',
             'super_admin' => ['boolean'],
-            'email' => ['nullable','email'],
+            'email' => ['nullable', 'email'],
             'password' => ['nullable'],
         ];
+
+        if ($this->isMethod('post')) { 
+            $rules['email'][] = 'unique:admins,email';
+        }
+
+        return $rules;
     }
+
 }

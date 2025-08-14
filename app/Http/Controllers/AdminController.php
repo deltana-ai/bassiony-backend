@@ -101,6 +101,7 @@ class AdminController extends BaseController
 
     public function login(Request $request): \Illuminate\Http\JsonResponse
     {
+        try {
         $credentials = $request->only('email', 'password');
         $admin = Admin::where('email', $credentials['email'])->first();
         if ($admin) {
@@ -117,10 +118,10 @@ class AdminController extends BaseController
                 ]);
             }
         }
-        return response()->json([
-            'result' => 'Error',
-            'message' => 'Invalid credentials',
-        ], 401);
+        return JsonResponse::respondError('Error Data Not Match', 401);
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
     }
 
     public function logout()

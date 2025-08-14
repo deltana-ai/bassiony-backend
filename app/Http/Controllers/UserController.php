@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\JsonResponse;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\LogResource;
 use App\Http\Resources\UserIndexResource;
@@ -90,29 +91,7 @@ class UserController extends BaseController
         }
     }
 
-    public function login(Request $request)
-    {
-        try {
-            $request->validate([
-                'email' => 'required|email',
-                'password' => 'required',
-            ]);
 
-            $user = User::where('email', $request->email)->first();
-
-            if (!$user || !Hash::check($request->password, $user->password)) {
-                return JsonResponse::respondError('The provided credentials are incorrect.');
-            }
-
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return JsonResponse::respondSuccess([
-                'access_token' => $token,
-            ]);
-        } catch (Exception $e) {
-            return JsonResponse::respondError($e->getMessage());
-        }
-    }
     public function forceDelete(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
@@ -122,11 +101,88 @@ class UserController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
+
+    public function register(RegisterRequest $request)
+    {
+        $validated = $request->validated();
+
+        try {
+            $user = $this->crudRepository->createUser($validated);
+
+            $token = $user->createToken('user-token')->plainTextToken;
+
+            return response()->json([
+                'status'  => true,
+                'user'    => new UserResource($user),
+                'message' => 'User Registered Successfully',
+                'token'   => $token
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return JsonResponse::respondError($th->getMessage());
+        }
+    }
+
+
+    public function login(Request $request)
+    {
+        try {
+            $request->validate([
+                'login' => 'required',
+                'password' => 'required',
+            ]);
+
+            $fieldType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+            $user = User::where($fieldType, $request->login)->first();
+
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return JsonResponse::respondError('The provided credentials are incorrect.');
+            }
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'status' => true,
+                'user' => new UserResource($user),
+                'message' => 'User Logged In Successfully',
+                'token' => $token
+            ]);
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+    public function changePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'login' => 'required',
+                'password' => 'required|min:6|confirmed',
+            ]);
+
+            $fieldType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+            $user = User::where($fieldType, $request->login)->first();
+
+            if (!$user) {
+                return JsonResponse::respondError('User not found.');
+            }
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+
+            return JsonResponse::respondSuccess('Password updated successfully');
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        $request->user('users')->tokens()->delete();
 
-        return JsonResponse::respondSuccess([], 'Successfully logged out');
+        return JsonResponse::respondSuccess('Successfully logged out');
     }
 
 }

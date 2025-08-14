@@ -12,15 +12,11 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('login', [UserController::class, 'login']);
-Route::post('logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
-Route::post('application-form', [UserController::class, 'applicationForm']);
-Route::post('/log/index', [UserController::class, 'logIndex']);
-Route::get('/user-total-count-country', [UserController::class, 'totalCountPerCountry']);
+
 
 //////////////////////////////////////// user ////////////////////////////////
 
-Route::middleware([])->group(function () {
+Route::middleware(['auth:admins'])->group(function () {
     Route::post('/user/index', [UserController::class, 'index']);
     Route::post('user/restore', [UserController::class, 'restore']);
     Route::delete('user/delete', [UserController::class, 'destroy']);
@@ -29,13 +25,27 @@ Route::middleware([])->group(function () {
     Route::apiResource('user', UserController::class);
 });
 
-
+Route::prefix('user')->middleware('throttle:20')->group(function () {
+    Route::post('register', [UserController::class, 'register']);
+    Route::post('login', [UserController::class, 'login']);
+    Route::post('change-password', [UserController::class, 'changePassword']);
+    Route::post('logout', [UserController::class, 'logout'])->middleware('auth:users');
+});
 
 
 //////////////////////////////////////// user ////////////////////////////////
 
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 ////////////////////////////////////////// Admin ////////////////////////////////
-Route::middleware([])->group(function () {
+Route::middleware(['auth:admins'])->group(function () {
     Route::post('/admin/index', [AdminController::class, 'index']);
     Route::post('admin/restore', [AdminController::class, 'restore']);
     Route::delete('admin/delete', [AdminController::class, 'destroy']);
@@ -50,6 +60,15 @@ Route::post('/admin/login', [AdminController::class, 'login']);
 ////////////////////////////////////////// Admin ////////////////////////////////
 
 
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////// media ////////////////////////////////
+
 Route::group(['middleware' => ['api']], static function () {
     Route::get('/media', [MediaController::class, 'index']);
     Route::get('/media/{media}', [MediaController::class, 'show']);
@@ -61,9 +80,19 @@ Route::group(['middleware' => ['api']], static function () {
 Route::get('/get-media/{media}', [MediaController::class, 'show']);
 Route::post('/media-array', [MediaController::class, 'showMedia']);
 Route::post('/media-upload-many', [MediaController::class, 'storeMany']);
+////////////////////////////////////////// media ////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 
 //////////////////////////////////////// ContactUs ////////////////////////////////
-Route::middleware([])->group(function () {
+Route::middleware(['auth:admins'])->group(function () {
     Route::post('/contactus/index', [ContactUsController::class, 'index']);
     Route::post('contactus/restore', [ContactUsController::class, 'restore']);
     Route::delete('contactus/delete', [ContactUsController::class, 'destroy']);
@@ -78,9 +107,18 @@ Route::post('publicsss', [ContactUsController::class, 'aaaa']);
 
 
 
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 //////////////////////////////////////// Slider ////////////////////////////////
 
-Route::middleware([])->group(function () {
+Route::middleware(['auth:admins'])->group(function () {
     Route::post('slider/index', [SliderController::class, 'index']);
     Route::post('slider/restore', [SliderController::class, 'restore']);
     Route::delete('slider/delete', [SliderController::class, 'destroy']);
@@ -95,3 +133,4 @@ Route::get('/get-slider', [SliderController::class, 'indexPublic']);
 
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

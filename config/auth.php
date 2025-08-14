@@ -40,11 +40,20 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'users' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
         'admins' => [
             'driver' => 'sanctum',
             'provider' => 'admins',
         ],
+        'pharmacists' => [
+            'driver' => 'sanctum',
+            'provider' => 'pharmacists',
+        ],
     ],
+
 
     /*
     |--------------------------------------------------------------------------
@@ -72,6 +81,11 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+
+         'pharmacists' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Pharmacist::class,
         ],
     ],
 
@@ -103,6 +117,12 @@ return [
         ],
         'admins' => [
             'provider' => 'admins',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+         'pharmacists' => [
+            'provider' => 'pharmacists',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
