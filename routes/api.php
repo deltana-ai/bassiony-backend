@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\BrandController;
+use App\Http\Controllers\{BrandController,CategoryController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
+use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
+
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
@@ -17,17 +19,24 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 ///////////////////////////////added by zeinab /////////////////////////////////////////
 //********************************** dashboard brands **************************
 Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+
   Route::apiResource('brands', AdminBrandController::class)->except(['destroy']);
   Route::delete('brands/delete', [AdminBrandController::class, 'destroy']);
-
   Route::post('brands/restore', [AdminBrandController::class, 'restore']);
   Route::delete('brands/force-delete', [AdminBrandController::class, 'forceDelete']);
+           /********************category********************/
+  Route::apiResource('categories', AdminCategoryController::class)->except(['destroy']);
+  Route::delete('categories/delete', [AdminCategoryController::class, 'destroy']);
+  Route::post('categories/restore', [AdminCategoryController::class, 'restore']);
+  Route::delete('categories/force-delete', [AdminCategoryController::class, 'forceDelete']);
 
 });
 //**************************application brands*************************************
 Route::get('brands/get', [BrandController::class, 'index']);
 Route::get('brands/show/{id}', [BrandController::class, 'show']);
-
+/***********************application categories ***********************************/
+Route::get('categories/get', [CategoryController::class, 'index']);
+Route::get('categories/show/{id}', [CategoryController::class, 'show']);
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
