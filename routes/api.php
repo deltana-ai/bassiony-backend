@@ -9,6 +9,7 @@ use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PharmacyProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -160,3 +161,16 @@ Route::get('/get-slider', [SliderController::class, 'indexPublic']);
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////products/////////////
+Route::middleware(['auth:admins'])->group(function () {
+    Route::post('product/index', [PharmacyProductController::class, 'index']);
+    Route::post('product/restore', [PharmacyProductController::class, 'restore']);
+    Route::delete('product/delete', [PharmacyProductController::class, 'destroy']);
+    Route::put('/product/{id}/{column}', [PharmacyProductController::class, 'toggle']);
+    Route::delete('product/force-delete', [PharmacyProductController::class, 'forceDelete']);
+    Route::apiResource('product', PharmacyProductController::class);
+});
+
+Route::get('/get-product', [PharmacyProductController::class, 'indexPublic']);
