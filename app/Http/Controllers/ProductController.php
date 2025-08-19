@@ -108,14 +108,17 @@ class ProductController extends BaseController
         }
     }
 
-    public function indexPublic()
+    public function indexPublic(Request $request)
     {
         try {
-            $products = Product::where('active', 1)
-                ->orderBy('position', 'asc')
-                ->get();
-            return ProductResource::collection($products);
-        } catch (Exception $e) {
+        $query = Product::where('active', 1);
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+        $products = $query->orderBy('position', 'asc')->get();
+        return ProductResource::collection($products);
+    } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }

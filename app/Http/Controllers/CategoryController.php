@@ -20,23 +20,24 @@ class CategoryController extends BaseController
         $this->crudRepository = $pattern;
     }
 
-    public function index()
+   public function index(Request $request)
     {
-      try {
-
-          $categories = Category::where('active', 1)
-              ->orderBy('position', 'asc')->take(20)
-              ->get();
-
-
-          return CategoryResource::collection($categories);
-      } catch (Exception $e) {
-          return JsonResponse::respondError($e->getMessage());
-      }
+     try {
+        $query = Category::where('active', 1);
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+        $categories = $query->orderBy('position', 'asc')->get();
+        return CategoryResource::collection($categories);
+        }
+         catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
     }
 
 
-    public function show(Category $category): ?\Illuminate\Http\JsonResponse
+    public function show(Category $category)
     {
         // here we show products belongs to this Category
     }
