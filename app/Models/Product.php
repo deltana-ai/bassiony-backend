@@ -28,13 +28,25 @@ class Product extends BaseModel
 
     public function ratings()
     {
-            return $this->hasMany(ProductRating::class);
+        return $this->hasMany(ProductRating::class);
     }
 
-public function pharmacies()
-{
-    return $this->belongsToMany(Pharmacy::class, 'pharmacy_products')
-                ->withPivot('price', 'stock', 'expiry_date')
-                ->withTimestamps();
-}
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+
+    public function pharmacies()
+    {
+        return $this->belongsToMany(Pharmacy::class, 'pharmacy_product')
+                    ->withPivot('price', 'stock', 'expiry_date')
+                    ->withTimestamps();
+    }
 }

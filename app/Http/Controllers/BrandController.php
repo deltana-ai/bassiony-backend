@@ -36,7 +36,7 @@ class BrandController extends BaseController
     }
 
 
-    public function show(Brand $brand): ?\Illuminate\Http\JsonResponse
+    public function show(Brand $brand)
     {
         // here we show products belongs to this brand
     }

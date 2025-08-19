@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\{BrandController,CategoryController};
+use App\Http\Controllers\{BrandController,CategoryController, ProductController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 
@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+
 
 ///////////////////////////////added by zeinab /////////////////////////////////////////
 //********************************** dashboard brands **************************
@@ -162,15 +165,17 @@ Route::get('/get-slider', [SliderController::class, 'indexPublic']);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////// products /////////////////////////////////
 
-////////products/////////////
-Route::middleware(['auth:admins'])->group(function () {
-    Route::post('product/index', [PharmacyProductController::class, 'index']);
-    Route::post('product/restore', [PharmacyProductController::class, 'restore']);
-    Route::delete('product/delete', [PharmacyProductController::class, 'destroy']);
-    Route::put('/product/{id}/{column}', [PharmacyProductController::class, 'toggle']);
-    Route::delete('product/force-delete', [PharmacyProductController::class, 'forceDelete']);
-    Route::apiResource('product', PharmacyProductController::class);
-});
+    Route::middleware(['auth:admins'])->group(function () {
+        Route::post('product/index', [ProductController::class, 'index']);
+        Route::post('product/restore', [ProductController::class, 'restore']);
+        Route::delete('product/delete', [ProductController::class, 'destroy']);
+        Route::put('/product/{id}/{column}', [ProductController::class, 'toggle']);
+        Route::delete('product/force-delete', [ProductController::class, 'forceDelete']);
+        Route::apiResource('product', ProductController::class);
+    });
 
-Route::get('/get-product', [PharmacyProductController::class, 'indexPublic']);
+    Route::get('/get-product', [ProductController::class, 'indexPublic']);
+
+/////////////////////////////////////// products /////////////////////////////////

@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('pharmacy_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->decimal('price', 8, 2)->nullable();
-            $table->integer('stock')->default(0); 
+            $table->integer('stock')->default(0);
+            $table->date('expiry_date')->nullable();
             $table->timestamps();
         });
     }

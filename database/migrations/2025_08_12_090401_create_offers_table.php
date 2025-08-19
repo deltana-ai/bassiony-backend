@@ -19,7 +19,6 @@ return new class extends Migration
             $table->date('end_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignId('pharmacy_id')->constrained()->onDelete('cascade');
-
             $table->timestamps();
         });
     }

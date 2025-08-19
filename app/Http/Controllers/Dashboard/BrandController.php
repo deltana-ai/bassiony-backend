@@ -21,7 +21,6 @@ class BrandController extends BaseController
 
     public function index()
     {
-
         try {
 
             $brands = BrandResource::collection($this->crudRepository->all(
