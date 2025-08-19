@@ -19,29 +19,53 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////added by zeinab /////////////////////////////////////////
-//********************************** dashboard brands **************************
+/////////////////////////////// Brands /////////////////////////////////////////
+
 Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
 
-  Route::apiResource('brands', AdminBrandController::class)->except(['destroy']);
-  Route::delete('brands/delete', [AdminBrandController::class, 'destroy']);
-  Route::post('brands/restore', [AdminBrandController::class, 'restore']);
-  Route::delete('brands/force-delete', [AdminBrandController::class, 'forceDelete']);
-           /********************category********************/
-  Route::apiResource('categories', AdminCategoryController::class)->except(['destroy']);
-  Route::delete('categories/delete', [AdminCategoryController::class, 'destroy']);
-  Route::post('categories/restore', [AdminCategoryController::class, 'restore']);
-  Route::delete('categories/force-delete', [AdminCategoryController::class, 'forceDelete']);
-
+    Route::post('brands/index', [AdminBrandController::class, 'index']);
+    Route::put('/brands/{id}/{column}', [AdminBrandController::class, 'toggle']);
+    Route::delete('brands/delete', [AdminBrandController::class, 'destroy']);
+    Route::post('brands/restore', [AdminBrandController::class, 'restore']);
+    Route::delete('brands/force-delete', [AdminBrandController::class, 'forceDelete']);
+    Route::apiResource('brands', AdminBrandController::class)->except(['destroy','index']);
 });
-//**************************application brands*************************************
 Route::get('brands/get', [BrandController::class, 'index']);
 Route::get('brands/show/{id}', [BrandController::class, 'show']);
-/***********************application categories ***********************************/
+
+/////////////////////////////// Brands /////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////categories //////////////////////////////////////
+
+
+Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+
+    Route::post('categories/index', [AdminCategoryController::class, 'index']);
+    Route::put('/categories/{id}/{column}', [AdminCategoryController::class, 'toggle']);
+    Route::delete('categories/delete', [AdminCategoryController::class, 'destroy']);
+    Route::post('categories/restore', [AdminCategoryController::class, 'restore']);
+    Route::delete('categories/force-delete', [AdminCategoryController::class, 'forceDelete']);
+    Route::apiResource('categories', AdminCategoryController::class)->except(['destroy','index']);
+
+});
+
 Route::get('categories/get', [CategoryController::class, 'index']);
 Route::get('categories/show/{id}', [CategoryController::class, 'show']);
-///////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////categories //////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 //////////////////////////////////////// user ////////////////////////////////
