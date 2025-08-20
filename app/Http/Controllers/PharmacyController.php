@@ -1,151 +1,108 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Controllers\BaseController;
 
 use App\Helpers\JsonResponse;
+use App\Http\Controllers\BaseController;
+use App\Http\Resources\{PharmacyResource, PharmacyDetailsResource, ProductResource, CategoryResource, BrandResource};
+use App\Models\{Pharmacy, Product, Category, Brand};
+use App\Repositories\EnterpriseRepository;
 use Illuminate\Http\Request;
-use App\Http\Resources\{PharmacyResource,PharmacyDetailsResource,ProductResource,CategoryResource,BrandResource};
-use App\Models\{Pharmacy,Product,Category,Brand};
 use Exception;
 
 class PharmacyController extends BaseController
 {
+    protected $repo;
 
-    public function index(Request $request){
+    public function __construct(EnterpriseRepository $repo)
+    {
+        $this->repo = $repo;
+    }
+
+    public function index(Request $request)
+    {
         try {
-            $query = Pharmacy::query()->select('id','name')->withAvg('ratings','rating')->withCount('ratings');
-            $per_page = 10;
-            if ($request->filled('per_page')) {
-                $per_page = $request->get('per_page');
-            }
-            if ($request->filled('search')) {
-                $search = $request->get('search');
-                $query->where('name', 'LIKE', "%{$search}%");
-            }
-            $pharmacies = $query->paginate($per_page);
+            $query = Pharmacy::query()
+                ->select('id','name')
+                ->withAvg('ratings','rating')
+                ->withCount('ratings');
+
+            $pharmacies = $this->repo->applyFilters($query, $request);
+
             return PharmacyResource::collection($pharmacies);
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-
-    public function show($id){
+    public function show($id)
+    {
         try {
             if (is_null($id)) {
                 return JsonResponse::respondError('Pharmacy id is required');
             }
-            $pharmacy = Pharmacy::withAvg('ratings','rating')->withCount('ratings')->find($id);
-            $pharmacy = new PharmacyDetailsResource($pharmacy);
-            return $pharmacy->additional(JsonResponse::success());
+
+            $pharmacy = Pharmacy::withAvg('ratings','rating')
+                ->withCount('ratings')
+                ->find($id);
+
+            return (new PharmacyDetailsResource($pharmacy))
+                ->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-
-    public function getPharmacyOffers(Request $request,$id){
+    public function getPharmacyProducts(Request $request, $id)
+    {
         try {
-            if (is_null($id)) {
-                return JsonResponse::respondError('Pharmacy id is required');
-            }
-            $query = Product::where('active', 1)->whereHas('offers')->whereHas('pharmacies',function($q) use ($id){
-                $q->where('pharmacies.id','=',$id);
-            });
-            $per_page = 10;
-            if ($request->filled('per_page')) {
-                $per_page = $request->get('per_page');
-            }
-            if ($request->filled('search')) {
-                $search = $request->get('search');
-                $query->where('name', 'LIKE', "%{$search}%");
-            }
-            $products = $query->orderBy('position', 'asc')->paginate($per_page);
+            $query = Product::query();
+
+            $products = $this->repo->applyFilters($query, $request, $id, 'pharmacies');
+
             return ProductResource::collection($products);
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-    public function getPharmacyProducts(Request $request,$id){
+    public function getPharmacyOffers(Request $request, $id)
+    {
         try {
-            if (is_null($id)) {
-                return JsonResponse::respondError('Pharmacy id is required');
-            }
-            $query = Product::where('active', 1)->whereHas('pharmacies',function($q) use ($id){
-                $q->where('pharmacies.id','=',$id);
-            });
-            $per_page = 10;
-            if ($request->filled('per_page')) {
-                $per_page = $request->get('per_page');
-            }
-            if ($request->filled('search')) {
-                $search = $request->get('search');
-                $query->where('name', 'LIKE', "%{$search}%");
-            }
-            $products = $query->orderBy('position', 'asc')->paginate($per_page);
+            $query = Product::where('active', 1)
+                ->whereHas('offers');
+
+            $products = $this->repo->applyFilters($query, $request, $id , 'pharmacies');
+
             return ProductResource::collection($products);
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-
-    public function getPharmacyCategories(Request $request,$id)
+    public function getPharmacyCategories(Request $request, $id)
     {
-     try {
-        if (is_null($id)) {
-            return JsonResponse::respondError('Pharmacy id is required');
-        }
-        $query = Category::query()->where('active', 1)
-            ->select('categories.*')
-            ->whereHas('products.pharmacies', function ($q) use ($id) {
-                $q->where('pharmacies.id', $id);
-            });
-        $per_page = 10;
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where('name', 'LIKE', "%{$search}%");
-        }
-        if ($request->filled('per_page')) {
-            $per_page = $request->get('per_page');
-        }
-        $categories = $query->orderBy('position', 'asc')->paginate($per_page);
-        return CategoryResource::collection($categories);
-        }
-         catch (Exception $e) {
+        try {
+            $query = Category::query()->select('categories.*');
+
+            $categories = $this->repo->applyFilters($query, $request, $id , 'products.pharmacies');
+
+            return CategoryResource::collection($categories);
+        } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-
-    public function getPharmacyBrands(Request $request,$id)
+    public function getPharmacyBrands(Request $request, $id)
     {
-     try {
-        if (is_null($id)) {
-            return JsonResponse::respondError('Pharmacy id is required');
-        }
-        $query = Brand::query()->where('active', 1)
-            ->select('brands.*')
-            ->whereHas('products.pharmacies', function ($q) use ($id) {
-                $q->where('pharmacies.id', $id);
-            });
-        $per_page = 10;
-        if ($request->filled('per_page')) {
-            $per_page = $request->get('per_page');
-        }
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where('name', 'LIKE', "%{$search}%");
-        }
-        $brands = $query->orderBy('position', 'asc')->paginate($per_page);;
-        return BrandResource::collection($brands);
-        }
-         catch (Exception $e) {
+        try {
+            $query = Brand::query()->select('brands.*');
+
+            $brands = $this->repo->applyFilters($query, $request, $id , 'products.pharmacies');
+
+            return BrandResource::collection($brands);
+        } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
-
-
 }
