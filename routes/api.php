@@ -215,6 +215,6 @@ Route::get('/get-slider', [SliderController::class, 'indexPublic']);
     });
 
     Route::get('/get-product', [ProductController::class, 'indexPublic']);
-        Route::apiResource('product', ProductController::class);
+        Route::apiResource('products', ProductController::class);
 
 /////////////////////////////////////// products /////////////////////////////////
