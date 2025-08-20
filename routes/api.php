@@ -4,7 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\{BrandController,CategoryController, ProductController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
-
+use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
@@ -17,6 +17,20 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////////pharmacies/////////////////////////////////////////
+
+Route::get('pharmacies/get', [PharmacyController::class, 'index']);
+Route::get('pharmacies/show/{id}', [PharmacyController::class,'show']);
+Route::get('pharmacies/{id}/products', [PharmacyController::class,'getPharmacyProducts']);
+Route::get('pharmacies/{id}/offers', [PharmacyController::class,'getPharmacyOffers']);
+Route::get('pharmacies/{id}/categories', [PharmacyController::class,'getPharmacyCategories']);
+Route::get('pharmacies/{id}/brands', [PharmacyController::class,'getPharmacyBrands']);
+
+//////////////////////////////////////pharmacies/////////////////////// 
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

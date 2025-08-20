@@ -19,4 +19,8 @@ class Category extends BaseModel
         'active' => 'boolean',
         'show_home'=>'boolean'
     ];
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

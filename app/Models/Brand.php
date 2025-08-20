@@ -19,4 +19,9 @@ class Brand extends BaseModel
         'show_home'=>'boolean'
     ];
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
 }

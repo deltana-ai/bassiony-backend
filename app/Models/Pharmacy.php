@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Traits\HasMedia;
 class Pharmacy extends BaseModel
 {
-    use SoftDeletes;
-
+     use HasMedia, SoftDeletes;
+    protected $with = [
+        'media',
+    ];
    protected $guarded = ['id'];
 
    public function ratings()
@@ -22,5 +24,9 @@ class Pharmacy extends BaseModel
                     ->withPivot('price', 'stock')
                     ->withTimestamps();
     }
+
+
+   
+
 
 }

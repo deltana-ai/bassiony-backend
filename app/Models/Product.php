@@ -11,7 +11,7 @@ class Product extends BaseModel
     use HasMedia , SoftDeletes;
 
     protected $with = [
-        'media',
+        'media','offers','pharmacies',
     ];
 
     protected $guarded = ['id'];
@@ -46,7 +46,7 @@ class Product extends BaseModel
     public function pharmacies()
     {
         return $this->belongsToMany(Pharmacy::class, 'pharmacy_product')
-                    ->withPivot('price', 'stock', 'expiry_date')
+                    ->withPivot('price', 'stock')
                     ->withTimestamps();
     }
 }
