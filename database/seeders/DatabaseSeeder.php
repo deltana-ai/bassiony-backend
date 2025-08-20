@@ -14,9 +14,18 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
-        $this->call(AdminSeeder::class);
-        $this->call(BaseSeeder::class);
+        // $this->call();
+        // $this->call();
         // User::factory(100)->create();
+        $this->call([
+            CategoriesSeeder::class,
+            BrandSeeder::class,
+            PharmacySeeder::class,
+        ProductSeeder::class,
+        PharmacyProductSeeder::class,
+        AdminSeeder::class,
+        BaseSeeder::class,
+    ]);
 
     }
 }
