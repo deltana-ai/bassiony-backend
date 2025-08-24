@@ -6,13 +6,13 @@ use App\Interfaces\AdminRepositoryInterface;
 use App\Interfaces\ContactUsRepositoryInterface;
 use App\Interfaces\SliderRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
-use App\Interfaces\{BrandRepositoryInterface,CategoryRepositoryInterface, ProductRepositoryInterface,FavoriteRepositoryInterface, RateRepositoryInterface};
+use App\Interfaces\{BrandRepositoryInterface,CategoryRepositoryInterface, ProductRepositoryInterface,FavoriteRepositoryInterface, PillReminderRepositoryInterface, RateRepositoryInterface};
 
 use App\Repositories\AdminRepository;
 use App\Repositories\ContactUsRepository;
 use App\Repositories\SliderRepository;
 use App\Repositories\UserRepository;
-use App\Repositories\{BrandRepository,CategoryRepository, ProductRepository,FavoriteRepository, RateRepository};
+use App\Repositories\{BrandRepository,CategoryRepository, ProductRepository,FavoriteRepository, PillReminderRepository, RateRepository};
 
 use Illuminate\Support\ServiceProvider;
 
@@ -32,6 +32,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(FavoriteRepositoryInterface::class, FavoriteRepository::class);
         $this->app->bind(RateRepositoryInterface::class, RateRepository::class);
+        $this->app->bind(PillReminderRepositoryInterface::class, PillReminderRepository::class);
 
     }
 

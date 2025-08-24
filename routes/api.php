@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\{BrandController,CategoryController, ProductController,OfferController,FavoriteController, RateController};
+use App\Http\Controllers\{BrandController,CategoryController, ProductController,OfferController,FavoriteController, RateController,PillReminderController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\PharmacyController;
@@ -265,3 +265,17 @@ Route::middleware(['auth:users'])->group(function () {
 
 Route::get('/get-rate', [RateController::class, 'indexPublic']);
 Route::apiResource('rate', RateController::class);
+
+
+
+/////////////////////////////////
+
+
+Route::middleware(['auth:users'])->group(function () {
+    Route::get('/pill-reminders', [PillReminderController::class, 'index']);
+    Route::post('/pill-reminders', [PillReminderController::class, 'store']);
+    Route::get('/pill-reminders/{id}', [PillReminderController::class, 'show']);
+    Route::put('/pill-reminders/{id}', [PillReminderController::class, 'update']);
+    Route::delete('/pill-reminders/{id}', [PillReminderController::class, 'destroy']);
+    Route::get('/pill-reminders/schedule', [PillReminderController::class, 'schedule']);
+});
