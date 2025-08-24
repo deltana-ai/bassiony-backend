@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\{BrandController,CategoryController, ProductController};
+use App\Http\Controllers\{BrandController,CategoryController, ProductController,OfferController,FavoriteController, RateController,PillReminderController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\PharmacyController;
@@ -103,6 +103,21 @@ Route::prefix('user')->middleware('throttle:20')->group(function () {
 
 //////////////////////////////////////// user ////////////////////////////////
 
+
+Route::middleware(['auth:pharmacists'])->group(function () {
+    
+    Route::post('/offer/index', [OfferController::class, 'index']);
+    Route::post('/offer/restore', [OfferController::class, 'restore']);
+    Route::delete('/offer/delete', [OfferController::class, 'destroy']);
+    Route::put('/offer/{id}/{column}', [OfferController::class, 'toggle']);
+    Route::delete('/offer/force-delete', [OfferController::class, 'forceDelete']);
+    Route::apiResource('offer', OfferController::class);
+    
+    Route::post('/offer/{offer}/products/add', [OfferController::class, 'addProductToOffer']);
+    Route::post('/offer/{offer}/products/remove', [OfferController::class, 'removeProductFromOffer']);
+    
+    Route::get('/offers/public', [OfferController::class, 'indexPublic'])->withoutMiddleware(['auth:pharmacists']);
+});
 
 
 
@@ -218,3 +233,49 @@ Route::get('/get-slider', [SliderController::class, 'indexPublic']);
         Route::apiResource('products', ProductController::class);
 
 /////////////////////////////////////// products /////////////////////////////////
+
+
+/////////////////// favorite ///////////////////////
+Route::middleware(['auth:users'])->group(function () {
+    Route::post('favorite/index', [FavoriteController::class, 'index']);
+    Route::post('favorite/restore', [FavoriteController::class, 'restore']);
+    Route::delete('favorite/delete', [FavoriteController::class, 'destroy']);
+    Route::put('/favorite/{id}/{column}', [FavoriteController::class, 'toggle']);
+    Route::delete('favorite/force-delete', [FavoriteController::class, 'forceDelete']);
+    Route::apiResource('favorite', FavoriteController::class);
+});
+
+
+Route::get('/get-favorite', [FavoriteController::class, 'indexPublic']);
+Route::apiResource('favorites', FavoriteController::class);
+
+////////////////////////////////////////////////////
+
+
+
+Route::middleware(['auth:users'])->group(function () {
+    Route::post('rate/index', [RateController::class, 'store']);
+    Route::post('rate/restore', [RateController::class, 'restore']);
+    Route::delete('rate/delete', [RateController::class, 'destroy']);
+    Route::put('/rate/{id}/{column}', [RateController::class, 'toggle']);
+    Route::delete('rate/force-delete', [RateController::class, 'forceDelete']);
+    Route::apiResource('rate', RateController::class);
+});
+
+
+Route::get('/get-rate', [RateController::class, 'indexPublic']);
+Route::apiResource('rate', RateController::class);
+
+
+
+/////////////////////////////////
+
+
+Route::middleware(['auth:users'])->group(function () {
+    Route::get('/pill-reminders', [PillReminderController::class, 'index']);
+    Route::post('/pill-reminders', [PillReminderController::class, 'store']);
+    Route::get('/pill-reminders/{id}', [PillReminderController::class, 'show']);
+    Route::put('/pill-reminders/{id}', [PillReminderController::class, 'update']);
+    Route::delete('/pill-reminders/{id}', [PillReminderController::class, 'destroy']);
+    Route::get('/pill-reminders/schedule', [PillReminderController::class, 'schedule']);
+});
