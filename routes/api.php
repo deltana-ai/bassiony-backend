@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\{BrandController,CategoryController, ProductController,OfferController,FavoriteController};
+use App\Http\Controllers\{BrandController,CategoryController, ProductController,OfferController,FavoriteController, RateController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\PharmacyController;
@@ -250,3 +250,18 @@ Route::get('/get-favorite', [FavoriteController::class, 'indexPublic']);
 Route::apiResource('favorites', FavoriteController::class);
 
 ////////////////////////////////////////////////////
+
+
+
+Route::middleware(['auth:users'])->group(function () {
+    Route::post('rate/index', [RateController::class, 'store']);
+    Route::post('rate/restore', [RateController::class, 'restore']);
+    Route::delete('rate/delete', [RateController::class, 'destroy']);
+    Route::put('/rate/{id}/{column}', [RateController::class, 'toggle']);
+    Route::delete('rate/force-delete', [RateController::class, 'forceDelete']);
+    Route::apiResource('rate', RateController::class);
+});
+
+
+Route::get('/get-rate', [RateController::class, 'indexPublic']);
+Route::apiResource('rate', RateController::class);

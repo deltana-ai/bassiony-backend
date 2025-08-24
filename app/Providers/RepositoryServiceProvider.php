@@ -6,13 +6,13 @@ use App\Interfaces\AdminRepositoryInterface;
 use App\Interfaces\ContactUsRepositoryInterface;
 use App\Interfaces\SliderRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
-use App\Interfaces\{BrandRepositoryInterface,CategoryRepositoryInterface, ProductRepositoryInterface,FavoriteRepositoryInterface};
+use App\Interfaces\{BrandRepositoryInterface,CategoryRepositoryInterface, ProductRepositoryInterface,FavoriteRepositoryInterface, RateRepositoryInterface};
 
 use App\Repositories\AdminRepository;
 use App\Repositories\ContactUsRepository;
 use App\Repositories\SliderRepository;
 use App\Repositories\UserRepository;
-use App\Repositories\{BrandRepository,CategoryRepository, ProductRepository,FavoriteRepository};
+use App\Repositories\{BrandRepository,CategoryRepository, ProductRepository,FavoriteRepository, RateRepository};
 
 use Illuminate\Support\ServiceProvider;
 
@@ -31,6 +31,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(FavoriteRepositoryInterface::class, FavoriteRepository::class);
+        $this->app->bind(RateRepositoryInterface::class, RateRepository::class);
 
     }
 
