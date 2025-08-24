@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
-use App\Http\Requests\PharmacyRatingRequest;
-use App\Http\Resources\PharmacyRatingResource;
-use App\Interfaces\PharmacyRateRepositoryInterface;
-use App\Models\PharmacyRating;
+use App\Http\Requests\ProductRatingRequest;
+use App\Http\Resources\ProductRatingResource;
+use App\Interfaces\ProductRateRepositoryInterface;
+use App\Models\ProductRating;
 use Exception;
 use Illuminate\Http\Request;
 
-class PharmacyRatingController extends BaseController
+class ProductRatingController extends BaseController
 {
     protected mixed $crudRepository;
 
-    public function __construct(PharmacyRateRepositoryInterface $pattern)
+    public function __construct(ProductRateRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
     }
@@ -23,7 +23,7 @@ class PharmacyRatingController extends BaseController
     {
         try {
 
-            $rates = PharmacyRatingResource::collection($this->crudRepository->all(
+            $rates = ProductRatingResource::collection($this->crudRepository->all(
                 [],
                 [],
                 ['*']
@@ -34,31 +34,31 @@ class PharmacyRatingController extends BaseController
         }
     }
 
-    public function store(PharmacyRatingRequest $request)
+    public function store(ProductRatingRequest $request)
     {
             try {
                 $rate = $this->crudRepository->create($request->validated());
                 
-                return new PharmacyRatingResource($rate);
+                return new ProductRatingResource($rate);
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
             }
     }
 
-    public function show(PharmacyRating $rate): ?\Illuminate\Http\JsonResponse
+    public function show(ProductRating $rate): ?\Illuminate\Http\JsonResponse
     {
         try {
-            return JsonResponse::respondSuccess('Item Fetched Successfully', new PharmacyRatingResource($rate));
+            return JsonResponse::respondSuccess('Item Fetched Successfully', new ProductRatingResource($rate));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
 
-    public function update(PharmacyRatingRequest $request, PharmacyRating $rate)
+    public function update(ProductRatingRequest $request, ProductRating $rate)
     {
         $this->crudRepository->update($request->validated(), $rate->id);
-        
+ 
         return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
     }
 
@@ -66,13 +66,14 @@ class PharmacyRatingController extends BaseController
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $this->crudRepository->deleteRecords('pharmacy_rates', $request['items']);
+            $this->crudRepository->deleteRecords('product_rates', $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
+    
 
 
 
