@@ -9,24 +9,23 @@ use App\Http\Resources\ProductResource;
 use App\Models\{Brand,Product};
 use Exception;
 use Illuminate\Http\Request;
+use App\Repositories\ModelFilterRepository;
 
 class BrandController extends BaseController
 {
    
+    protected $repo;
+
+    public function __construct(ModelFilterRepository $repo)
+    {
+        $this->repo = $repo;
+    }
 
     public function index(Request $request)
     {
      try {
         $query = Brand::where('active', 1);
-        $per_page = 10;
-        if ($request->filled('per_page')) {
-            $per_page = $request->get('per_page');
-        }
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where('name', 'LIKE', "%{$search}%");
-        }
-        $brands = $query->orderBy('position', 'asc')->paginate($per_page);;
+        $brands = $this->repo->applyFilters($query, $request);
         return BrandResource::collection($brands);
         }
          catch (Exception $e) {
@@ -40,15 +39,7 @@ class BrandController extends BaseController
         try {
             $brand = Brand::find($id);
             $query = Product::where('active', 1)->where('brand_id',$brand->id)->whereHas('pharmacies');
-            $per_page = 10;
-            if ($request->filled('per_page')) {
-                $per_page = $request->get('per_page');
-            }
-            if ($request->filled('search')) {
-                $search = $request->get('search');
-                $query->where('name', 'LIKE', "%{$search}%");
-            }
-            $products = $query->orderBy('position', 'asc')->paginate($per_page);
+            $products = $this->repo->applyFilters($query, $request );
             return ProductResource::collection($products);
         } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());

@@ -31,11 +31,20 @@ class EnterpriseRepository
         $perPage = $request->get('per_page', 10);
 
         $table = $query->getModel()->getTable();
-        if (Schema::hasColumn($table, 'position')) {
-            $query->orderBy('position', 'asc');
-        } else {
-            $query->orderBy('id', 'desc');
+        
+        if($request->filled('order_by') && $request->filled('order_direction')) {
+            $orderBy = $request->get('order_by', 'id');
+            $orderByDirection = $request->get('order_direction', 'asc');
+            $query->orderBy($orderBy, $orderByDirection);
         }
+        else{
+            if (Schema::hasColumn($table, 'position')) {
+              $query->orderBy('position', 'asc');
+            } else {
+              $query->orderBy('id', 'desc');
+            }
+        }
+        
 
         return $query->paginate($perPage);
     }

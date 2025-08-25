@@ -10,6 +10,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PharmacyProductController;
+use App\Http\Controllers\PharmacyRatingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -279,3 +280,23 @@ Route::middleware(['auth:users'])->group(function () {
     Route::delete('/pill-reminders/{id}', [PillReminderController::class, 'destroy']);
     Route::get('/pill-reminders/schedule', [PillReminderController::class, 'schedule']);
 });
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////pharmacy rate///////////////////////////////////////
+Route::middleware(['auth:users'])->group(function () {
+
+    Route::apiResource('pharmacy/rate', PharmacyRatingController::class)->except(['index','destroy']);
+});
+//////////////////////////////// dashoard pharmacy rate //////////////////////////////
+Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+    Route::post('pharmacy/rate/index', [PharmacyRatingController::class, 'index']);
+    Route::get('pharmacy/rate/{id}', [PharmacyRatingController::class, 'show']);
+    Route::delete('pharmacy/rate/delete', [PharmacyRatingController::class, 'destroy']);
+});
+
+/////////////////////////////////////////////////////////
+Route::get('pharmacy/{id}/get-rate', [PharmacyRatingController::class, 'indexPublic']);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -20,6 +20,24 @@ class PharmacyRatingResource extends JsonResource
             'pharmacy_id'    => $this->pharmacy_id,
             'rating'         => $this->rating,
             'comment'        => $this->comment, 
+            'created_at'     => $this->created_at?$this->created_at->toIso8601String():null,
+            'updated_at'     => $this->updated_at?$this->updated_at->toIso8601String():null,
+            
+            'user'           => $this->whenLoaded('user', function () {
+                                return [
+                                    'id'   => $this->user->id,
+                                    'name' => $this->user->name,
+                                ];
+                              }),
+            
+            'pharmacy'        => $this->whenLoaded('pharmacy', function () {
+                                return [
+                                    'id'        => $this->pharmacy->id,
+                                    'name'      => $this->pharmacy->name,
+                                    'imageUrl'  => $this->pharmacy->getFirstMediaUrl(),
+                                    'image'     => new MediaResource($this->pharmacy->getFirstMedia()),
+                                ];
+                              }),
         ];
     }
 }
