@@ -174,21 +174,7 @@ class RateController extends BaseController
         }
     }
 
-    /**
-     */
-    public function userFavorites($userId)
-    {
-        try {
-            $favorites = ProductRating::where('user_id', $userId)
-                ->with(['product'])
-                ->get();
-
-            return RetatResource::collection($favorites)->additional(JsonResponse::success());
-        } catch (Exception $e) {
-            return JsonResponse::respondError($e->getMessage());
-        }
-    }
-
+  
     /**
      */
     public function indexPublic(Request $request)
@@ -211,7 +197,7 @@ class RateController extends BaseController
         }
     }
 
- 
+
     private function applyAggregateOnCreate(int $productId, float $newRate): void
     {
         /** @var Product $product */
@@ -219,7 +205,7 @@ class RateController extends BaseController
         if (!$product) return;
 
         $count = (int) $product->rating_count;
-        $avg   = (float) $product->rating; 
+        $avg   = (float) $product->rating;
 
         $newCount = $count + 1;
         $newAvg = $newCount > 0 ? (($avg * $count) + $newRate) / $newCount : $newRate;
@@ -238,7 +224,7 @@ class RateController extends BaseController
         $product = Product::lockForUpdate()->find($productId);
         if (!$product) return;
 
-        $count = max(1, (int) $product->rating_count); 
+        $count = max(1, (int) $product->rating_count);
         $avg   = (float) $product->rating;
 
         $newAvg = (($avg * $count) - $oldRate + $newRate) / $count;
@@ -248,7 +234,7 @@ class RateController extends BaseController
         ]);
     }
 
-    
+
     private function recalcProductAggregates(int $productId): void
     {
         $agg = ProductRating::where('product_id', $productId)
