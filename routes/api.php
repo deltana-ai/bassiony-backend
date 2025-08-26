@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\{BrandController,CategoryController, ProductController,OfferController,FavoriteController, RateController,PillReminderController};
+use App\Http\Controllers\{BrandController,CategoryController, ProductController,OfferController,FavoriteController, PharmacistController, RateController,PillReminderController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\PharmacyController;
@@ -21,8 +21,60 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+//////////////////////////////////////// User ////////////////////////////////
 
-//////////////////////////////////pharmacies/////////////////////////////////////////
+Route::middleware(['auth:admins'])->group(function () {
+    Route::post('/user/index', [UserController::class, 'index']);
+    Route::post('user/restore', [UserController::class, 'restore']);
+    Route::delete('user/delete', [UserController::class, 'destroy']);
+    Route::put('/user/{id}/{column}', [UserController::class, 'toggle']);
+    Route::delete('user/force-delete', [UserController::class, 'forceDelete']);
+    Route::apiResource('user', UserController::class);
+});
+
+Route::prefix('user')->middleware('throttle:20')->group(function () {
+    Route::post('register', [UserController::class, 'register']);
+    Route::post('login', [UserController::class, 'login']);
+    Route::post('change-password', [UserController::class, 'changePassword']);
+    Route::post('logout', [UserController::class, 'logout'])->middleware('auth:users');
+});
+
+
+//////////////////////////////////////// User ////////////////////////////////
+
+//////////////////////////////////////// Pharmacist ////////////////////////////////
+
+Route::middleware(['auth:admins'])->group(function () {
+    Route::post('/pharmacist/index', [PharmacistController::class, 'index']);
+    Route::post('pharmacist/restore', [PharmacistController::class, 'restore']);
+    Route::delete('pharmacist/delete', [PharmacistController::class, 'destroy']);
+    Route::put('/pharmacist/{id}/{column}', [PharmacistController::class, 'toggle']);
+    Route::delete('pharmacist/force-delete', [PharmacistController::class, 'forceDelete']);
+    Route::apiResource('pharmacist', PharmacistController::class);
+});
+
+Route::prefix('pharmacist')->middleware('throttle:20')->group(function () {
+    Route::post('register', [PharmacistController::class, 'register']);
+    Route::post('login', [PharmacistController::class, 'login']);
+    Route::post('change-password', [PharmacistController::class, 'changePassword']);
+});
+
+Route::prefix('pharmacist')->group(function () {
+    Route::post('logout', [PharmacistController::class, 'logout'])
+        ->middleware('auth:pharmacists');
+});
+
+
+//////////////////////////////////////// Pharmacist ////////////////////////////////
+
+
+
+
+
+
+
+
+//////////////////////////////////pharmacies  /////////////////////////////////////////
 
 Route::get('pharmacies/get', [PharmacyController::class, 'index']);
 Route::get('pharmacies/show/{id}', [PharmacyController::class,'show']);
@@ -31,7 +83,7 @@ Route::get('pharmacies/{id}/offers', [PharmacyController::class,'getPharmacyOffe
 Route::get('pharmacies/{id}/categories', [PharmacyController::class,'getPharmacyCategories']);
 Route::get('pharmacies/{id}/brands', [PharmacyController::class,'getPharmacyBrands']);
 
-//////////////////////////////////////pharmacies/////////////////////// 
+//////////////////////////////////////pharmacies///////////////////////
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,44 +133,20 @@ Route::get('categories/show/{id}', [CategoryController::class, 'show']);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+Route::middleware(['auth:pharmacists' , 'auth:admins'])->group(function () {
 
-
-//////////////////////////////////////// user ////////////////////////////////
-
-Route::middleware(['auth:admins'])->group(function () {
-    Route::post('/user/index', [UserController::class, 'index']);
-    Route::post('user/restore', [UserController::class, 'restore']);
-    Route::delete('user/delete', [UserController::class, 'destroy']);
-    Route::put('/user/{id}/{column}', [UserController::class, 'toggle']);
-    Route::delete('user/force-delete', [UserController::class, 'forceDelete']);
-    Route::apiResource('user', UserController::class);
-});
-
-Route::prefix('user')->middleware('throttle:20')->group(function () {
-    Route::post('register', [UserController::class, 'register']);
-    Route::post('login', [UserController::class, 'login']);
-    Route::post('change-password', [UserController::class, 'changePassword']);
-    Route::post('logout', [UserController::class, 'logout'])->middleware('auth:users');
-});
-
-
-//////////////////////////////////////// user ////////////////////////////////
-
-
-Route::middleware(['auth:pharmacists'])->group(function () {
-    
     Route::post('/offer/index', [OfferController::class, 'index']);
     Route::post('/offer/restore', [OfferController::class, 'restore']);
     Route::delete('/offer/delete', [OfferController::class, 'destroy']);
     Route::put('/offer/{id}/{column}', [OfferController::class, 'toggle']);
     Route::delete('/offer/force-delete', [OfferController::class, 'forceDelete']);
     Route::apiResource('offer', OfferController::class);
-    
+
     Route::post('/offer/{offer}/products/add', [OfferController::class, 'addProductToOffer']);
     Route::post('/offer/{offer}/products/remove', [OfferController::class, 'removeProductFromOffer']);
-    
-    Route::get('/offers/public', [OfferController::class, 'indexPublic'])->withoutMiddleware(['auth:pharmacists']);
+
 });
+Route::get('/offers/public', [OfferController::class, 'indexPublic']);
 
 
 
@@ -192,14 +220,6 @@ Route::post('publicsss', [ContactUsController::class, 'aaaa']);
 
 
 
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
 //////////////////////////////////////// Slider ////////////////////////////////
 
 Route::middleware(['auth:admins'])->group(function () {
@@ -216,8 +236,6 @@ Route::get('/get-slider', [SliderController::class, 'indexPublic']);
 //////////////////////////////////////// Slider ////////////////////////////////
 
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////// products /////////////////////////////////
 
@@ -236,40 +254,26 @@ Route::get('/get-slider', [SliderController::class, 'indexPublic']);
 /////////////////////////////////////// products /////////////////////////////////
 
 
-/////////////////// favorite ///////////////////////
+// /////////////////////////////////////// rateing /////////////////////////////////////////
+
 Route::middleware(['auth:users'])->group(function () {
-    Route::post('favorite/index', [FavoriteController::class, 'index']);
-    Route::post('favorite/restore', [FavoriteController::class, 'restore']);
-    Route::delete('favorite/delete', [FavoriteController::class, 'destroy']);
-    Route::put('/favorite/{id}/{column}', [FavoriteController::class, 'toggle']);
-    Route::delete('favorite/force-delete', [FavoriteController::class, 'forceDelete']);
-    Route::apiResource('favorite', FavoriteController::class);
+    Route::post('rateing/index', [RateController::class, 'index']);
+    Route::post('rateing/restore', [RateController::class, 'restore']);
+    Route::delete('rateing/delete', [RateController::class, 'destroy']);
+    Route::put('/rateing/{id}/{column}', [RateController::class, 'toggle']);
+    Route::delete('rateing/force-delete', [RateController::class, 'forceDelete']);
+    Route::apiResource('rateing', RateController::class);
 });
 
 
-Route::get('/get-favorite', [FavoriteController::class, 'indexPublic']);
-Route::apiResource('favorites', FavoriteController::class);
-
-////////////////////////////////////////////////////
+Route::get('/get-rateing', [RateController::class, 'indexPublic']);
 
 
-
-Route::middleware(['auth:users'])->group(function () {
-    Route::post('rate/index', [RateController::class, 'store']);
-    Route::post('rate/restore', [RateController::class, 'restore']);
-    Route::delete('rate/delete', [RateController::class, 'destroy']);
-    Route::put('/rate/{id}/{column}', [RateController::class, 'toggle']);
-    Route::delete('rate/force-delete', [RateController::class, 'forceDelete']);
-    Route::apiResource('rate', RateController::class);
-});
-
-
-Route::get('/get-rate', [RateController::class, 'indexPublic']);
-Route::apiResource('rate', RateController::class);
+// /////////////////////////////////////// rateing /////////////////////////////////////////
 
 
 
-/////////////////////////////////
+///////////////////////////////// pill reminders /////////////////////////////////
 
 
 Route::middleware(['auth:users'])->group(function () {
@@ -282,21 +286,25 @@ Route::middleware(['auth:users'])->group(function () {
 });
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////// pill reminders ///////////////////////////////////
 
-////////////////////////////////pharmacy rate///////////////////////////////////////
-Route::middleware(['auth:users'])->group(function () {
 
-    Route::apiResource('pharmacy/rate', PharmacyRatingController::class)->except(['index','destroy']);
-});
-//////////////////////////////// dashoard pharmacy rate //////////////////////////////
+
+
+
+
+////////////////////////////////  pharmacy rate //////////////////////////////
+
 Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
     Route::post('pharmacy/rate/index', [PharmacyRatingController::class, 'index']);
     Route::get('pharmacy/rate/{id}', [PharmacyRatingController::class, 'show']);
     Route::delete('pharmacy/rate/delete', [PharmacyRatingController::class, 'destroy']);
 });
 
-/////////////////////////////////////////////////////////
 Route::get('pharmacy/{id}/get-rate', [PharmacyRatingController::class, 'indexPublic']);
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Route::middleware(['auth:users'])->group(function () {
+    Route::apiResource('pharmacy/rate', PharmacyRatingController::class)->except(['index','destroy']);
+});
+////////////////////////////////pharmacy rate///////////////////////////////////////

@@ -22,7 +22,7 @@ class OfferController extends Controller
     public function index()
     {
         try {
-            $offers = $this->offerRepository->all([], ['products', 'pharmacy'], ['*']);
+            $offers = $this->offerRepository->all(['products', 'pharmacy'], [], ['*']);
             return OfferResource::collection($offers)->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -43,11 +43,9 @@ class OfferController extends Controller
     {
         try {
             $offer = $this->offerRepository->create($request->validated());
-            
             if ($request->has('products')) {
                 $offer->products()->attach($request->products);
             }
-            
             $offer->load(['products', 'pharmacy']);
             return (new OfferResource($offer))->additional(JsonResponse::success());
         } catch (Exception $e) {
@@ -59,11 +57,9 @@ class OfferController extends Controller
     {
         try {
             $this->offerRepository->update($request->validated(), $offer->id);
-            
             if ($request->has('products')) {
                 $offer->products()->sync($request->products);
             }
-            
             $offer->load(['products', 'pharmacy']);
             return (new OfferResource($offer))->additional(JsonResponse::success());
         } catch (Exception $e) {
@@ -71,24 +67,21 @@ class OfferController extends Controller
         }
     }
 
-    public function destroy(Request $request)
+
+    public function destroy(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $count = $this->offerRepository->deleteRecords('offers', $request->items);
-            
-            if ($count > 1) {
-                return JsonResponse::respondError(trans(JsonResponse::MSG_CANNOT_DELETED_MULTI_RESOURCE));
-            }
-            
-            if ($count == 222) {
-                return JsonResponse::respondError(trans(JsonResponse::MSG_CANNOT_DELETED));
-            }
-            
-            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
+            $count = $this->offerRepository->deleteRecords('offers', $request['items']);
+            return $count > 1
+                ? JsonResponse::respondError(trans(JsonResponse::MSG_CANNOT_DELETED_MULTI_RESOURCE))
+                : ($count == 222 ? JsonResponse::respondError(trans(JsonResponse::MSG_CANNOT_DELETED))
+                    : JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY)));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
+
+
 
     public function restore(Request $request)
     {
@@ -146,7 +139,7 @@ class OfferController extends Controller
 
             $offer->products()->attach($request->product_id);
             $offer->load('products');
-            
+
             return (new OfferResource($offer))->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -162,7 +155,7 @@ class OfferController extends Controller
 
             $offer->products()->detach($request->product_id);
             $offer->load('products');
-            
+
             return (new OfferResource($offer))->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
