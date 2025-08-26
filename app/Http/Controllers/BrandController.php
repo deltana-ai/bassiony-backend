@@ -24,6 +24,8 @@ class BrandController extends BaseController
     public function index(Request $request)
     {
      try {
+
+
         $query = Brand::where('active', 1);
         $brands = $this->repo->applyFilters($query, $request);
         return BrandResource::collection($brands);
@@ -38,6 +40,9 @@ class BrandController extends BaseController
     {
         try {
             $brand = Brand::find($id);
+            if (is_null($brand)) {
+                return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_FOUND));
+            }
             $query = Product::where('active', 1)->where('brand_id',$brand->id)->whereHas('pharmacies');
             $products = $this->repo->applyFilters($query, $request );
             return ProductResource::collection($products);

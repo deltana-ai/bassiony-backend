@@ -37,6 +37,9 @@ class CategoryController extends BaseController
     {
         try {
             $category = Category::find($id);
+            if (is_null($category)) {
+                return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_FOUND));
+            }
             $query = Product::where('active', 1)->where('category_id',$category->id)->whereHas('pharmacies');
             $products = $this->repo->applyFilters($query, $request );
 
