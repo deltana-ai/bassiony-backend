@@ -11,6 +11,7 @@ class OrderItem extends  BaseModel
 
    protected $guarded = ['id'];
 
+
     public function order()
     {
         return $this->belongsTo(Order::class);
@@ -21,3 +22,9 @@ class OrderItem extends  BaseModel
         return $this->belongsTo(Product::class);
     }
 }
+
+
+
+
+
+

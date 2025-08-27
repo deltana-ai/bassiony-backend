@@ -179,5 +179,4 @@ class User extends Authenticatable
         return $this->hasMany(Point::class, 'user_id');
     }
 
-
 }

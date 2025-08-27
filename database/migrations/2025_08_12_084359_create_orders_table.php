@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('pharmacist_id')->constrained('pharmacists')->cascadeOnDelete();
+            $table->foreignId('pharmacist_id')->nullable()->constrained('pharmacists')->nullOnDelete();
             $table->foreignId('address_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('promo_code_id')->nullable()->constrained()->nullOnDelete();
             $table->enum('status', ['pending', 'approved', 'rejected', 'delivered'])->default('pending');
@@ -26,6 +26,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

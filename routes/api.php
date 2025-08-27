@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\{BrandController,CategoryController, ProductController,OfferController,FavoriteController, PharmacistController, RateController,PillReminderController};
+use App\Http\Controllers\{BrandController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\PharmacyController;
@@ -308,3 +308,31 @@ Route::middleware(['auth:users'])->group(function () {
     Route::apiResource('pharmacy/rate', PharmacyRatingController::class)->except(['index','destroy']);
 });
 ////////////////////////////////pharmacy rate///////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Cart
+    Route::get('cart', [CartController::class, 'index']);
+    Route::post('cart', [CartController::class, 'store']);
+    Route::put('cart/{cartItem}', [CartController::class, 'update']);
+    Route::delete('cart/{cartItem}', [CartController::class, 'destroy']);
+
+    // Orders
+    Route::get('orders', [OrderController::class, 'index']);
+    Route::post('orders', [OrderController::class, 'store']);
+    Route::get('orders/{order}', [OrderController::class, 'show']);
+});

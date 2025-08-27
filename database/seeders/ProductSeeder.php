@@ -18,7 +18,7 @@ class ProductSeeder extends Seeder
             'show_home'   => true,
             'rating'      => 4.5,
             'rating_count'=> 100,
-            'tax'         => 5,
+            'price'         => 5,
         ]);
 
         Product::create([
@@ -31,7 +31,7 @@ class ProductSeeder extends Seeder
             'show_home'   => false,
             'rating'      => 4.2,
             'rating_count'=> 50,
-            'tax'         => 10,
+            'price'         => 10,
         ]);
     }
 }

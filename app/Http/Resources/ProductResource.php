@@ -25,7 +25,7 @@ class ProductResource extends JsonResource
             'show_home'   => (bool) $this->show_home,
             'rating'      => (float) $this->rating,
             'rating_count'=> $this->rating_count,
-            'tax'         => (float) $this->tax,
+            'price'         => (float) $this->price,
             // 'pharmacy_product' =>  new PharmacyProductResource(
             //     $this->pharmacies->random()
             // ),

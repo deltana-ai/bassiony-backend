@@ -30,5 +30,4 @@ class Order extends BaseModel
     {
         return $this->hasMany(OrderItem::class);
     }
-
 }

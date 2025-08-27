@@ -25,7 +25,7 @@ class ProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'brand_id'    => 'nullable|exists:brands,id',
             'rating'      => 'nullable|numeric|min:0|max:9.9',
-            'tax'         => 'nullable|numeric|min:0|max:999.99',
+            'price'         => 'nullable|numeric',
         ];
     }
 }

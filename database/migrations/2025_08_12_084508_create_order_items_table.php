@@ -14,15 +14,17 @@ return new class extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('medicine_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained()->cascadeOnDelete(); // 👈 هنا التغيير
             $table->integer('quantity')->default(1);
-            $table->decimal('price', 10, 2)->nullable();
+            $table->decimal('price', 10, 2)->nullable(); // سعر الوحدة وقت الطلب
+            $table->decimal('total', 10, 2)->nullable(); // سعر الوحدة * الكمية
             $table->string('return_number')->unique()->nullable();
             $table->string('reason')->nullable();
             $table->string('comment')->nullable();
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

@@ -6,14 +6,14 @@ use App\Interfaces\AdminRepositoryInterface;
 use App\Interfaces\ContactUsRepositoryInterface;
 use App\Interfaces\SliderRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
-use App\Interfaces\{BrandRepositoryInterface,CategoryRepositoryInterface, ProductRepositoryInterface,FavoriteRepositoryInterface, PharmacistRepositoryInterface, PillReminderRepositoryInterface, RateRepositoryInterface};
+use App\Interfaces\{BrandRepositoryInterface,CategoryRepositoryInterface, ProductRepositoryInterface,FavoriteRepositoryInterface, OrderRepositoryInterface, PharmacistRepositoryInterface, PillReminderRepositoryInterface, RateRepositoryInterface};
 use App\Interfaces\{PharmacyRateRepositoryInterface};
 use App\Repositories\PharmacyRateRepository;
 use App\Repositories\AdminRepository;
 use App\Repositories\ContactUsRepository;
 use App\Repositories\SliderRepository;
 use App\Repositories\UserRepository;
-use App\Repositories\{BrandRepository, CategoryRepository, ProductRepository,FavoriteRepository, PharmacistRepository, PillReminderRepository, RateRepository};
+use App\Repositories\{BrandRepository, CategoryRepository, ProductRepository,FavoriteRepository, OrderRepository, PharmacistRepository, PillReminderRepository, RateRepository};
 
 use Illuminate\Support\ServiceProvider;
 
@@ -35,6 +35,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PillReminderRepositoryInterface::class, PillReminderRepository::class);
         $this->app->bind(PharmacyRateRepositoryInterface::class, PharmacyRateRepository::class);
         $this->app->bind(PharmacistRepositoryInterface::class, PharmacistRepository::class);
+        $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
     }
 
     /**
