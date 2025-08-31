@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\{BrandController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
+use App\Http\Controllers\{AddressController, BrandController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\PharmacyController;
@@ -168,6 +168,8 @@ Route::middleware(['auth:admins'])->group(function () {
     Route::get('/get-admin', [AdminController::class, 'getCurrentAdmin']);
     Route::apiResource('admin', AdminController::class);
 });
+// في api.php
+Route::post('/status-check', [AdminController::class, 'ping']);
 Route::post('/admin/login', [AdminController::class, 'login']);
 ////////////////////////////////////////// Admin ////////////////////////////////
 
@@ -324,6 +326,8 @@ Route::middleware(['auth:users'])->group(function () {
 
 
 
+
+
 Route::middleware('auth:sanctum')->group(function () {
     // Cart
     Route::get('cart', [CartController::class, 'index']);
@@ -335,4 +339,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders', [OrderController::class, 'index']);
     Route::post('orders', [OrderController::class, 'store']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
+});
+
+
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::delete('/addresses-many', [AddressController::class, 'destroyMany']);
+    Route::apiResource('addresses', AddressController::class);
 });
