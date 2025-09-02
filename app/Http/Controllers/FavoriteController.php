@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JsonResponse;
 use App\Http\Requests\FavoriteRequest;
 use App\Http\Resources\FavoriteResource;
 use App\Models\Favorite;
@@ -16,28 +17,56 @@ class FavoriteController extends Controller
             ->where('user_id', $request->user()->id)
             ->get();
 
-        return FavoriteResource::collection($favorites);
+        return JsonResponse::respondSuccess(
+            JsonResponse::MSG_SUCCESS,
+            FavoriteResource::collection($favorites)
+        );
     }
 
+    // إضافة للمفضلة
     public function store(FavoriteRequest $request)
     {
-        $favorite = Favorite::firstOrCreate([
-            'user_id' => $request->user()->id,
-            'product_id' => $request->product_id,
+        $exists = Favorite::where('user_id', $request->user()->id)
+            ->where('product_id', $request->product_id)
+            ->where('pharmacist_id', $request->pharmacist_id)
+            ->exists();
+
+        if ($exists) {
+            return JsonResponse::respondError(
+                'هذا المنتج موجود بالفعل في المفضلة',
+                422
+            );
+        }
+
+        $favorite = Favorite::create([
+            'user_id'       => $request->user()->id,
+            'product_id'    => $request->product_id,
             'pharmacist_id' => $request->pharmacist_id,
         ]);
 
-        return new FavoriteResource($favorite->load(['product', 'pharmacist']));
+        return JsonResponse::respondSuccess(
+            JsonResponse::MSG_ADDED_SUCCESSFULLY,
+            new FavoriteResource($favorite->load(['product', 'pharmacist'])),
+            201
+        );
     }
 
+    // حذف من المفضلة
     public function destroy(Favorite $favorite, Request $request)
     {
         if ($favorite->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'غير مصرح لك'], 403);
+            return JsonResponse::respondError(
+                'غير مصرح لك',
+                403
+            );
         }
 
         $favorite->delete();
 
-        return response()->json(['message' => 'تم الحذف من المفضلة']);
+        return JsonResponse::respondSuccess(
+            JsonResponse::MSG_DELETED_SUCCESSFULLY,
+            null,
+            200
+        );
     }
 }
