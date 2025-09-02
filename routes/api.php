@@ -315,13 +315,17 @@ Route::middleware(['auth:users'])->group(function () {
 
 
 
+////////////////////////////////  favorites  //////////////////////////////
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('favorites', FavoriteController::class)->only(['index','store','destroy']);
+});
 
 
 
 
-
-
-
+////////////////////////////////   favorites //////////////////////////////
 
 
 
