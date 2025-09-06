@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\{AddressController, BrandController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
+use App\Http\Controllers\{AddressController, BrandController, CardController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\PharmacyController;
@@ -350,4 +350,11 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/addresses-many', [AddressController::class, 'destroyMany']);
     Route::apiResource('addresses', AddressController::class);
+});
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/cards-list', [CardController::class, 'index']);
+    Route::post('/cards', [CardController::class, 'store']);
 });
