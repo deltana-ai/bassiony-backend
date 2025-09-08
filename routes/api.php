@@ -38,6 +38,7 @@ Route::prefix('user')->middleware('throttle:20')->group(function () {
     Route::post('change-password', [UserController::class, 'changePassword']);
     Route::post('logout', [UserController::class, 'logout'])->middleware('auth:users');
 });
+Route::post('/check-phone', [UserController::class, 'checkPhone']);
 
 
 //////////////////////////////////////// User ////////////////////////////////

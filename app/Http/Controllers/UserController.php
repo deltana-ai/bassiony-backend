@@ -185,4 +185,24 @@ class UserController extends BaseController
         return JsonResponse::respondSuccess('Successfully logged out');
     }
 
+
+    public function checkPhone(Request $request)
+{
+    try {
+        $request->validate([
+            'phone' => 'required|string'
+        ]);
+
+        $exists = User::where('phone', $request->phone)->exists();
+
+        if ($exists) {
+            return JsonResponse::respondSuccess('Phone number already exists', ['exists' => true]);
+        } else {
+            return JsonResponse::respondSuccess('Phone number not found', ['exists' => false]);
+        }
+    } catch (Exception $e) {
+        return JsonResponse::respondError($e->getMessage());
+    }
 }
+
+}   
