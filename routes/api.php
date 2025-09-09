@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\{AddressController, BrandController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
+use App\Http\Controllers\{AddressController, BrandController, CardController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\PharmacyController;
@@ -38,6 +38,7 @@ Route::prefix('user')->middleware('throttle:20')->group(function () {
     Route::post('change-password', [UserController::class, 'changePassword']);
     Route::post('logout', [UserController::class, 'logout'])->middleware('auth:users');
 });
+Route::post('/check-phone', [UserController::class, 'checkPhone']);
 
 
 //////////////////////////////////////// User ////////////////////////////////
@@ -250,7 +251,7 @@ Route::get('/get-slider', [SliderController::class, 'indexPublic']);
         Route::apiResource('product', ProductController::class);
     });
 
-    Route::get('/get-product', [ProductController::class, 'indexPublic']);
+    Route::get('/get-product', [CategoryController::class, 'indexProduct']);
         Route::apiResource('products', ProductController::class);
 
 /////////////////////////////////////// products /////////////////////////////////
@@ -315,13 +316,17 @@ Route::middleware(['auth:users'])->group(function () {
 
 
 
+////////////////////////////////  favorites  //////////////////////////////
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('favorites', FavoriteController::class)->only(['index','store','destroy']);
+});
 
 
 
 
-
-
-
+////////////////////////////////   favorites //////////////////////////////
 
 
 
@@ -346,4 +351,11 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/addresses-many', [AddressController::class, 'destroyMany']);
     Route::apiResource('addresses', AddressController::class);
+});
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/cards-list', [CardController::class, 'index']);
+    Route::post('/cards', [CardController::class, 'store']);
 });

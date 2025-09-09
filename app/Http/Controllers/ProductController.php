@@ -9,8 +9,8 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
-
 class ProductController extends BaseController
+
 {
     protected mixed $crudRepository;
 
@@ -122,4 +122,6 @@ class ProductController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
+ 
+
 }

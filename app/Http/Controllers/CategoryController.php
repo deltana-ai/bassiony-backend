@@ -32,6 +32,19 @@ class CategoryController extends BaseController
         }
     }
 
+       public function indexProduct(Request $request)
+    {
+     try {
+        $query = Product::where('active', 1);
+
+        $products = $this->repo->applyFilters($query, $request );
+
+        return ProductResource::collection($products);
+        }
+         catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
 
     public function show(Request $request,$id)
     {
