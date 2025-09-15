@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pharmacy_product', function (Blueprint $table) {
+        Schema::create('company_product', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pharmacy_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->decimal('price', 8, 2)->nullable();
+            $table->foreignId('company_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->decimal('wholesale_price', 10, 2)->nullable(); // Renamed for clarity
+            $table->decimal('retail_price', 10, 2)->nullable();
             $table->integer('stock')->default(0)->index();
             $table->integer('reserved_stock')->default(0);
-            $table->date('expiry_date')->nullable();
+
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pharmacy_product');
+        Schema::dropIfExists('company_products');
     }
 };
