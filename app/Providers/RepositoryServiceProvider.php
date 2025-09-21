@@ -6,15 +6,16 @@ use App\Interfaces\AdminRepositoryInterface;
 use App\Interfaces\ContactUsRepositoryInterface;
 use App\Interfaces\SliderRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
-use App\Interfaces\{BrandRepositoryInterface,CategoryRepositoryInterface, ProductRepositoryInterface,FavoriteRepositoryInterface, OrderRepositoryInterface, PharmacistRepositoryInterface, PillReminderRepositoryInterface, RateRepositoryInterface};
-use App\Interfaces\{PharmacyRateRepositoryInterface};
+use App\Interfaces\{BranchRepositoryInterface, BrandRepositoryInterface,CategoryRepositoryInterface, ProductRepositoryInterface,FavoriteRepositoryInterface, OrderRepositoryInterface, PharmacistRepositoryInterface, PillReminderRepositoryInterface, RateRepositoryInterface};
+use App\Interfaces\{PharmacyRateRepositoryInterface,PharmacyRepositoryInterface};
+use App\Interfaces\{CompanyRepositoryInterface,LocationRepositoryInterface,WarehouseRepositoryInterface};
 use App\Repositories\PharmacyRateRepository;
 use App\Repositories\AdminRepository;
 use App\Repositories\ContactUsRepository;
 use App\Repositories\SliderRepository;
 use App\Repositories\UserRepository;
-use App\Repositories\{BrandRepository, CategoryRepository, ProductRepository,FavoriteRepository, OrderRepository, PharmacistRepository, PillReminderRepository, RateRepository};
-
+use App\Repositories\{BranchRepository, BrandRepository, CategoryRepository, ProductRepository,FavoriteRepository, OrderRepository, PharmacistRepository, PillReminderRepository, RateRepository};
+use App\Repositories\{CompanyRepository,LocationRepository,WarehouseRepository};
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -36,6 +37,10 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PharmacyRateRepositoryInterface::class, PharmacyRateRepository::class);
         $this->app->bind(PharmacistRepositoryInterface::class, PharmacistRepository::class);
         $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
+        $this->app->bind(BranchRepositoryInterface::class, BranchRepository::class);
+        $this->app->bind(CompanyRepositoryInterface::class, CompanyRepository::class);
+        $this->app->bind(WarehouseRepositoryInterface::class, WarehouseRepository::class);
+        $this->app->bind(LocationRepositoryInterface::class, LocationRepository::class);
     }
 
     /**

@@ -30,7 +30,7 @@ class CategoryRequest extends FormRequest
       ];
 
       if ($this->isMethod('post')) {
-          $rules['name'][] = 'unique:brands,name';
+          $rules['name'][] = 'unique:categories,name';
       }
       else{
         $category = $this->route('category')?? $this->route('id');
