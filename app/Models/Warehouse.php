@@ -27,4 +27,9 @@ class Warehouse extends Model
         return $this->hasMany(WarehouseProduct::class);
     }
 
+    public function branches()
+    {
+        return $this->belongsToMany(Branch::class, 'branch_warehouse');
+    }
+
 }

@@ -25,6 +25,11 @@ class Pharmacy extends BaseModel
                     ->withTimestamps();
     }
 
+    public function branches()
+    {
+        return $this->hasMany(Branch::class);
+    }
+
     public function pharmacists()
     {
         return $this->hasMany(Pharmacist::class);

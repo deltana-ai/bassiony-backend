@@ -24,6 +24,11 @@ class CompanyProduct extends Model
         return $this->belongsTo(Product::class);
     }
 
+     public function warehouseProducts()
+    {
+        return $this->hasMany(WarehouseProduct::class);
+    }
+
     public function getAvailableStockAttribute()
     {
         return max(0, $this->stock - $this->reserved_stock);

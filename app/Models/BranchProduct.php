@@ -20,9 +20,10 @@ class BranchProduct extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function product()
+    
+    public function warehouseProduct()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(WarehouseProduct::class);
     }
     public function getAvailableStockAttribute()
     {

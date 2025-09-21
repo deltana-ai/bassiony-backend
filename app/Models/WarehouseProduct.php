@@ -13,9 +13,9 @@ class WarehouseProduct extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
-    public function product()
+    public function companyProduct()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(CompanyProduct::class);
     }
 
     
