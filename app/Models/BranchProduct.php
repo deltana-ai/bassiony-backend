@@ -19,6 +19,11 @@ class BranchProduct extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+    
+    public function pharmacy_product()
+    {
+        return $this->belongsTo(PharmacyProduct::class);
+    }
 
     
     public function warehouseProduct()

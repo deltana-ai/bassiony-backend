@@ -17,7 +17,9 @@ use App\Repositories\UserRepository;
 use App\Repositories\{BranchRepository, BrandRepository, CategoryRepository, ProductRepository,FavoriteRepository, OrderRepository, PharmacistRepository, PillReminderRepository, RateRepository};
 use App\Repositories\{CompanyRepository,LocationRepository,WarehouseRepository};
 use Illuminate\Support\ServiceProvider;
+use App\Interfaces\{PharmacyProductRepositoryInterface,CompanyProductRepositoryInterface,BranchProductRepositoryInterface,BranchRouteRepositoryInterface,WarehouseProductRepositoryInterface,WarehouseRouteRepositoryInterface};
 
+use App\Repositories\{PharmacyProductRepository,CompanyProductRepository,BranchProductRepository,BranchRouteRepository,WarehouseProductRepository,WarehouseRouteRepository};
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -41,6 +43,15 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CompanyRepositoryInterface::class, CompanyRepository::class);
         $this->app->bind(WarehouseRepositoryInterface::class, WarehouseRepository::class);
         $this->app->bind(LocationRepositoryInterface::class, LocationRepository::class);
+        $this->app->bind(PharmacyProductRepositoryInterface::class, PharmacyProductRepository::class);
+        $this->app->bind(CompanyProductRepositoryInterface::class, CompanyProductRepository::class);
+
+        $this->app->bind(BranchProductRepositoryInterface::class, BranchProductRepository::class);
+        $this->app->bind(BranchRouteRepositoryInterface::class, BranchRouteRepository::class);
+        $this->app->bind(WarehouseProductRepositoryInterface::class, WarehouseProductRepository::class);
+        $this->app->bind(WarehouseRouteRepositoryInterface::class, WarehouseRouteRepository::class);
+
+
     }
 
     /**
