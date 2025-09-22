@@ -4,8 +4,10 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\{AddressController, BrandController, CardController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Dashboard\PharmacyController as AdminPharmacyController ;
 use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\Dashboard\{BranchController,LocationController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
@@ -358,4 +360,38 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cards-list', [CardController::class, 'index']);
     Route::post('/cards', [CardController::class, 'store']);
+});
+
+/////////////////////////////////////////////////////////////////////////////
+
+Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+    Route::post('pharmacies/index', [AdminPharmacyController::class, 'index']);
+    Route::post('pharmacies/restore', [AdminPharmacyController::class, 'restore']);
+    Route::delete('pharmacies/delete', [AdminPharmacyController::class, 'destroy']);
+    Route::put('/pharmacies/{id}/{column}', [AdminPharmacyController::class, 'toggle']);
+    Route::delete('pharmacies/force-delete', [AdminPharmacyController::class, 'forceDelete']);
+    Route::apiResource('pharmacies', AdminPharmacyController::class); 
+});
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+    Route::post('branches/index', [BranchController::class, 'index']);
+    Route::post('branches/restore', [BranchController::class, 'restore']);
+    Route::delete('branches/delete', [BranchController::class, 'destroy']);
+    Route::put('/branches/{id}/{column}', [BranchController::class, 'toggle']);
+    Route::delete('branches/force-delete', [BranchController::class, 'forceDelete']);
+    Route::apiResource('branches', BranchController::class); 
+});
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+    Route::post('locations/index', [LocationController::class, 'index']);
+    Route::delete('locations/delete', [LocationController::class, 'destroy']);
+    Route::apiResource('locations', LocationController::class); 
 });

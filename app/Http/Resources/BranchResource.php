@@ -18,8 +18,15 @@ class BranchResource extends JsonResource
          'id' => $this->id,
          'name' => $this->name,
          'code' => $this->code,
-         'pharmacy' => $this->pharmacy? new PharmacyResource($this->pharmacy) : null,
-         'location' => $this->location? new LocationResource($this->location) : null,
+      
+         'pharmacy' => [
+            'id' => $this->pharmacy->id ?? null,
+            'name' => $this->pharmacy->name ?? null,
+         ],
+         'location' => [
+            'id' => $this->location->id ?? null,
+             'name' => $this->location->name ?? null,
+        ],
          'createdAt' => $this->created_at ? $this->created_at->format('Y-M-d H:i:s A') : null,
          'updatedAt' => $this->updated_at ? $this->updated_at->format('Y-M-d H:i:s A') : null,
          'deletedAt' => $this->deleted_at ? $this->deleted_at->format('Y-M-d H:i:s A') : null,

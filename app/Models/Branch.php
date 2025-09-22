@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
-class Branch extends Model
+use Illuminate\Database\Eloquent\SoftDeletes;
+class Branch extends BaseModel
 {
+     use  SoftDeletes;
     protected $guarded = ['id'];
 
     

@@ -30,11 +30,11 @@ class PharmacyRequest extends FormRequest
         
         ];
         if ($this->isMethod('post')) {
-          $rules['license_number'][] = 'unique:locations,license_number';
+          $rules['license_number'][] = 'unique:pharmacies,license_number';
         }
         else{
             $location = $this->route('pharmacy')?? $this->route('id');
-            $rules['license_number'][] = Rule::unique('pharmacies','license_number')->ignore($pharmacy->id);
+            $rules['license_number'][] = Rule::unique('pharmacies','license_number')->ignore($location->id);
 
         }
         return $rules;
