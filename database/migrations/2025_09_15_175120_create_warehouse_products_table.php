@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('warehouse_product', function (Blueprint $table) {
             $table->id();
-            // $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
-            // $table->foreignId('company_product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
+            $table->foreignId('company_product_id')->constrained()->onDelete('cascade');
             $table->integer('stock')->default(0)->index();
            $table->integer('reserved_stock')->default(0);
 

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('branch_product', function (Blueprint $table) {
             $table->id();
-            // $table->foreignId('branch_id')->constrained()->onDelete('cascade');
-            // $table->foreignId('pharmacy_product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('branch_id')->constrained()->onDelete('cascade');
+            $table->foreignId('pharmacy_product_id')->constrained()->onDelete('cascade');
             $table->integer('stock')->default(0)->index();
             $table->integer('reserved_stock')->default(0);
             $table->date('expiry_date')->nullable()->index();
