@@ -28,11 +28,11 @@ class CompanyRequest extends FormRequest
             'phone'   => 'nullable|string|max:20|regex:/^[0-9+\-\s()]+$/',
         ];
          if ($this->isMethod('post')) {
-          $rules['name'][] = 'unique:companies,name';
+          $rules['name'] = $rules['name'].'|unique:companies,name';
         }
         else{
             $company = $this->route('company')?? $this->route('id');
-            $rules['name'][] = Rule::unique('companies','name')->ignore($company->id);
+            $rules['name'] = "$rules[name]|".Rule::unique('companies','name')->ignore($company->id);
 
         }
         return $rules;

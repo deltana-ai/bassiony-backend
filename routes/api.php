@@ -7,7 +7,7 @@ use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController
 use App\Http\Controllers\Dashboard\PharmacyController as AdminPharmacyController ;
 use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\ContactUsController;
-use App\Http\Controllers\Dashboard\{BranchController,LocationController};
+use App\Http\Controllers\Dashboard\{BranchController,BranchProductController, CompanyController, LocationController, WarehouseController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
@@ -378,12 +378,22 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
 /////////////////////////////////////////////////////////////////////////////
 
 Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+
+
     Route::post('branches/index', [BranchController::class, 'index']);
     Route::post('branches/restore', [BranchController::class, 'restore']);
     Route::delete('branches/delete', [BranchController::class, 'destroy']);
     Route::put('/branches/{id}/{column}', [BranchController::class, 'toggle']);
     Route::delete('branches/force-delete', [BranchController::class, 'forceDelete']);
     Route::apiResource('branches', BranchController::class); 
+
+
+    ///////////////////////////////operations on products/////////////////////////
+    Route::post('branches/{branch}/products/index', [BranchProductController::class, 'index']);
+    Route::delete('branches/{branch}/products', [BranchProductController::class, 'destroy']);
+    Route::apiResource('branches/{branch}/products', BranchProductController::class); 
+
+
 });
 
 
@@ -394,4 +404,35 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
     Route::post('locations/index', [LocationController::class, 'index']);
     Route::delete('locations/delete', [LocationController::class, 'destroy']);
     Route::apiResource('locations', LocationController::class); 
+});
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+
+Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+    Route::post('warehouses/index', [WarehouseController::class, 'index'])->name('warehouses.index');
+    Route::post('warehouses/restore', [WarehouseController::class, 'restore']);
+    Route::delete('warehouses/delete', [WarehouseController::class, 'destroy']);
+    Route::put('/warehouses/{id}/{column}', [WarehouseController::class, 'toggle']);
+    Route::delete('warehouses/force-delete', [WarehouseController::class, 'forceDelete']);
+    Route::apiResource('warehouses', WarehouseController::class); 
+});
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+
+Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
+    Route::post('companies/index', [CompanyController::class, 'index'])->name('warehouses.index');
+    Route::post('companies/restore', [CompanyController::class, 'restore']);
+    Route::delete('companies/delete', [CompanyController::class, 'destroy']);
+    Route::put('/companies/{id}/{column}', [CompanyController::class, 'toggle']);
+    Route::delete('companies/force-delete', [CompanyController::class, 'forceDelete']);
+    Route::apiResource('companies', CompanyController::class); 
 });

@@ -11,7 +11,7 @@ class BranchProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,9 @@ class BranchProductRequest extends FormRequest
     {
         return [
             'branch_id' => 'required|exists:branches,id',
-            'pharmacy_product_id' => 'required|exists:pharmacy_product,id',
+            'product_id' => 'required|exists:products,id',
+            'branch_price' => 'nullable|numeric',
+            'batch_number' => 'nullable|string',
             'stock' => 'integer|min:0',
             'reserved_stock' => 'integer|min:0',
             'expiry_date' => 'nullable|date',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
+use App\Http\Requests\BranchProductRequest;
 use App\Http\Requests\BranchRequest;
 use App\Http\Resources\BranchResource ;
 use App\Interfaces\BranchRepositoryInterface;
@@ -48,9 +49,19 @@ class BranchController extends BaseController
     public function show(Branch $branch): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $branch->load(['location:id,name', 'pharmacy:id,name']);
+            $branch->load(['location:id,name', 'pharmacy:id,name','products']);
 
             return JsonResponse::respondSuccess('Item Fetched Successfully', new BranchResource($branch));
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+    public function storeProduct(Branch $branch, BranchProductRequest $request){
+
+        try {
+            $branch->products()->attach($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $request->expiry_date, 'batch_number' => $request->batch_number]);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
@@ -66,10 +77,31 @@ class BranchController extends BaseController
     }
 
 
+    public function updateProduct(Branch $branch, BranchProductRequest $request){
+
+        try {
+            $branch->products()->syncWithoutDetaching($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $request->expiry_date, 'batch_number' => $request->batch_number]);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
             $this->crudRepository->deleteRecords('branches', $request['items']);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+    public function destroyProduct(Branch $branch, BranchProductRequest $request){
+
+        try {
+            $branch->products()->detach($request->product_id);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

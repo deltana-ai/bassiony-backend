@@ -45,14 +45,23 @@ class Product extends BaseModel
 
     public function pharmacies()
     {
-        return $this->belongsToMany(Pharmacy::class, 'pharmacy_products')
+        return $this->belongsToMany(Pharmacy::class, 'pharmacy_product')
                     ->withPivot('price', 'stock','reserved_stock')
                     ->withTimestamps();
     }
 
-    public function companies()
+    public function branches()
     {
-        return $this->belongsToMany(Company::class, 'company_product') ->withPivot('price', 'stock','reserved_stock')
+        return $this->belongsToMany(Branch::class, 'branch_product')
+                    ->withPivot('branch_price', 'stock','reserved_stock','expiry_date','batch_number')
+                    ->withTimestamps();
+    }
+
+
+
+    public function warehouses()
+    {
+        return $this->belongsToMany(Warehouse::class, 'warehouse_product') ->withPivot('warehouse_price', 'stock','reserved_stock','expiry_date','batch_number')
                     ->withTimestamps();;
     }
 }

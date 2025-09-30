@@ -48,7 +48,7 @@ class WarehouseController extends BaseController
     public function show(Warehouse $warehouse): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $warehouse->load(['location', 'company']);
+            $warehouse->load(['location', 'company','products']);
             return JsonResponse::respondSuccess('Item Fetched Successfully', new WarehouseResource($warehouse));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

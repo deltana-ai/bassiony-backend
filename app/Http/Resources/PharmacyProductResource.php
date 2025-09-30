@@ -20,6 +20,7 @@ class PharmacyProductResource extends JsonResource
             'stock'       => $this->pivot->stock,
             'pharmacy_id' => $this->pivot->pharmacy_id,
             'product_id'  => $this->pivot->product_id, 
+            
         ];
     }
 }

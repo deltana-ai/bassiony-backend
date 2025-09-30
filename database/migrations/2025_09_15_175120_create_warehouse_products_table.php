@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('warehouse_products', function (Blueprint $table) {
+        Schema::create('warehouse_product', function (Blueprint $table) {
             $table->id();
             $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
-            $table->foreignId('company_product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('stock')->default(0)->index();
-           $table->integer('reserved_stock')->default(0);
+            $table->integer('reserved_stock')->default(0);
+            $table->decimal('warehouse_price', 10, 2)->nullable(); 
+            $table->string('batch_number')->nullable();
 
             $table->date('expiry_date')->nullable();
             $table->timestamps();

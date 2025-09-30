@@ -14,6 +14,25 @@ class BranchProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'products' => $this->products->map(function ($product) {
+                return [
+                    'id'             => $product->id,
+                    'name'           => $product->name,
+                    'description'    => $product->description,
+                    'price'          => $product->price,
+                    'active'         => (bool) $product->active,
+                    'imageUrl'       => $product->getFirstMediaUrl(),
+                    'branch_price'   => $product->pivot->branch_price,
+                    'stock'          => $product->pivot->stock,
+                    'reserved_stock' => $product->pivot->reserved_stock,
+                    'expiry_date'    => $product->pivot->expiry_date,
+                    'batch_number'   => $product->pivot->batch_number,
+                ];
+            }),
+            'pharmacy' => new PharmacyResource($this->pharmacy), 
+        ];
+
     }
 }

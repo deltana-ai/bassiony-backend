@@ -26,9 +26,6 @@ class ProductResource extends JsonResource
             'rating'      => (float) $this->rating,
             'rating_count'=> $this->rating_count,
             'price'         => (float) $this->price,
-            // 'pharmacy_product' =>  new PharmacyProductResource(
-            //     $this->pharmacies->random()
-            // ),
 
             'imageUrl'    => $this->getFirstMediaUrl(),
             'image'       => new MediaResource($this->getFirstMedia()),

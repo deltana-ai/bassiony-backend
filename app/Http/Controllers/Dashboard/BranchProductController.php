@@ -5,7 +5,8 @@ use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\BranchProductRequest;
 use App\Http\Resources\BranchProductResource ;
-use App\Interfaces\BranchProductRepositoryInterface;
+use App\Interfaces\BranchRepositoryInterface;
+use App\Models\Branch;
 use App\Models\BranchProduct;
 use Exception;
 use Illuminate\Http\Request;
@@ -14,17 +15,18 @@ class BranchProductController extends BaseController
 {
     protected mixed $crudRepository;
 
-    public function __construct(BranchProductRepositoryInterface $pattern)
+    public function __construct(BranchRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
     }
+
 
     public function index()
     {
         try {
 
             $branch_product_products = BranchProductResource::collection($this->crudRepository->all(
-                ['branch_product:id,name', 'pharmacy_product','branch_product.pharmacy:id,name','pharmacy_product.product:id,name'],
+                [ 'products','pharmacy:id,name'],
                 [],
                 ['*']
             ));
@@ -34,42 +36,47 @@ class BranchProductController extends BaseController
         }
     }
 
-    public function store(BranchProductRequest $request)
+    public function store(Branch $branch,BranchProductRequest $request)
     {
             try {
-                $branch_product = $this->crudRepository->create($request->validated());
+                $branch_product = $branch->products()->attach($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $request->expiry_date, 'batch_number' => $request->batch_number]);
                 
-                return new BranchProductResource($branch_product);
+                return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
             }
     }
 
-    public function show(BranchProduct $branch_product): ?\Illuminate\Http\JsonResponse
+    public function show(Branch $branch, int $productId): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $branch_product->load(['branch_product:id,name', 'pharmacy_product','branch_product.pharmacy:id,name','pharmacy_product.product:id,name']);
+             $branch->load([
+            'products' => function ($q) use ($productId) {
+                $q->where('products.id', $productId);
+            },
+            'pharmacy:id,name'
+        ]);
 
-            return JsonResponse::respondSuccess('Item Fetched Successfully', new BranchProductResource($branch_product));
+            return JsonResponse::respondSuccess('Item Fetched Successfully', new BranchProductResource($branch));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
 
-    public function update(BranchProductRequest $request, BranchProduct $branch_product)
+    public function update(BranchProductRequest $request, Branch $branch)
     {
-        $this->crudRepository->update($request->validated(), $branch_product->id);
+        $branch->products()->syncWithoutDetaching($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $request->expiry_date, 'batch_number' => $request->batch_number]);
 
        
         return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
     }
 
 
-    public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
+    public function destroy(Branch $branch,Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $this->crudRepository->deleteRecords('branch_products', $request['items']);
+            $branch->products()->detach($request->items);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

@@ -32,13 +32,13 @@ class WarehouseRequest extends FormRequest
             'active'      => 'nullable|boolean',
         ];
         if ($this->isMethod('post')) {
-          $rules['name'][] = 'unique:warehouses,name';
-          $rules['code'][] = 'unique:warehouses,code';
+          $rules['name'] = $rules['name'].'|unique:warehouses,name';
+          $rules['code'] = $rules['code'].'|unique:warehouses,code';
         }
         else{
             $warehouse = $this->route('warehouse')?? $this->route('id');
-            $rules['name'][] = Rule::unique('warehouses','name')->ignore($warehouse->id);
-            $rules['code'][] = Rule::unique('warehouses','code')->ignore($warehouse->id);
+            $rules['name'] = $rules['name']."|".Rule::unique('warehouses','name')->ignore($warehouse->id);
+            $rules['code'] = $rules['code']."|".Rule::unique('warehouses','code')->ignore($warehouse->id);
 
         }
         return $rules;

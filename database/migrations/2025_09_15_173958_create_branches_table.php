@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('code', 50)->unique(); 
             $table->foreignId('pharmacy_id')->constrained()->onDelete('cascade');
-            $table->foreignId('location_id')->constrained()->onDelete('cascade');
 
             $table->string('address');
             $table->boolean('active')->default(true)->index();

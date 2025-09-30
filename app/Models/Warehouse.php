@@ -22,9 +22,9 @@ class Warehouse extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function warehouseProducts()
+    public function products()
     {
-        return $this->hasMany(WarehouseProduct::class);
+        return $this->belongsToMany(Product::class, 'warehouse_product')->withPivot('warehouse_price', 'stock','reserved_stock','expiry_date','batch_number');
     }
 
     public function branches()

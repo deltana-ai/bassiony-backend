@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('branch_warehouses', function (Blueprint $table) {
             $table->id();
-               $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
-               $table->foreignId('warehouse_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('warehouse_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

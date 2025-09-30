@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasMedia;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Company extends Model
+class Company extends BaseModel
 {
+    use HasMedia, SoftDeletes;
     protected $guarded = ['id'];
 
     protected $with = [
