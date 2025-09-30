@@ -20,7 +20,8 @@ class WarehouseResource extends JsonResource
          'code' => $this->code,
          'company' => $this->company? new CompanyResource($this->whenLoaded('company')) : null,
          'location' => $this->location? new LocationResource($this->whenLoaded('location')) : null,
-         'products' => new ProductResource($this->whenLoaded('products')),
+         'branches' => $this->branches?  BranchResource::collection($this->whenLoaded('branches')) : null,
+
          'createdAt' => $this->created_at ? $this->created_at->format('Y-M-d H:i:s A') : null,
          'updatedAt' => $this->updated_at ? $this->updated_at->format('Y-M-d H:i:s A') : null,
          'deletedAt' => $this->deleted_at ? $this->deleted_at->format('Y-M-d H:i:s A') : null,

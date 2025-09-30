@@ -5,8 +5,10 @@ use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\WarehouseProductRequest;
 use App\Http\Resources\WarehouseProductResource ;
-use App\Interfaces\WarehouseProductRepositoryInterface;
+use App\Interfaces\WarehouseRepositoryInterface;
+use App\Models\Warehouse;
 use App\Models\WarehouseProduct;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -14,73 +16,83 @@ class WarehouseProductController extends BaseController
 {
     protected mixed $crudRepository;
 
-    public function __construct(WarehouseProductRepositoryInterface $pattern)
+    public function __construct(WarehouseRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
     }
+
 
     public function index()
     {
         try {
 
-            $warehouse_products = WarehouseProductResource::collection($this->crudRepository->all(
-                ["company", "company_product","company_product.product:id,name","company_product.company:id,name"],
+            $warehouse_product_products = WarehouseProductResource::collection($this->crudRepository->all(
+                [ 'products','company:id,name'],
                 [],
                 ['*']
             ));
-            return $warehouse_products->additional(JsonResponse::success());
+            return $warehouse_product_products->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-    public function store(WarehouseProductRequest $request)
+    public function store(Warehouse $warehouse,WarehouseProductRequest $request)
     {
             try {
-                $branch = $this->crudRepository->create($request->validated());
+                $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date)
+                ->format('Y-m-d');
+                $warehouse_product = $warehouse->products()->attach($request->product_id,['warehouse_price' => $request->warehouse_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $expiry_date, 'batch_number' => $request->batch_number]);
                 
-                return new WarehouseProductResource($branch);
+                return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
             }
     }
 
-    public function show(WarehouseProduct $branch): ?\Illuminate\Http\JsonResponse
+    public function show(Warehouse $warehouse, int $productId): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $branch->load(["company", "company_product","company_product.product:id,name","company_product.company:id,name"]);
+             $warehouse->load([
+            'products' => function ($q) use ($productId) {
+                $q->where('products.id', $productId);
+            },
+            'company:id,name'
+        ]);
 
-            return JsonResponse::respondSuccess('Item Fetched Successfully', new WarehouseProductResource($branch));
+            return JsonResponse::respondSuccess('Item Fetched Successfully', new WarehouseProductResource($warehouse));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
 
-    public function update(WarehouseProductRequest $request, WarehouseProduct $branch)
+    public function update(WarehouseProductRequest $request, Warehouse $warehouse)
     {
-        $this->crudRepository->update($request->validated(), $branch->id);
+        try {
+            $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date)
+                ->format('Y-m-d');
+            $warehouse->products()->syncWithoutDetaching($request->product_id,['warehouse_price' => $request->warehouse_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $expiry_date, 'batch_number' => $request->batch_number]);
 
-       
-        return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+        }
+        
+        catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
     }
 
 
-    public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
+    public function destroy(Warehouse $warehouse,Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $this->crudRepository->deleteRecords('warehouse_products', $request['items']);
+            $warehouse->products()->detach($request->items);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-
-
-
-
-   
 
 
 

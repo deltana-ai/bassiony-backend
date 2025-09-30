@@ -18,11 +18,9 @@ class BranchResource extends JsonResource
          'id' => $this->id,
          'name' => $this->name,
          'code' => $this->code,
-         'warehouse' => $this->warehouse? new WarehouseResource($this->whenLoaded('warehouse')) : null,
-         
+         'warehouse' => $this->warehouses?  WarehouseResource::collection($this->whenLoaded('warehouses')) : null,
          'company' => $this->pharmacy? new PharmacyResource($this->whenLoaded('pharmacy')) : null,
          'location' => $this->location? new LocationResource($this->whenLoaded('location')) : null,
-         'products' => new ProductResource($this->whenLoaded('products')),
          'createdAt' => $this->created_at ? $this->created_at->format('Y-M-d H:i:s A') : null,
          'updatedAt' => $this->updated_at ? $this->updated_at->format('Y-M-d H:i:s A') : null,
          'deletedAt' => $this->deleted_at ? $this->deleted_at->format('Y-M-d H:i:s A') : null,

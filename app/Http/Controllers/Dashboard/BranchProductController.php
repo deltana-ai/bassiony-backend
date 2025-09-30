@@ -8,6 +8,7 @@ use App\Http\Resources\BranchProductResource ;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Models\Branch;
 use App\Models\BranchProduct;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -39,7 +40,9 @@ class BranchProductController extends BaseController
     public function store(Branch $branch,BranchProductRequest $request)
     {
             try {
-                $branch_product = $branch->products()->attach($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $request->expiry_date, 'batch_number' => $request->batch_number]);
+                $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date)
+                ->format('Y-m-d');
+                $branch_product = $branch->products()->attach($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $expiry_date, 'batch_number' => $request->batch_number]);
                 
                 return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
             } catch (Exception $e) {
@@ -66,10 +69,17 @@ class BranchProductController extends BaseController
 
     public function update(BranchProductRequest $request, Branch $branch)
     {
-        $branch->products()->syncWithoutDetaching($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $request->expiry_date, 'batch_number' => $request->batch_number]);
-
-       
-        return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+        try {
+            $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date)
+                    ->format('Y-m-d');
+            $branch->products()->syncWithoutDetaching($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $expiry_date, 'batch_number' => $request->batch_number]);
+            
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+        }
+        catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+  
     }
 
 

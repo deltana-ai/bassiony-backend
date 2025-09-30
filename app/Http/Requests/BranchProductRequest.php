@@ -23,7 +23,7 @@ class BranchProductRequest extends FormRequest
     {
         return [
             'branch_id' => 'required|exists:branches,id',
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:products,id|unique:branch_product,product_id,NULL,id,branch_id,' . $this->branch_id,
             'branch_price' => 'nullable|numeric',
             'batch_number' => 'nullable|string',
             'stock' => 'integer|min:0',

@@ -57,10 +57,10 @@ class BranchController extends BaseController
         }
     }
 
-    public function storeProduct(Branch $branch, BranchProductRequest $request){
+    public function storeWarehouse(Branch $branch, Request $request){
 
         try {
-            $branch->products()->attach($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $request->expiry_date, 'batch_number' => $request->batch_number]);
+            $branch->warehouses()->attach($request->warehouse_id);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -77,10 +77,10 @@ class BranchController extends BaseController
     }
 
 
-    public function updateProduct(Branch $branch, BranchProductRequest $request){
+    public function updateWarehouse(Branch $branch, Request $request){
 
         try {
-            $branch->products()->syncWithoutDetaching($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $request->expiry_date, 'batch_number' => $request->batch_number]);
+            $branch->warehouses()->syncWithoutDetaching($request->warehouse_id);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -98,10 +98,10 @@ class BranchController extends BaseController
         }
     }
 
-    public function destroyProduct(Branch $branch, BranchProductRequest $request){
+    public function destroyWarehouse(Branch $branch, Request $request){
 
         try {
-            $branch->products()->detach($request->product_id);
+            $branch->warehouses()->detach($request->warehouse_id);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
