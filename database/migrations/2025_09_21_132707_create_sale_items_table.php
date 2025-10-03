@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+          Schema::disableForeignKeyConstraints();
+
         Schema::create('sale_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sale_id')->constrained()->cascadeOnDelete();
@@ -22,6 +24,8 @@ return new class extends Migration
             $table->date('expiry_date')->nullable();
             $table->timestamps();
         });
+        Schema::enableForeignKeyConstraints();
+
     }
 
     /**
