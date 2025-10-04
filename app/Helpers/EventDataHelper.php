@@ -218,46 +218,7 @@ class EventDataHelper
      * @param int $userId The user ID.
      * @return float The price.
      */
-    public static function getPrice(string $type, int $userId, int $conferenceId): float
-    {
-        $earlyBird = self::earlyBirdStatus($conferenceId);
-
-        $company = User::find($userId);
-        $conference = Conference::find($conferenceId);
-        $companyMembershipType = $company->active_member; // true is a member, false no non-member
-
-        if ($type === 'delegate') {
-            if ($companyMembershipType) {
-                // Handle delegate price for a member $conference->value('value') event_earlybird_price_delegate   event_price_delegate
-                $price = $earlyBird ? (float)$conference->value('eb_member_delegate_price') : (float)$conference->value('member_delegate_price');
-            } else {
-                // Handle delegate price for a non-member $conference->value('event_earlybird_price_delegate')  event_earlybird_non_member_price_delegate  event_non_member_price_delegate
-                $price = $earlyBird ? (float)$conference->value('eb_non_member_delegate_price') : (float)$conference->value('non_member_delegate_price');
-            }
-        } else if ($type === 'spouse') {
-            if ($companyMembershipType) {
-                // Handle spouse price for a member
-                $price = $earlyBird ? (float)$conference->value('eb_member_spouse_price') : (float)$conference->value('member_spouse_price');
-            } else {
-                // Handle spouse price for a non-member
-                $price = $earlyBird ? (float)$conference->value('eb_non_member_spouse_price') : (float)$conference->value('non_member_spouse_price');
-            }
-        } else {
-            $price = 0;
-        }
-
-        return $price;
-    }
-
-    /**
-     * Get the price based on type and user ID.
-     * @return bool The price.
-     */
-    public static function earlyBirdStatus(int $id): bool
-    {
-        $earlyBirdSetting = Conference::where('id', $id)->value('early_bird_active');
-        return (bool)$earlyBirdSetting;
-    }
+   
 
     /**
      * Get the price based on type and user ID.

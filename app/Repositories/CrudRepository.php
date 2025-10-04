@@ -317,7 +317,189 @@ class CrudRepository implements ICrudRepository
             return $query->get($columns);
         }
     }
-  function logInfo($abilitieId, $networkId = null, $date = null)
+
+
+
+
+
+    public function allUser($with = [], $conditions = [], $columns = ['*'], $useNetworkId = false, $useCollection = false)
+    {
+        $networkId = request()->header('X-Network-ID');
+        $currentNetworkCollect = User::where('id', $networkId)->value('collection');
+        $order_by = request(Constants::ORDER_BY) ?? "id";
+        $deleted = request(Constants::Deleted) ?? false;
+        $order_by_direction = request(Constants::ORDER_By_DIRECTION) ?? "asc";
+        $filter_operator = request(Constants::FILTER_OPERATOR) ?? "Like";
+        $filters = request(Constants::FILTERS) ?? [];
+        $per_page = request(Constants::PER_PAGE) ?? 15;
+        $paginate = request(Constants::PAGINATE) ?? false;
+        $relationData = request('relation');
+        $networks = request('networks');
+        $network_users = request('network_filter');
+        $query = $this->model;
+
+        if ($this->model instanceof User) {
+            $query = $query->where('active_member', 1);
+        }
+
+        $all_conditions = array_merge($conditions, $filters);
+
+        if ($deleted == true) {
+            $query = $query->onlyTrashed();
+        }
+        if (!empty($with)) {
+            $query = $query->with($with);
+        }
+        if ($deleted == false) {
+            if (!empty($relationData)) {
+
+                foreach ($relationData as $relation) {
+                    $name_relation = $relation['name_relation'];
+                    $name_in_relation = $relation['name_in_relation'];
+                    $filed_in_relation = $relation['filed_in_relation'];
+                    if (isset($networks_active))
+                        $networks_active = $relation['networks_active'];
+                    if ($filed_in_relation == 'active' and $name_relation == 'networks') {
+                        $relationMethod = $query->getModel()->$name_relation();
+                        $relationTable = $relationMethod->getTable();
+                        $query = $query->orWhereHas($name_relation, function ($q) use ($name_in_relation, $filed_in_relation, $relationTable) {
+                            $q->where("$relationTable.$filed_in_relation", $name_in_relation)->where('network_id', request()->header('X-Network-ID'));
+                        });
+                    } else {
+                        $query = $query->orWhereHas($name_relation, function ($q) use ($name_in_relation, $filed_in_relation, $relation, $networks) {
+                            $networks_active = $relation['networks_active'] ?? null;
+                            $networks = request('networks') ?? null;
+                            if (is_string($name_in_relation)) {
+                                if (isset($networks_active)) {
+                                    $q->where($filed_in_relation, 'LIKE', '%' . $name_in_relation . '%')->where('network', $networks_active)->whereIn('network_id', $networks);
+                                } else {
+                                    $q->where($filed_in_relation, 'LIKE', '%' . $name_in_relation . '%');
+                                }
+                            } else {
+                                $q->where($filed_in_relation, $name_in_relation);
+                            }
+                        });
+                    }
+                    foreach ($filters as $key => $value) {
+                        if (is_numeric($value)) {
+                            $query = $query->where($key, '=', $value);
+                        } else {
+                            $query = $query->where($key, 'LIKE', '%' . $value . '%');
+                        }
+                    }
+                }
+            }
+            if (!empty($network_users)) {
+                $status = $network_users['status'];
+                $type = isset($network_users['type']) ? $network_users['type'] : null;
+                $network = isset($network_users['network'])  ? $network_users['network'] : null;
+                $fpp = isset($network_users['fpp']) ? $network_users['fpp'] : null;
+                $active = isset($network_users['active']) ? $network_users['active'] : null;
+                $network_ids = isset($network_users['network_ids']) ? $network_users['network_ids'] : null;
+                $query = $query->WhereHas('networks', function ($q) use ($network_ids, $type, $status, $network, $fpp, $active) {
+                    if (isset($active)) {
+                        $q->where('users_networks.active', "$active");
+                    }
+                    if (!empty($network_ids)) {
+                        $q->whereIn('network_id', $network_ids);
+                    }
+                    if (!empty($status)) {
+                        $q->whereIn('status', $status);
+                    }
+                    if (!empty($type)) {
+                        $q->whereIn('type', $type);
+                    }
+                    if (isset($network)) {
+                        $q->where('network', $network);
+                    }
+                    if (isset($fpp)) {
+                        $q->where('fpp', $fpp);
+                    }
+                });
+                foreach ($filters as $key => $value) {
+                    if (is_numeric($value)) {
+                        $query = $query->where($key, '=', $value);
+                    } else {
+                        $query = $query->where($key, 'LIKE', '%' . $value . '%');
+                    }
+                }
+            }
+        } else {
+            $query = $query->onlyTrashed();
+            foreach ($filters as $key => $value) {
+                if (is_numeric($value)) {
+                    $query = $query->where($key, '=', $value);
+                } else {
+                    $query = $query->where($key, 'LIKE', '%' . $value . '%');
+                }
+            }
+        }
+        if (!empty($filters)) {
+            foreach ($filters as $key => $value) {
+                if (is_numeric($value)) {
+                    $query = $query->where($key, '=', $value);
+                } else {
+                    $query = $query->where($key, 'LIKE', '%' . $value . '%');
+                }
+            }
+        }
+        if (isset($order_by)) {
+            $query = $query->orderBy($order_by, $order_by_direction);
+        }
+        if ($useNetworkId) {
+            if ($useCollection) {
+                if (!$currentNetworkCollect) {
+                    $query = $query->where('network_id', $networkId);
+                }
+            } else {
+                $query = $query->where('network_id', $networkId);
+            }
+        }
+        if ($paginate) {
+            return $query->paginate($per_page, $columns);
+        } else {
+            return $query->get($columns);
+        }
+    }
+
+
+    function allUpdateTable($id, $case, $key = null, $value = null)
+    {
+        switch ($case) {
+            case ('previous'):
+                if ($id == 0) {
+                    $model = $this->model->orderby('id', 'desc')->firstOrFail();
+                } else {
+                    $model = $this->model->where('id', '<', $id)->when(isset($value), function ($query) use ($key, $value) {
+                        return $query->where($key, $value);
+                    })->orderby('id', 'desc')->firstOrFail();
+                    break;
+                }
+                $model = $this->model->where('id', '<', $id)->when(isset($value), function ($query) use ($key, $value) {
+                    return $query->where($key, $value);
+                })->orderby('id', 'desc')->firstOrFail();
+                break;
+
+            case ('next'):
+                $model = $this->model->where('id', '>', $id)->when(isset($value), function ($query) use ($key, $value) {
+                    return $query->where($key, $value);
+                })->orderby('id', 'asc')->firstOrFail();
+                break;
+            case ('first'):
+                $model = $this->model->when(isset($value), function ($query) use ($key, $value) {
+                    return $query->where($key, $value);
+                })->firstOrFail();
+                break;
+            case ('last'):
+                $model = $this->model->when(isset($value), function ($query) use ($key, $value) {
+                    return $query->where($key, $value);
+                })->orderBy('id', 'desc')->first();
+                break;
+        }
+        return $model;
+    }
+
+    function logInfo($abilitieId, $networkId = null, $date = null)
     {
         if (!$date) $date = Carbon::now()->format('Y-m-d');
 
