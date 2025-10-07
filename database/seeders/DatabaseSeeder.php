@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         PharmacyProductSeeder::class,
         AdminSeeder::class,
         BaseSeeder::class,
+    CompanySeeder::class,
     ]);
 
     }

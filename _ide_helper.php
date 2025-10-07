@@ -12834,45 +12834,47 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Migrate the delayed jobs that are ready to the regular queue.
+         * Release a reserved job back onto the queue after (n) seconds.
          *
-         * @param string $from
-         * @param string $to
-         * @return array
+         * @param string $queue
+         * @param \Illuminate\Queue\Jobs\DatabaseJobRecord $job
+         * @param int $delay
+         * @return mixed
          * @static
          */
-        public static function migrateExpiredJobs($from, $to)
+        public static function release($queue, $job, $delay)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            return $instance->migrateExpiredJobs($from, $to);
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->release($queue, $job, $delay);
         }
 
         /**
          * Delete a reserved job from the queue.
          *
          * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
+         * @param string $id
          * @return void
+         * @throws \Throwable
          * @static
          */
-        public static function deleteReserved($queue, $job)
+        public static function deleteReserved($queue, $id)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            $instance->deleteReserved($queue, $job);
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            $instance->deleteReserved($queue, $id);
         }
 
         /**
          * Delete a reserved job from the reserved queue and release it.
          *
          * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
+         * @param \Illuminate\Queue\Jobs\DatabaseJob $job
          * @param int $delay
          * @return void
          * @static
          */
         public static function deleteAndRelease($queue, $job, $delay)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             $instance->deleteAndRelease($queue, $job, $delay);
         }
 
@@ -12885,7 +12887,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function clear($queue)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->clear($queue);
         }
 
@@ -12898,32 +12900,20 @@ namespace Illuminate\Support\Facades {
          */
         public static function getQueue($queue)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getQueue($queue);
         }
 
         /**
-         * Get the connection for the queue.
+         * Get the underlying database instance.
          *
-         * @return \Illuminate\Redis\Connections\Connection
+         * @return \Illuminate\Database\Connection
          * @static
          */
-        public static function getConnection()
+        public static function getDatabase()
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            return $instance->getConnection();
-        }
-
-        /**
-         * Get the underlying Redis instance.
-         *
-         * @return \Illuminate\Contracts\Redis\Factory
-         * @static
-         */
-        public static function getRedis()
-        {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            return $instance->getRedis();
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->getDatabase();
         }
 
         /**
@@ -12936,7 +12926,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobTries($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobTries($job);
         }
 
@@ -12950,7 +12940,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobBackoff($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobBackoff($job);
         }
 
@@ -12964,7 +12954,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobExpiration($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobExpiration($job);
         }
 
@@ -12978,7 +12968,7 @@ namespace Illuminate\Support\Facades {
         public static function createPayloadUsing($callback)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            \Illuminate\Queue\RedisQueue::createPayloadUsing($callback);
+            \Illuminate\Queue\DatabaseQueue::createPayloadUsing($callback);
         }
 
         /**
@@ -12990,7 +12980,7 @@ namespace Illuminate\Support\Facades {
         public static function getContainer()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getContainer();
         }
 
@@ -13004,7 +12994,7 @@ namespace Illuminate\Support\Facades {
         public static function setContainer($container)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             $instance->setContainer($container);
         }
 

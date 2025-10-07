@@ -12,6 +12,8 @@ class Branch extends BaseModel
     
      protected $casts = [
         'active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function pharmacy()
@@ -33,10 +35,6 @@ class Branch extends BaseModel
 
     
 
-    public function warehouses()
-    {
-        return $this->belongsToMany(Warehouse::class, 'branch_warehouse');
-    }
 
    
       

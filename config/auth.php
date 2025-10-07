@@ -52,6 +52,10 @@ return [
             'driver' => 'sanctum',
             'provider' => 'pharmacists',
         ],
+        'employees' => [
+            'driver' => 'sanctum',
+            'provider' => 'employees',
+        ],
     ],
 
 
@@ -86,6 +90,14 @@ return [
          'pharmacists' => [
             'driver' => 'eloquent',
             'model' => App\Models\Pharmacist::class,
+        ],
+        'pharmacists' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Pharmacist::class,
+        ],
+        'employees' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Employee::class,
         ],
     ],
 
@@ -123,6 +135,12 @@ return [
         ],
          'pharmacists' => [
             'provider' => 'pharmacists',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'employees' => [
+            'provider' => 'employees',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

@@ -410,27 +410,14 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
     Route::apiResource('locations', LocationController::class); 
 });
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////
-
-Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
-    Route::post('warehouses/index', [WarehouseController::class, 'index'])->name('warehouses.index');
-    Route::post('warehouses/restore', [WarehouseController::class, 'restore']);
-    Route::delete('warehouses/delete', [WarehouseController::class, 'destroy']);
-    Route::put('/warehouses/{id}/{column}', [WarehouseController::class, 'toggle']);
-    Route::delete('warehouses/force-delete', [WarehouseController::class, 'forceDelete']);
-    Route::apiResource('warehouses', WarehouseController::class); 
-});
+////////////////////////////////////////////////////////////////////////
 
 
 
 
 
 
-////////////////////////////////////////////////////////////////////////////
+//////////////////////////////companies//////////////////////////////////////////////
 
 Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
     Route::post('companies/index', [CompanyController::class, 'index'])->name('warehouses.index');
@@ -440,3 +427,4 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
     Route::delete('companies/force-delete', [CompanyController::class, 'forceDelete']);
     Route::apiResource('companies', CompanyController::class); 
 });
+require __DIR__.'/company.php';

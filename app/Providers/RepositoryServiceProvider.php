@@ -17,9 +17,9 @@ use App\Repositories\UserRepository;
 use App\Repositories\{BranchRepository, BrandRepository, CategoryRepository, ProductRepository,FavoriteRepository, OrderRepository, PharmacistRepository, PillReminderRepository, RateRepository};
 use App\Repositories\{CompanyRepository,LocationRepository,WarehouseRepository,PharmacyRepository};
 use Illuminate\Support\ServiceProvider;
-use App\Interfaces\{PharmacyProductRepositoryInterface,CompanyProductRepositoryInterface,BranchProductRepositoryInterface,BranchRouteRepositoryInterface,WarehouseProductRepositoryInterface,WarehouseRouteRepositoryInterface};
+use App\Interfaces\{PharmacyProductRepositoryInterface,CompanyProductRepositoryInterface,BranchProductRepositoryInterface,BranchRouteRepositoryInterface, EmployeeRepositoryInterface, RoleRepositoryInterface, WarehouseProductRepositoryInterface,WarehouseRouteRepositoryInterface};
 
-use App\Repositories\{PharmacyProductRepository,CompanyProductRepository,BranchProductRepository,BranchRouteRepository,WarehouseProductRepository,WarehouseRouteRepository};
+use App\Repositories\{PharmacyProductRepository,CompanyProductRepository,BranchProductRepository,BranchRouteRepository, EmployeeRepository, RoleRepository, WarehouseProductRepository,WarehouseRouteRepository};
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -48,9 +48,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PharmacyRepositoryInterface::class, PharmacyRepository::class);
 
         $this->app->bind(BranchProductRepositoryInterface::class, BranchProductRepository::class);
-        $this->app->bind(BranchRouteRepositoryInterface::class, BranchRouteRepository::class);
         $this->app->bind(WarehouseProductRepositoryInterface::class, WarehouseProductRepository::class);
-        $this->app->bind(WarehouseRouteRepositoryInterface::class, WarehouseRouteRepository::class);
+        $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
+        $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
 
 
     }

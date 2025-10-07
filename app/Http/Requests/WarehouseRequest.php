@@ -27,7 +27,7 @@ class WarehouseRequest extends FormRequest
         $rules =  [
             'name'        => 'required|string|max:255',
             'code'        => 'required|string|max:50',     
-            'company_id'  => 'required|exists:companies,id',
+            // 'company_id'  => 'required|exists:companies,id',
             'location_id' => 'required|exists:locations,id',
             'active'      => 'nullable|boolean',
         ];

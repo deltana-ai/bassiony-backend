@@ -1,21 +1,21 @@
 <?php
 
 namespace App\Http\Controllers\Dashboard;
-use App\Http\Controllers\BaseController;
+
 use App\Helpers\JsonResponse;
-use App\Http\Requests\WarehouseRequest;
-use App\Http\Resources\WarehouseResource ;
-use App\Interfaces\WarehouseRepositoryInterface;
-use App\Models\Warehouse;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\RoleRequest;
+use App\Http\Resources\RoleResource;
+use App\Interfaces\RoleRepositoryInterface;
+use App\Models\Role;
 use Exception;
 use Illuminate\Http\Request;
-use SebastianBergmann\CodeUnit\FunctionUnit;
 
-class WarehouseController extends BaseController
+class EmployeeRoleController extends Controller
 {
     protected mixed $crudRepository;
 
-    public function __construct(WarehouseRepositoryInterface $pattern)
+    public function __construct(RoleRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
     }
@@ -24,55 +24,58 @@ class WarehouseController extends BaseController
     {
         try {
 
-            $warehouses = WarehouseResource::collection($this->crudRepository->all(
-                ["company", "location"],
+            $roles = RoleResource::collection($this->crudRepository->all(
+                [],
                 [],
                 ['*']
             ));
-            return $warehouses->additional(JsonResponse::success());
+            return $roles->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-    public function store(WarehouseRequest $request)
+    public function store(RoleRequest $request)
     {
             try {
-                $data = $this->prepareData( $request);
-                $warehouse = $this->crudRepository->create($data);
+                $data = $this->prepareData($request);
+                $role = $this->crudRepository->create($data);
                
-                return new WarehouseResource($warehouse);
+                return new RoleResource($role);
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
             }
     }
 
-    public function show(Warehouse $warehouse): ?\Illuminate\Http\JsonResponse
+    public function show(Role $role): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $warehouse->load(['location', 'company','products']);
-            return JsonResponse::respondSuccess('Item Fetched Successfully', new WarehouseResource($warehouse));
+            return JsonResponse::respondSuccess('Item Fetched Successfully', new RoleResource($role));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
 
-    public function update(WarehouseRequest $request, Warehouse $warehouse)
+    public function update(RoleRequest $request, Role $role)
     {
-
-        $data = $this->prepareData( $request);
-        $this->crudRepository->update($data, $warehouse->id);
-
+        try {
+            $data = $this->prepareData($request);
+            $this->crudRepository->update($data, $role->id);
        
-        return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+
+        } catch (\Throwable $th) {
+            return JsonResponse::respondError($th->getMessage());
+        }
+        
     }
 
 
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $this->crudRepository->deleteRecords('warehouses', $request['items']);
+            $this->crudRepository->deleteRecords('roles', $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -82,7 +85,7 @@ class WarehouseController extends BaseController
     public function restore(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $this->crudRepository->restoreItem(Warehouse::class, $request['items']);
+            $this->crudRepository->restoreItem(Role::class, $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_RESTORED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -95,22 +98,20 @@ class WarehouseController extends BaseController
     public function forceDelete(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $this->crudRepository->deleteRecordsFinial(Warehouse::class, $request['items']);
+            $this->crudRepository->deleteRecordsFinial(Role::class, $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_FORCE_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-    private Function prepareData(WarehouseRequest $request)
+
+    private Function prepareData(RoleRequest $request)
     {  
         $data = $request->validated();
-        $data['company_id'] = auth("employees")->user()->company_id??0;
+        $data['guard_name'] = "employees";
         return $data;
     }
-
-
-
 
 
 }

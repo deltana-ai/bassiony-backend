@@ -4,7 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-
+use App\Models\Company;
+use Illuminate\Support\Facades\Auth;
 class CompanyRequest extends FormRequest
 {
     /**
@@ -32,6 +33,9 @@ class CompanyRequest extends FormRequest
         }
         else{
             $company = $this->route('company')?? $this->route('id');
+            if(Auth::guard('employees')->check()){ 
+                $company = Company::find(auth("employees")->user()->company_id);
+            }
             $rules['name'] = "$rules[name]|".Rule::unique('companies','name')->ignore($company->id);
 
         }
