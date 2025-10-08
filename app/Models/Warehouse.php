@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Policies\WarehousePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -17,6 +18,11 @@ class Warehouse extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+     public static function policy()
+    {
+        return WarehousePolicy::class;
+    }
     
 
      public function company()
@@ -31,7 +37,7 @@ class Warehouse extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'warehouse_product')->withPivot('warehouse_price', 'stock','reserved_stock','expiry_date','batch_number');
+        return $this->belongsToMany(Product::class, 'warehouse_product')->withPivot('warehouse_price', 'stock','reserved_stock','expiry_date','batch_number')->withTimestamps();
     }
 
     

@@ -22,8 +22,7 @@ class WarehouseProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'product_id' => 'required|exists:products,id|unique:warehouse_product,product_id,NULL,id,warehouse_id,' . $this->warehouse_id,
+            'product_id' => 'required|exists:products,id',
             'warehouse_price' => 'nullable|numeric',
             'batch_number' => 'nullable|string',
             'stock' => 'integer|min:0',

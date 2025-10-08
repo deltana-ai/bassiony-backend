@@ -72,7 +72,7 @@ class BranchProductController extends BaseController
         try {
             $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date)
                     ->format('Y-m-d');
-            $branch->products()->syncWithoutDetaching($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $expiry_date, 'batch_number' => $request->batch_number]);
+            $branch->products()->updateExistingPivot($request->product_id,['branch_price' => $request->branch_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $expiry_date, 'batch_number' => $request->batch_number]);
             
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
         }

@@ -387,10 +387,7 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
     Route::delete('branches/force-delete', [BranchController::class, 'forceDelete']);
     Route::apiResource('branches', BranchController::class); 
 
-    ///////////////////////////////add warehouse to branch /////////////////////////
-    Route::post('branches/{branch}/warehouse', [BranchController::class, 'storeWarehouse']);
-    Route::patch('branches/{branch}/warehouse', [BranchController::class, 'updateWarehouse']);
-    Route::delete('branches/{branch}/warehouse', [BranchController::class, 'destroyWarehouse']);
+   
 
     ///////////////////////////////operations on products/////////////////////////
     Route::post('branches/{branch}/products/index', [BranchProductController::class, 'index']);

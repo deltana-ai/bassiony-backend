@@ -15,7 +15,7 @@ class WarehouseProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            
             'products' => $this->products->map(function ($product) {
                 return [
                     'id'                => $product->id,
@@ -31,7 +31,13 @@ class WarehouseProductResource extends JsonResource
                     'batch_number'      => $product->pivot->batch_number,
                 ];
             }),
-            'company' => new CompanyResource($this->company), 
+            'warehouse' => [
+                'id' => $this->id,
+                'name' => $this->name,
+                'code' => $this->code,
+            ],
+            
+            
         ];
     }
 }

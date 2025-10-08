@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{ CompanyController, EmployeeProfileController, EmployeeRoleController, LocationController, WarehouseController};
+use App\Http\Controllers\Dashboard\{ CompanyController, EmployeeProfileController, EmployeeRoleController, LocationController, WarehouseController, WarehouseProductController};
 use App\Http\Controllers\Dashboard\EmployeeController;
 
 Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/dashboard')->name('company.')->group(function () {
@@ -56,6 +56,12 @@ Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/d
     //////////////////////////////////////////////////////////////////////////////////////////////
 
 
+
+    ////////////////////////////////// warehouse product crud //////////////////////////////////////////////////////
+    Route::post('warehouses/{warehouse}/products/index', [WarehouseProductController::class, 'index'])->name('warehouse.products.index');
+    Route::delete('warehouses/{warehouse}/products/delete', [WarehouseProductController::class, 'destroy']);
+    Route::apiResource('warehouses/{warehouse}/products', WarehouseProductController::class); 
+    //////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
