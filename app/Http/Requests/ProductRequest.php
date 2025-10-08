@@ -17,7 +17,7 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => 'required|string|max:255',
+            'name'        => 'required|string|max:255,unique:products,name,' . $this->product?->id,
             'position'    => 'nullable|integer',
             'active'      => 'boolean',
             'show_home'   => 'boolean',

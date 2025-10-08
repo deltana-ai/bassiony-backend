@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('stock')->default(0)->index();
             $table->integer('reserved_stock')->default(0);
-            $table->decimal('warehouse_price', 10, 2)->nullable(); 
             $table->string('batch_number')->nullable();
 
             $table->date('expiry_date')->nullable();

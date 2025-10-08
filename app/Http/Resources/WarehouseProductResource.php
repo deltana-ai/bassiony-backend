@@ -15,7 +15,7 @@ class WarehouseProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            
+
             'products' => $this->products->map(function ($product) {
                 return [
                     'id'                => $product->id,
@@ -24,7 +24,6 @@ class WarehouseProductResource extends JsonResource
                     'price'             => $product->price,
                     'active'            => (bool) $product->active,
                     'imageUrl'          => $product->getFirstMediaUrl(),
-                    'warehouse_price'   => $product->pivot->warehouse_price,
                     'stock'             => $product->pivot->stock,
                     'reserved_stock'    => $product->pivot->reserved_stock,
                     'expiry_date'       => $product->pivot->expiry_date,
@@ -36,8 +35,8 @@ class WarehouseProductResource extends JsonResource
                 'name' => $this->name,
                 'code' => $this->code,
             ],
-            
-            
+
+
         ];
     }
 }
