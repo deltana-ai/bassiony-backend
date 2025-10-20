@@ -23,7 +23,6 @@ class WarehouseProductRequest extends FormRequest
     {
         return [
             'product_id' => 'required|exists:products,id',
-            'warehouse_price' => 'nullable|numeric',
             'batch_number' => 'nullable|string',
             'stock' => 'integer|min:0',
             'reserved_stock' => 'integer|min:0',

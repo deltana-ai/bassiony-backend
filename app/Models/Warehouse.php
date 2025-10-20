@@ -11,7 +11,7 @@ class Warehouse extends Model
     use SoftDeletes;
 
     protected $guarded = ['id'];
-    
+
     protected $casts = [
         'active' => 'boolean',
         'created_at' => 'datetime',
@@ -23,7 +23,7 @@ class Warehouse extends Model
     {
         return WarehousePolicy::class;
     }
-    
+
 
      public function company()
     {
@@ -37,9 +37,9 @@ class Warehouse extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'warehouse_product')->withPivot('warehouse_price', 'stock','reserved_stock','expiry_date','batch_number')->withTimestamps();
+        return $this->belongsToMany(Product::class, 'warehouse_product')->withPivot( 'stock','reserved_stock','expiry_date','batch_number')->withTimestamps();
     }
 
-    
+
 
 }

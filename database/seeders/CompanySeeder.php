@@ -21,9 +21,13 @@ class CompanySeeder extends Seeder
             'phone' => '01000000000',
         ]);
 
-        //  إنشاء دور المدير (manager)
         $managerRole = Role::firstOrCreate([
             'name' => 'manager',
+            'guard_name' => 'employees',
+        ]);
+
+        $employeeRole = Role::firstOrCreate([
+            'name' => 'employee',
             'guard_name' => 'employees',
         ]);
 
@@ -34,16 +38,16 @@ class CompanySeeder extends Seeder
 
         //  إنشاء المخزن الافتراضي
 
-       
+
         $warehouse = Warehouse::create([
             'name' => 'Main Warehouse',
             'code' => 'WH-001',
             'company_id' => $company->id,
-            'location_id' => $location->id, 
+            'location_id' => $location->id,
             'active' => true,
         ]);
 
-        
+
 
         //  إنشاء الموظف (المدير العام)
         $manager = Employee::create([

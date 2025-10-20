@@ -28,7 +28,6 @@ class WarehouseProductController extends BaseController
     public function index()
     {
         try {
-
             $warehouse_product_products = WarehouseProductResource::collection($this->crudRepository->all(
                 [ 'products' ],
                 [],
@@ -55,8 +54,8 @@ class WarehouseProductController extends BaseController
                 if ($exists) {
                     return JsonResponse::respondError('This product with the same batch number and expiry date already exists in this warehouse.');
                 }
-                $warehouse_product = $warehouse->products()->attach($request->product_id,['warehouse_price' => $request->warehouse_price, 'stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $expiry_date, 'batch_number' => $request->batch_number]);
-                
+                $warehouse_product = $warehouse->products()->attach($request->product_id,['stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $expiry_date, 'batch_number' => $request->batch_number]);
+
                 return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
@@ -78,10 +77,8 @@ class WarehouseProductController extends BaseController
                     $q->wherePivot('expiry_date', $expiry_date);
                 }
 
-                $q->withPivot(['warehouse_price', 'stock', 'reserved_stock', 'expiry_date', 'batch_number']);
+                $q->withPivot(['stock', 'reserved_stock', 'expiry_date', 'batch_number']);
             }]);
-
-
 
             return JsonResponse::respondSuccess('Item Fetched Successfully', new WarehouseProductResource($warehouse));
         } catch (Exception $e) {
@@ -96,11 +93,10 @@ class WarehouseProductController extends BaseController
             $this->authorize('manage', $warehouse);
             $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date)
                 ->format('Y-m-d');
-            
+
             $warehouse->products()->updateExistingPivot(
                 $request->product_id,
                 [
-                    'warehouse_price' => $request->warehouse_price,
                     'stock' => $request->stock,
                     'reserved_stock' => $request->reserved_stock,
                     'expiry_date' => $expiry_date,
@@ -110,7 +106,7 @@ class WarehouseProductController extends BaseController
 
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
         }
-        
+
         catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
@@ -128,7 +124,7 @@ class WarehouseProductController extends BaseController
             $productIds = (array) $request->items;
             $batchNumber = $request->batch_number;
 
-            
+
             $warehouse->products()
                 ->wherePivot('batch_number', $batchNumber)
                 ->whereIn('product_id', $productIds)

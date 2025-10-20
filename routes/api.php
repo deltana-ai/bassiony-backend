@@ -370,7 +370,7 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
     Route::delete('pharmacies/delete', [AdminPharmacyController::class, 'destroy']);
     Route::put('/pharmacies/{id}/{column}', [AdminPharmacyController::class, 'toggle']);
     Route::delete('pharmacies/force-delete', [AdminPharmacyController::class, 'forceDelete']);
-    Route::apiResource('pharmacies', AdminPharmacyController::class); 
+    Route::apiResource('pharmacies', AdminPharmacyController::class);
 });
 
 
@@ -385,14 +385,7 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
     Route::delete('branches/delete', [BranchController::class, 'destroy']);
     Route::put('/branches/{id}/{column}', [BranchController::class, 'toggle']);
     Route::delete('branches/force-delete', [BranchController::class, 'forceDelete']);
-    Route::apiResource('branches', BranchController::class); 
-
-   
-
-    ///////////////////////////////operations on products/////////////////////////
-    Route::post('branches/{branch}/products/index', [BranchProductController::class, 'index']);
-    Route::delete('branches/{branch}/products/delete', [BranchProductController::class, 'destroy']);
-    Route::apiResource('branches/{branch}/products', BranchProductController::class); 
+    Route::apiResource('branches', BranchController::class);
 
 
 });
@@ -404,7 +397,7 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
 Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
     Route::post('locations/index', [LocationController::class, 'index']);
     Route::delete('locations/delete', [LocationController::class, 'destroy']);
-    Route::apiResource('locations', LocationController::class); 
+    Route::apiResource('locations', LocationController::class);
 });
 
 ////////////////////////////////////////////////////////////////////////
@@ -417,11 +410,11 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
 //////////////////////////////companies//////////////////////////////////////////////
 
 Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
-    Route::post('companies/index', [CompanyController::class, 'index'])->name('warehouses.index');
+    // Route::post('companies/index', [CompanyController::class, 'index']);
     Route::post('companies/restore', [CompanyController::class, 'restore']);
     Route::delete('companies/delete', [CompanyController::class, 'destroy']);
     Route::put('/companies/{id}/{column}', [CompanyController::class, 'toggle']);
     Route::delete('companies/force-delete', [CompanyController::class, 'forceDelete']);
-    Route::apiResource('companies', CompanyController::class); 
+    Route::apiResource('companies', CompanyController::class);
 });
 require __DIR__.'/company.php';
