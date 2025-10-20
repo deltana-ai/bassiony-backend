@@ -86,4 +86,9 @@ class Employee extends BaseModel
         return $this->role && $this->role->name === $role;
     }
 
+    public function warehouse()
+    {
+       return $this->belongsTo(Warehouse::class); 
+    }
+
 }

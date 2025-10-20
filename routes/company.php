@@ -10,6 +10,8 @@ Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/d
 
 
     /////////////////////////////////////// warehouses //////////////////////////////////////////////
+
+    
     Route::post('warehouses/index', [WarehouseController::class, 'index'])->name('warehouses.index');
     Route::post('warehouses/restore', [WarehouseController::class, 'restore']);
     Route::delete('warehouses/delete', [WarehouseController::class, 'destroy']);

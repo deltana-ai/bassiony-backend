@@ -28,7 +28,7 @@ class EmployeeController extends BaseController
     {
         try {
             $employee = EmployeeResource::collection($this->crudRepository->all(
-                [],
+                ["warehouse"],
                 [],
                 ['*']
             ));
@@ -52,6 +52,7 @@ class EmployeeController extends BaseController
     public function show(Employee $employee): ?\Illuminate\Http\JsonResponse
     {
         try {
+            $employee->load(["warehouse"]);
             return JsonResponse::respondSuccess('Item Fetched Successfully', new EmployeeResource($employee));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

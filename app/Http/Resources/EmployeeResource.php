@@ -21,6 +21,8 @@ class EmployeeResource extends JsonResource
             'phone' => $this->phone,
             'active' => (bool)$this->active,
             'role' => $this->role?->name,
+            'warehouse_id' => $this->warehouse_id,
+            'warehouse_name' => $this->warehouse?->name,
             'address' => $this->address,
             'createdAt' => $this->created_at ? $this->created_at->format('d-M-Y H:i A') : null,
             'updatedAt' => $this->updated_at ? $this->updated_at->format('d-M-Y H:i A') : null
