@@ -54,7 +54,11 @@ Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/d
     Route::delete('employees/delete', [EmployeeController::class, 'destroy']);
     Route::put('/employees/{id}/{column}', [EmployeeController::class, 'toggle']);
     Route::delete('employees/force-delete', [EmployeeController::class, 'forceDelete']);
+    Route::put('/employees/assign-warehouse', [EmployeeController::class, 'assignWarehouse']);
+    Route::put('/employees/assign-role', [EmployeeController::class, 'assignRole']);
     Route::apiResource('employees', EmployeeController::class)->except(['index']);
+    
+
     //////////////////////////////////////////////////////////////////////////////////////////////
 
 

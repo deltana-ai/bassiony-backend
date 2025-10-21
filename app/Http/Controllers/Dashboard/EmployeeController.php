@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
 
 use App\Helpers\JsonResponse;
+use App\Http\Requests\AssignEmployeeRoleRequest;
+use App\Http\Requests\AssignWarehouseRequest;
 use App\Http\Requests\EmployeeRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Resources\EmployeeResource;
@@ -106,7 +108,28 @@ class EmployeeController extends BaseController
         }
     }
 
-    
+    public function assignWarehouse(AssignWarehouseRequest $request)
+    {
+        try {
+            $this->crudRepository->assignToWarehouse('employees', $request['items'] ,$request->warehouse_id);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+
+    }
+
+    public function assignRole(AssignEmployeeRoleRequest $request)
+    {
+        try {
+            $this->crudRepository->assignToRole('employees', $request['items'] ,$request->role_id);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+
+    }
+
 
 
     private Function prepareData(EmployeeRequest $request)
