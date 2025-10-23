@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Pharmacist;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,14 +28,21 @@ class PharmacyRequest extends FormRequest
             'address'        => ['nullable', 'string', 'max:500'],
             'phone'          => ['nullable', 'string', 'max:20'],
             'license_number' => ['nullable', 'string', 'max:100'],
+            'email' => ['required','string', 'email'],
+
         
         ];
         if ($this->isMethod('post')) {
           $rules['license_number'][] = 'unique:pharmacies,license_number';
+          $rules['email'] []= 'unique:pharmacists,email';
+
         }
         else{
+            $pharmacist = Pharmacist::where('is_owner',1)->first();
+
             $location = $this->route('pharmacy')?? $this->route('id');
             $rules['license_number'][] = Rule::unique('pharmacies','license_number')->ignore($location->id);
+            $rules['email'] = Rule::unique('pharmacists','email')->ignore($pharmacist->id);
 
         }
         return $rules;

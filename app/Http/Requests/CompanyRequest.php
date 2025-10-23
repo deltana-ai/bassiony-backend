@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Models\Company;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 class CompanyRequest extends FormRequest
 {
@@ -27,16 +28,22 @@ class CompanyRequest extends FormRequest
             'name'    => 'required|string|max:255',
             'address' => 'nullable|string|max:500',
             'phone'   => 'nullable|string|max:20|regex:/^[0-9+\-\s()]+$/',
+            'email' => ['required','string', 'email'],
+
         ];
          if ($this->isMethod('post')) {
           $rules['name'] = $rules['name'].'|unique:companies,name';
+          $rules['email'] = $rules['email'].'|unique:employees,email';
+
         }
         else{
             $company = $this->route('company')?? $this->route('id');
             if(Auth::guard('employees')->check()){ 
                 $company = Company::find(auth("employees")->user()->company_id);
             }
+            $employee = Employee::where('is_owner',1)->first();
             $rules['name'] = "$rules[name]|".Rule::unique('companies','name')->ignore($company->id);
+            $rules['email'] = "$rules[email]|".Rule::unique('employees','email')->ignore($employee->id);
 
         }
         return $rules;

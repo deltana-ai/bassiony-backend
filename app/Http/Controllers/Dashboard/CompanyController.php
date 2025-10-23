@@ -41,7 +41,7 @@ class CompanyController extends BaseController
             try {
 
                 $this->authorize('create', Company::class);
-                $company = $this->crudRepository->create($request->validated());
+                $company = $this->crudRepository->createCompanywithUser($request->validated());
                 
                 return new CompanyResource($company);
             } catch (Exception $e) {
@@ -52,9 +52,7 @@ class CompanyController extends BaseController
     public function show(Company $company): ?\Illuminate\Http\JsonResponse
     {
         try {
-            if(Auth()->guard('employees')->check()) {
-              $company = $this->crudRepository->find(auth("employees")->user()->company_id);
-            }
+            
             $this->authorize('view', $company);
             
             return JsonResponse::respondSuccess('Item Fetched Successfully', new CompanyResource($company));
@@ -71,7 +69,7 @@ class CompanyController extends BaseController
               $company = $this->crudRepository->find(auth("employees")->user()->company_id);
             }
             $this->authorize('update', $company);
-            $this->crudRepository->update($request->validated(), $company->id);
+            $this->crudRepository->updateCompanywithUser($request->validated(), $company->id);
 
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
 
@@ -86,7 +84,7 @@ class CompanyController extends BaseController
     {
         try {
             $this->authorize('delete', Company::class);
-            $this->crudRepository->deleteRecords('companies', $request['items']);
+            $this->crudRepository->deleteCompanywithUsers( $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -97,7 +95,7 @@ class CompanyController extends BaseController
     {
         try {
             $this->authorize('restore', Company::class);
-            $this->crudRepository->restoreItem(Company::class, $request['items']);
+            $this->crudRepository->restoreCompanywithUsers( $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_RESTORED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

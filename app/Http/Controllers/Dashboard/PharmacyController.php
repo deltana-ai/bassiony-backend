@@ -37,7 +37,7 @@ class PharmacyController extends BaseController
     public function store(PharmacyRequest $request)
     {
             try {
-                $pharmacy = $this->crudRepository->create($request->validated());
+                $pharmacy = $this->crudRepository->createPharmacywithUser($request->validated());
                 
                 return new PharmacyResource($pharmacy);
             } catch (Exception $e) {
@@ -57,7 +57,7 @@ class PharmacyController extends BaseController
 
     public function update(PharmacyRequest $request, Pharmacy $pharmacy)
     {
-        $this->crudRepository->update($request->validated(), $pharmacy->id);
+        $this->crudRepository->updatePharmacywithUser($request->validated(), $pharmacy->id);
 
         
         return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
@@ -67,7 +67,7 @@ class PharmacyController extends BaseController
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $this->crudRepository->deleteRecords('pharmacies', $request['items']);
+            $this->crudRepository->deletePharmacywithUsers( $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -77,7 +77,7 @@ class PharmacyController extends BaseController
     public function restore(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $this->crudRepository->restoreItem(Pharmacy::class, $request['items']);
+            $this->crudRepository->restorePharmacywithUsers( $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_RESTORED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

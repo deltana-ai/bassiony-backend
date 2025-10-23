@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('password')->nullable();
             $table->unsignedBigInteger('pharmacy_id')->nullable();
+            $table->boolean('is_owner')->default(0);
+
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

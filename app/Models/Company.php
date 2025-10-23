@@ -34,5 +34,9 @@ class Company extends BaseModel
         return $this->hasMany(Warehouse::class);
     }
    
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
 
 }
