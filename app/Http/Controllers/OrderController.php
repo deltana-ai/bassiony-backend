@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\JsonResponse;
 use App\Http\Requests\StoreOrderRequest;
+use App\Http\Requests\UpdateOrderStatusRequest;
+
 use App\Http\Resources\OrderResource;
 use App\Models\CartItem;
 use App\Models\Order;
@@ -70,4 +72,36 @@ class OrderController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
+
+public function updateStatus(UpdateOrderStatusRequest $request, $orderId)
+{
+    try {
+        $order = Order::findOrFail($orderId);
+
+        if (in_array($order->status, ['rejected', 'delivered'])) {
+            return JsonResponse::respondError(
+                'You cannot change the status of an order that has been delivered or rejected.'
+            );
+        }
+
+        if ($order->status === 'approved' && $request->status === 'rejected') {
+            return JsonResponse::respondError(
+                'You cannot change an approved order to rejected.'
+            );
+        }
+
+        $order->status = $request->status;
+        $order->save();
+
+        return (new OrderResource($order))->additional([
+            'result'  => 'Success',
+            'message' => 'Order status updated successfully',
+            'status'  => 200,
+        ]);
+    } catch (Exception $e) {
+        return JsonResponse::respondError($e->getMessage());
+    }
+}
+
+
 }
