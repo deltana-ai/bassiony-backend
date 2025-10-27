@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete(); // ✅ خليها nullable
             $table->foreignId('pharmacist_id')->nullable()->constrained('pharmacists')->nullOnDelete();
             $table->foreignId('address_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('promo_code_id')->nullable()->constrained()->nullOnDelete();
