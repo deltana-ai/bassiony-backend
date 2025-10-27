@@ -30,4 +30,9 @@ class Order extends BaseModel
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function pharmacy()
+    {
+        return $this->belongsTo(Pharmacy::class);
+    }
 }

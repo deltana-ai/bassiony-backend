@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{ CompanyController, EmployeeProfileController, EmployeeRoleController, LocationController, WarehouseController, WarehouseProductController};
+use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOrderController, EmployeeProfileController, EmployeeRoleController, LocationController, PharmacyOrderController, WarehouseController, WarehouseProductController};
 use App\Http\Controllers\Dashboard\EmployeeController;
 
 Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/dashboard')->name('company.')->group(function () {
@@ -11,7 +11,7 @@ Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/d
 
     /////////////////////////////////////// warehouses //////////////////////////////////////////////
 
-    
+
     Route::post('warehouses/index', [WarehouseController::class, 'index'])->name('warehouses.index');
     Route::post('warehouses/restore', [WarehouseController::class, 'restore']);
     Route::delete('warehouses/delete', [WarehouseController::class, 'destroy']);
@@ -57,7 +57,7 @@ Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/d
     Route::put('/employees/assign-warehouse', [EmployeeController::class, 'assignWarehouse']);
     Route::put('/employees/assign-role', [EmployeeController::class, 'assignRole']);
     Route::apiResource('employees', EmployeeController::class)->except(['index']);
-    
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -93,3 +93,21 @@ Route::prefix('company')->middleware('throttle:20')->group(function () {
     Route::post('reset-password', [EmployeeProfileController::class, 'resetPassword']);
 
 });
+
+
+
+Route::get('companies/{companyId}/available-products', [CompanyController::class, 'availableProducts']);
+
+
+// pharmacy Order & Cart Routes
+Route::get('/pharmacy/cart', [PharmacyOrderController::class, 'index']);
+Route::post('/pharmacy/cart', [PharmacyOrderController::class, 'store']);
+Route::delete('/pharmacy/cart', [PharmacyOrderController::class, 'destroy']);
+
+// 🧾 pharmacy Order
+Route::post('/pharmacy/orders', [PharmacyOrderController::class, 'storeOrder']);
+
+Route::put('company/orders/{id}/status', [CompanyOrderController::class, 'updateStatus']);
+
+
+Route::post('company/orders/{id}/assign', [CompanyOrderController::class, 'assignWarehouse']);

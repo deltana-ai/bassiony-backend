@@ -6,6 +6,7 @@ use App\Helpers\JsonResponse;
 use App\Http\Requests\PharmacyRequest;
 use App\Http\Resources\Dashboard\PharmacyResource;
 use App\Interfaces\PharmacyRepositoryInterface;
+use App\Models\CartItem;
 use App\Models\Pharmacy;
 use Exception;
 use Illuminate\Http\Request;
@@ -38,7 +39,7 @@ class PharmacyController extends BaseController
     {
             try {
                 $pharmacy = $this->crudRepository->createPharmacywithUser($request->validated());
-                
+
                 return new PharmacyResource($pharmacy);
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
@@ -59,7 +60,7 @@ class PharmacyController extends BaseController
     {
         $this->crudRepository->updatePharmacywithUser($request->validated(), $pharmacy->id);
 
-        
+
         return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
     }
 
@@ -99,6 +100,10 @@ class PharmacyController extends BaseController
 
 
 
+
+
+
+   
 
 
 }

@@ -5,8 +5,10 @@ use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\CompanyRequest;
 use App\Http\Resources\CompanyResource;
+use App\Http\Resources\ProductResource;
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Models\Company;
+use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -42,7 +44,7 @@ class CompanyController extends BaseController
 
                 $this->authorize('create', Company::class);
                 $company = $this->crudRepository->createCompanywithUser($request->validated());
-                
+
                 return new CompanyResource($company);
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
@@ -52,9 +54,9 @@ class CompanyController extends BaseController
     public function show(Company $company): ?\Illuminate\Http\JsonResponse
     {
         try {
-            
+
             $this->authorize('view', $company);
-            
+
             return JsonResponse::respondSuccess('Item Fetched Successfully', new CompanyResource($company));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -76,7 +78,7 @@ class CompanyController extends BaseController
         } catch (\Throwable $th) {
             return JsonResponse::respondError($th->getMessage());
         }
-        
+
     }
 
 
@@ -118,6 +120,30 @@ class CompanyController extends BaseController
 
 
 
+
+
+      public function availableProducts($companyId)
+        {
+            $company = Company::findOrFail($companyId);
+
+            $products =  Product::whereHas('warehouses', function ($query) use ($companyId) {
+                    $query->where('stock', '>', 0)
+                        ->whereHas('company', function ($q) use ($companyId) {
+                            $q->where('id', $companyId);
+                        });
+                })
+                ->with(['warehouses' => function ($q) use ($companyId) {
+                    $q->where('stock', '>', 0)
+                    ->where('company_id', $companyId)
+                    ->select('warehouses.id', 'warehouses.name', 'warehouse_product.stock');
+                }])
+                ->get();
+
+            return response()->json([
+                'company' => $company->name,
+                'products' => ProductResource::collection($products),
+            ]);
+        }
 
 
 }
