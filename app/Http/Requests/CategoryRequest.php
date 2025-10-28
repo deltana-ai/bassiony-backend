@@ -27,6 +27,8 @@ class CategoryRequest extends FormRequest
           'position' => ['numeric','min:0'],
           'active' => ['boolean'],
           'show_home' => ['boolean'],
+          'image' => ['nullable','integer','exists:media,id'],
+
       ];
 
       if ($this->isMethod('post')) {
