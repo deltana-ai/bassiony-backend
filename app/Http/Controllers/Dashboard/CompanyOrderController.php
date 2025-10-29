@@ -5,6 +5,7 @@ use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\CompanyRequest;
 use App\Http\Resources\CompanyResource;
+use App\Http\Resources\OrderResource;
 use App\Http\Resources\ProductResource;
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Models\Company;
@@ -17,43 +18,41 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CompanyOrderController extends BaseController
 {
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $id): ?\Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'status' => 'required|in:approved,rejected',
-            'reason' => 'nullable|string|max:500',
-        ]);
+        try {
+            $request->validate([
+                'status' => 'required|in:approved,rejected',
+                'reason' => 'nullable|string|max:500',
+            ]);
 
-        $order = Order::find($id);
+            $order = Order::find($id);
 
-        if (!$order) {
-            return response()->json([
-                'result' => 'Error',
-                'message' => 'Order not found',
-            ], 404);
+            if (!$order) {
+                return JsonResponse::respondError('Order not found', 404);
+            }
+
+            if ($order->status !== 'pending') {
+                return JsonResponse::respondError('Only pending orders can be updated', 400);
+            }
+
+            $order->status = $request->status;
+
+            if ($request->status === 'rejected' && $request->filled('reason')) {
+                $order->review = $request->reason;
+            }
+
+            $order->save();
+
+            return JsonResponse::respondSuccess(
+                "Order {$request->status} successfully",
+                new OrderResource($order)
+            );
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage(), 500);
         }
-
-        if ($order->status !== 'pending') {
-            return response()->json([
-                'result' => 'Error',
-                'message' => 'Only pending orders can be updated',
-            ], 400);
-        }
-
-        $order->status = $request->status;
-
-         if ($request->status === 'rejected' && $request->filled('reason')) {
-            $order->review = $request->reason;
-        }
-
-        $order->save();
-
-        return response()->json([
-            'result' => 'Success',
-            'message' => "Order {$request->status} successfully",
-            'data' => $order,
-        ]);
     }
+
 
 
 
@@ -97,11 +96,12 @@ class CompanyOrderController extends BaseController
 
         return response()->json([
             'result' => 'Success',
-            'message' => 'Order assigned to warehouse successfully',
             'data' => [
                 'order_id' => $order->id,
                 'warehouse' => $warehouse->name,
             ],
+            'message' => 'Order assigned to warehouse successfully',
+            'status' => '200',
         ]);
     }
 }
