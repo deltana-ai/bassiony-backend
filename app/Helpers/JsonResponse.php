@@ -37,7 +37,9 @@ class JsonResponse
     const MSG_CANNOT_DELETED_MULTI_RESOURCE = "Can not be deleted due to relationship with other resources";
     const MSG_BAD_REQUEST = "responses.msg_bad_request";
     const MSG_PROPER_HEADER = "responses.msg_add_proper_header";
-
+    const MSG_OFFER_NOT_PENDING = "responses.msg_offer_not_pending";
+    const MSG_OFFER_NOT_ACTIVE = "responses.msg_offer_not_active";
+    const MSG_CANCELED_SUCCESSFULLY = "responses.msg_canceled_successfully";
     /**
      * @param $message
      * @param null $content

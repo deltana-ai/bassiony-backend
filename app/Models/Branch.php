@@ -28,7 +28,7 @@ class Branch extends BaseModel
     public function products()
     {
         return $this->belongsToMany(Product::class, 'branch_product', 'branch_id', 'product_id')
-                    ->withPivot(['branch_price', 'stock', 'reserved_stock', 'expiry_date', 'batch_number'])
+                    ->withPivot([ 'stock', 'reserved_stock', 'expiry_date', 'batch_number'])
                     ->withTimestamps();
     }
     

@@ -6,7 +6,7 @@ use App\Policies\WarehousePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Warehouse extends Model
+class Warehouse extends BaseModel
 {
     use SoftDeletes;
 

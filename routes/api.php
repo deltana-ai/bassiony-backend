@@ -311,3 +311,4 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
 
 require __DIR__.'/admin.php';
 require __DIR__.'/company.php';
+require __DIR__.'/pharmacy.php';
