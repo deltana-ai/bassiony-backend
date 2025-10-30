@@ -31,7 +31,7 @@ class WarehouseProductController extends BaseController
             $warehouse_product_products = WarehouseProductResource::collection($this->crudRepository->all(
                 [ 'products' ],
                 [],
-                ['id','name','code']
+                ['id','name']
             ));
             return $warehouse_product_products->additional(JsonResponse::success());
         } catch (Exception $e) {

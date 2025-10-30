@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, LocationController, 
+use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, 
     PharmacyOrderController, ResponseOfferController };
 use App\Http\Controllers\ProductController;
 
@@ -16,11 +16,7 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
 
 
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    Route::post('locations/index', [LocationController::class, 'index']);
-    Route::apiResource('locations', LocationController::class)->only(['show']);
-    //////////////////////////////////////////////////////////////////////////////////////////////
-
+ 
 
 
      /////////////////////////////////show product details//////////////////////////////////////////////////

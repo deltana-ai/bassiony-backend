@@ -25,7 +25,7 @@ class BranchController extends BaseController
         try {
 
             $branches = BranchResource::collection($this->crudRepository->all(
-                ["pharmacy:id,name", "location:id,name"],
+                ["pharmacy:id,name"],
                 [],
                 ['*']
             ));
@@ -49,7 +49,7 @@ class BranchController extends BaseController
     public function show(Branch $branch): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $branch->load(['location:id,name', 'pharmacy:id,name','products']);
+            $branch->load([ 'pharmacy:id,name','products']);
 
             return JsonResponse::respondSuccess('Item Fetched Successfully', new BranchResource($branch));
         } catch (Exception $e) {

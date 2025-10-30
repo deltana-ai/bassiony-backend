@@ -3,7 +3,7 @@
 use App\Http\Controllers\{AddressController, BrandController, CardController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
 
 use App\Http\Controllers\PharmacyController;
-use App\Http\Controllers\Dashboard\{BranchController,BranchProductController, CompanyController, LocationController, WarehouseController};
+use App\Http\Controllers\Dashboard\{BranchController,BranchProductController, CompanyController, WarehouseController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;

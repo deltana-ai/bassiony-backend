@@ -30,11 +30,7 @@ class Warehouse extends BaseModel
         return $this->belongsTo(Company::class);
     }
 
-     public function location()
-    {
-        return $this->belongsTo(Location::class);
-    }
-
+    
     public function products()
     {
         return $this->belongsToMany(Product::class, 'warehouse_product')->withPivot( 'stock','reserved_stock','expiry_date','batch_number')->withTimestamps();

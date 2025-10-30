@@ -31,7 +31,6 @@ class WarehouseProductDetailsResource extends JsonResource
             'warehouse' => [
                 'id' => $this->warehouse?->id,
                 'name' => $this->warehouse?->name,
-                'code' => $this->warehouse?->code,
             ],
 
 

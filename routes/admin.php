@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{CompanyController, LocationController};
+use App\Http\Controllers\Dashboard\{CompanyController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Dashboard\PharmacyController as AdminPharmacyController ;
@@ -154,10 +154,3 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
 
 
 
-///////////////////////////////locations//////////////////////////////////////////////
-Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
-    Route::post('locations/index', [LocationController::class, 'index']);
-    Route::delete('locations/delete', [LocationController::class, 'destroy']);
-    Route::apiResource('locations', LocationController::class)->except(['destroy','index']);
-});
-///////////////////////////////locations//////////////////////////////////////////////

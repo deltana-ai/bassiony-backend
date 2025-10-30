@@ -20,12 +20,15 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CategoriesSeeder::class,
             BrandSeeder::class,
+            PermissionSeeder::class,
+            RoleSeeder::class,
             PharmacySeeder::class,
-        ProductSeeder::class,
-        PharmacyProductSeeder::class,
-        AdminSeeder::class,
-        BaseSeeder::class,
-    CompanySeeder::class,
+            ProductSeeder::class,
+            PharmacyProductSeeder::class,
+            AdminSeeder::class,
+            BaseSeeder::class,
+            CompanySeeder::class,
+ 
     ]);
 
     }

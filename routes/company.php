@@ -2,11 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, CompanyOrderController, EmployeeProfileController, EmployeeRoleController, LocationController, PharmacyOrderController, ResponseOfferController, WarehouseController, WarehouseProductController};
+use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, CompanyOrderController, EmployeeProfileController, EmployeeRoleController, PharmacyOrderController, ResponseOfferController, WarehouseController, WarehouseProductController};
 use App\Http\Controllers\Dashboard\EmployeeController;
 use App\Http\Controllers\ProductController;
 
-Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/dashboard')->name('company.')->group(function () {
+Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('company.')->group(function () {
 
 
 
@@ -23,12 +23,7 @@ Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/d
 
 
 
-    //////////////////////////////////////locations/////////////////////////////////////////////////
-    Route::post('locations/index', [LocationController::class, 'index']);
-    Route::apiResource('locations', LocationController::class)->only(['show']);
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-
+    
 
     ///////////////////////////////////update company data/////////////////////////////////////////
     Route::patch('/our-company', [CompanyController::class, 'update']);

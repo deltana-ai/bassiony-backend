@@ -21,10 +21,7 @@ class Branch extends BaseModel
         return $this->belongsTo(Pharmacy::class);
     }
 
-    public function location()
-    {
-        return $this->belongsTo(Location::class);
-    }
+   
     public function products()
     {
         return $this->belongsToMany(Product::class, 'branch_product', 'branch_id', 'product_id')

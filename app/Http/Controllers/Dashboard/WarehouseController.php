@@ -25,7 +25,7 @@ class WarehouseController extends BaseController
         try {
 
             $warehouses = WarehouseResource::collection($this->crudRepository->all(
-                ["company", "location"],
+                ["company"],
                 [],
                 ['*']
             ));
@@ -50,7 +50,7 @@ class WarehouseController extends BaseController
     public function show(Warehouse $warehouse): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $warehouse->load(['location', 'company','products']);
+            $warehouse->load([ 'company','products']);
             return JsonResponse::respondSuccess('Item Fetched Successfully', new WarehouseResource($warehouse));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

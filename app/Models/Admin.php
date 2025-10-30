@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Activitylog\Models\Activity;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  *
@@ -59,9 +60,11 @@ use Spatie\Activitylog\Models\Activity;
  */
 class Admin extends BaseModel
 {
-    use HasApiTokens, HasFactory, Notifiable , SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable , SoftDeletes,HasRoles;
 
     protected $guarded = ['id'];
+
+    public $guard_name = "admins";
 
     protected $hidden = [
         'password',

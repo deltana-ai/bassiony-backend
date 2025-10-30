@@ -33,7 +33,6 @@ class WarehouseProductResource extends JsonResource
             'warehouse' => [
                 'id' => $this->id,
                 'name' => $this->name,
-                'code' => $this->code,
             ],
 
 

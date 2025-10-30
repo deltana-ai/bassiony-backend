@@ -40,8 +40,8 @@ class PharmacyRequest extends FormRequest
         else{
             $pharmacist = Pharmacist::where('is_owner',1)->first();
 
-            $location = $this->route('pharmacy')?? $this->route('id');
-            $rules['license_number'][] = Rule::unique('pharmacies','license_number')->ignore($location->id);
+            $pharmacy = $this->route('pharmacy')?? $this->route('id');
+            $rules['license_number'][] = Rule::unique('pharmacies','license_number')->ignore($pharmacy->id);
             $rules['email'] = Rule::unique('pharmacists','email')->ignore($pharmacist->id);
 
         }
