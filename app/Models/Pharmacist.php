@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Pharmacist extends BaseModel
+class Pharmacist extends Authenticatable
 {
     use HasApiTokens, HasMedia, SoftDeletes ,HasRoles;
 

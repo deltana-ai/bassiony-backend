@@ -30,16 +30,26 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
     public function createPharmacywithUser( array $data )
     {
         return DB::transaction(function () use ($data) {
-            unset($data["email"]);
-            $pharmacy = $this->create($data);
+
             $employee_data = $this->handleData($data);
+
+            unset($data["email"]);
+
+            $pharmacy = $this->create($data);
+
             $employee_data["pharmacy_id"] = $pharmacy->id;
+
             $password = $employee_data["un_hash"];
+
             unset($employee_data["un_hash"]);
+
             $employee = $this->employee_repo->create($employee_data);
+
+            $employee ->assignRole("pharmacy_owner");
+
             $employee->notify(new SendPassword($password ,$this->dashboard_type));
 
-            return $employee ;
+            return ["employee"=>$employee,"password"=>$password] ;
         });
 
     }
@@ -47,14 +57,26 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
     public function updatePharmacywithUser( array $data  ,$pharmacy_id )
     {
         return DB::transaction(function () use ($data,$pharmacy_id) {
+
+            $employee_data = $this->handleData($data);
+
             unset($data["email"]);
-            $pharmacy = $this->update($data , $pharmacy_id) ;
-            $employee_data["pharmacy_id"] = $pharmacy->id;
+
+            $this->update($data , $pharmacy_id) ;
+
+            $employee_data["pharmacy_id"] = $pharmacy_id;
+
             $password = $employee_data["un_hash"];
+
             unset($employee_data["un_hash"]);
-            $employee = $this->employee_repo->model::where('is_owner',1)->first();
+
+            $employee = Pharmacist::where('is_owner',1)->first();
+
+            $employee ->update($employee_data);
+
             $employee->notify(new SendPassword($password ,$this->dashboard_type));
-            return $employee ;
+
+            return ["employee"=>$employee,"password"=>$password] ;
         });
 
     }
@@ -103,7 +125,7 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
 
         $employee["password"] = Hash::make($password) ;
         $employee["un_hash"] = $password; 
-        $employee["role_id"] = 1;
+     
         $employee["is_owner"] = 1;
         return $employee;
       

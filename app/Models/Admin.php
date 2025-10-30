@@ -58,7 +58,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|Admin withoutTrashed()
  * @mixin Eloquent
  */
-class Admin extends BaseModel
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class Admin extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable , SoftDeletes,HasRoles;
 

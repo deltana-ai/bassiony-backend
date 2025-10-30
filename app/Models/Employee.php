@@ -17,6 +17,8 @@ use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
 
 /**
  *
@@ -58,7 +60,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|Admin withoutTrashed()
  * @mixin Eloquent
  */
-class Employee extends BaseModel
+class Employee extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable , SoftDeletes,HasRoles;
 
