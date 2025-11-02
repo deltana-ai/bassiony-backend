@@ -29,16 +29,26 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
     public function createCompanywithUser( array $data )
     {
         return DB::transaction(function () use ($data) {
-            unset($data["email"]);
-            $company = $this->create($data);
+
             $employee_data = $this->handleData($data);
+
+            unset($data["email"]);
+            
+            $company = $this->create($data);
+
             $employee_data["company_id"] = $company->id;
+
             $password = $employee_data["un_hash"];
+
             unset($employee_data["un_hash"]);
+
             $employee = $this->employee_repo->create($employee_data);
+            
+            $employee ->assignRole("company_owner");
+            
             $employee->notify(new SendPassword($password ,$this->dashboard_type));
 
-            return $employee ;
+            return ["employee"=>$employee,"password"=>$password] ;
         });
 
     }
@@ -46,14 +56,28 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
     public function updateCompanywithUser( array $data  ,$company_id )
     {
         return DB::transaction(function () use ($data,$company_id) {
+
+            $employee_data = $this->handleData($data);
+
             unset($data["email"]);
-            $company = $this->update($data , $company_id) ;
+
+            $company = $this->find($company_id);
+
+            $company->update($data) ;
+             
             $employee_data["company_id"] = $company->id;
+
             $password = $employee_data["un_hash"];
+
             unset($employee_data["un_hash"]);
-            $employee = $this->employee_repo->model::where('is_owner',1)->first();
+
+            $employee = Employee::where('is_owner',1)->first();
+      
+            $employee ->update($employee_data);
+            
             $employee->notify(new SendPassword($password ,$this->dashboard_type));
-            return $employee ;
+
+            return ["employee"=>$employee,"password"=>$password] ;
         });
 
     }
@@ -102,7 +126,7 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
 
         $employee["password"] = Hash::make($password) ;
         $employee["un_hash"] = $password; 
-        $employee["role_id"] = 1;
+       
         $employee["is_owner"] = 1;
         return $employee;
       

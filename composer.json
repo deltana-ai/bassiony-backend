@@ -12,7 +12,8 @@
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "spatie/laravel-activitylog": "^4.10"
+        "spatie/laravel-activitylog": "^4.10",
+        "spatie/laravel-permission": "^6.22"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.1",

@@ -28,7 +28,7 @@ class CompanyRequest extends FormRequest
             'name'    => 'required|string|max:255',
             'address' => 'nullable|string|max:500',
             'phone'   => 'nullable|string|max:20|regex:/^[0-9+\-\s()]+$/',
-            'email' => ['required','string', 'email'],
+            'email' => 'required|string|email',
 
         ];
          if ($this->isMethod('post')) {

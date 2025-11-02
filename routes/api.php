@@ -3,7 +3,7 @@
 use App\Http\Controllers\{AddressController, BrandController, CardController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
 
 use App\Http\Controllers\PharmacyController;
-use App\Http\Controllers\Dashboard\{BranchController,BranchProductController, CompanyController, LocationController, WarehouseController};
+use App\Http\Controllers\Dashboard\{BranchController,BranchProductController, CompanyController, WarehouseController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
@@ -311,3 +311,4 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
 
 require __DIR__.'/admin.php';
 require __DIR__.'/company.php';
+require __DIR__.'/pharmacy.php';

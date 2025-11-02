@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->unsignedBigInteger('pharmacy_id')->nullable();
             $table->boolean('is_owner')->default(0);
+            $table->foreignId('branch_id')->nullable()->constrained()->onDelete('set null');
 
             $table->rememberToken();
             $table->timestamps();

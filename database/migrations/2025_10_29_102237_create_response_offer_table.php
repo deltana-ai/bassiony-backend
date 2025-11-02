@@ -11,18 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('branches', function (Blueprint $table) {
+        Schema::create('response_offer', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('code', 50)->unique(); 
+            $table->foreignId('company_offer_id')->constrained("company_offers")->onDelete('cascade');
             $table->foreignId('pharmacy_id')->constrained()->onDelete('cascade');
+            $table->decimal('total_price', 10, 2);
+            $table->decimal('item_price',10,2)->default(1);
 
-            $table->string('address');
-            $table->boolean('active')->default(true)->index();
-
-            $table->softDeletes();
+            $table->integer('quantity');
+            $table->enum('status',["pending","approved","rejected","delivered","canceled"])->default("pending");
             $table->timestamps();
-            $table->index(['pharmacy_id', 'active']);
         });
     }
 
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('branches');
+        Schema::dropIfExists('response_offer');
     }
 };

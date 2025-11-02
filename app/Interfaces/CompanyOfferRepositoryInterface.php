@@ -1,6 +1,10 @@
 <?php
+
 namespace App\Interfaces;
+
 use App\Interfaces\Interfaces\ICrudRepository;
-interface WarehouseRouteRepositoryInterface extends ICrudRepository
+
+interface CompanyOfferRepositoryInterface  extends ICrudRepository
 {
+
 }

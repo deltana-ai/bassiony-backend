@@ -19,15 +19,12 @@ class Company extends BaseModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-     public static function policy()
+    public static function policy()
     {
         return CompanyPolicy::class;
     }
 
-    public function products()
-    {
-        return $this->hasMany(CompanyProduct::class);
-    }
+   
 
     public function warehouses()
     {

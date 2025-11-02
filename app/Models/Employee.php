@@ -16,6 +16,9 @@ use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Activitylog\Models\Activity;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
 
 /**
  *
@@ -57,13 +60,14 @@ use Spatie\Activitylog\Models\Activity;
  * @method static Builder|Admin withoutTrashed()
  * @mixin Eloquent
  */
-class Employee extends BaseModel
+class Employee extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable , SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable , SoftDeletes,HasRoles;
 
     protected $guarded = ['id'];
-    protected $guard = 'employees';
-
+    
+    public $guard_name = "employees";
+   
     protected $hidden = [
         'password',
         'remember_token',

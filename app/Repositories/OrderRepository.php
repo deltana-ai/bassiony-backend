@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Interfaces\OrderRepositoryInterface;
 use App\Models\{CartItem, OrderItem, PromoCode, Order};
 use Illuminate\Support\Facades\DB;
+use App\Helpers\Constants;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -13,6 +14,42 @@ class OrderRepository implements OrderRepositoryInterface
     public function __construct(Order $order)
     {
         $this->model = $order;
+    }
+
+    public function all($with = [], $conditions = [], $columns = array('*'))
+    {
+        $order_by = request(Constants::ORDER_BY) ?? "id";
+        $deleted = request(Constants::Deleted) ?? false;
+        $order_by_direction = request(Constants::ORDER_By_DIRECTION) ?? "asc";
+        $filter_operator = request(Constants::FILTER_OPERATOR) ?? "=";
+        $filters = request(Constants::FILTERS) ?? [];
+        $per_page = request(Constants::PER_PAGE) ?? 15;
+        $paginate = request(Constants::PAGINATE) ?? true;
+        $query = $this->model;
+        if ($deleted == true) {
+            $query = $query->onlyTrashed();
+        }
+
+        $all_conditions = array_merge($conditions, $filters);
+        foreach ($all_conditions as $key => $value) {
+            if (is_numeric($value)) {
+                $query = $query->where($key, '=', $value);
+            } else {
+                $query = $query->where($key, 'LIKE', '%' . $value . '%');
+            }
+        }
+        if (isset($order_by) && !empty($with))
+            $query = $query->with($with)->orderBy($order_by, $order_by_direction);
+        if ($paginate && !empty($with))
+            return $query->with($with)->paginate($per_page, $columns);
+        if (isset($order_by))
+            $query = $query->orderBy($order_by, $order_by_direction);
+        if ($paginate)
+            return $query->paginate($per_page, $columns);
+        if (!empty($with))
+            return $query->with($with)->get($columns);
+        else
+            return $query->get($columns);
     }
 
     public function createOrder(array $data, $user)

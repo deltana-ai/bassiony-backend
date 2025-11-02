@@ -34,7 +34,7 @@ class CrudRepository implements ICrudRepository
         }
 
         $all_conditions = array_merge($conditions, $filters);
-        foreach ($filters as $key => $value) {
+        foreach ($all_conditions as $key => $value) {
             if (is_numeric($value)) {
                 $query = $query->where($key, '=', $value);
             } else {

@@ -18,11 +18,16 @@ class Pharmacy extends BaseModel
         return $this->hasMany(PharmacyRating::class);
    }
 
-    public function products()
+    // public function products()
+    // {
+    //     return $this->belongsToMany(Product::class)
+    //                 ->withPivot('price', 'stock')
+    //                 ->withTimestamps();
+    // }
+
+    public function offerResponses()
     {
-        return $this->belongsToMany(Product::class)
-                    ->withPivot('price', 'stock')
-                    ->withTimestamps();
+        return $this->hasMany(ResponseOffer::class);
     }
 
     public function branches()

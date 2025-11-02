@@ -2,10 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOrderController, EmployeeProfileController, EmployeeRoleController, LocationController, PharmacyOrderController, WarehouseController, WarehouseProductController};
+use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, CompanyOrderController, EmployeeProfileController, EmployeeRoleController, PharmacyOrderController, ResponseOfferController, WarehouseController, WarehouseProductController};
 use App\Http\Controllers\Dashboard\EmployeeController;
+use App\Http\Controllers\ProductController;
 
-Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/dashboard')->name('company.')->group(function () {
+Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('company.')->group(function () {
 
 
 
@@ -22,13 +23,7 @@ Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/d
 
 
 
-    //////////////////////////////////////locations/////////////////////////////////////////////////
-    Route::post('locations/index', [LocationController::class, 'index']);
-    Route::delete('locations/delete', [LocationController::class, 'destroy']);
-    Route::apiResource('locations', LocationController::class);
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-
+    
 
     ///////////////////////////////////update company data/////////////////////////////////////////
     Route::patch('/our-company', [CompanyController::class, 'update']);
@@ -72,6 +67,33 @@ Route::middleware(['auth:employees','employee.role:manager'])->prefix('company/d
 
 
 
+
+
+    /////////////////////////////////show product details//////////////////////////////////////////////////
+    Route::post('product/index', [ProductController::class, 'index']);
+    Route::get('product/{product}', [ProductController::class,"show"]);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    Route::post('offers/index', [CompanyOfferController::class, 'index']);
+    Route::delete('offers/delete', [CompanyOfferController::class, 'destroy']);
+    Route::put('/offers/{id}/{column}', [CompanyOfferController::class, 'toggle']);
+    Route::apiResource('offers', CompanyOfferController::class)->except(['destroy','index']);
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    Route::post('response-offers/index', [ResponseOfferController::class, 'index']);
+    Route::delete('response-offers/delete', [ResponseOfferController::class, 'destroy']);
+    Route::put('/response-offers/{id}/{column}', [ResponseOfferController::class, 'toggle']);
+    Route::put('response-offers/update/{responseOffer}', [ResponseOfferController::class, 'updateStatus']);
+    Route::put('response-offers/show/{responseOffer}', [ResponseOfferController::class, 'show']);
+    /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 

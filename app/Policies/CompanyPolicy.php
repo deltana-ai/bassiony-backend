@@ -26,7 +26,6 @@ class CompanyPolicy
     {
         $guard = $this->getGuard();
 
-        // admin و employee و pharmacist كلهم ممكن يشوفوا الشركات
         return in_array($guard, ['admins', 'employees', 'pharmacists']);
     }
 

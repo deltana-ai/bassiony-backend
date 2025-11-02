@@ -6,9 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Company;
 use App\Models\Warehouse;
-use App\Models\Role;
 use App\Models\Employee;
-use App\Models\Location;
 
 class CompanySeeder extends Seeder
 {
@@ -21,29 +19,22 @@ class CompanySeeder extends Seeder
             'phone' => '01000000000',
         ]);
 
-        $managerRole = Role::firstOrCreate([
-            'name' => 'manager',
-            'guard_name' => 'employees',
-        ]);
+        
+        
+       // $user->assignRole('employee');
 
-        $employeeRole = Role::firstOrCreate([
-            'name' => 'employee',
-            'guard_name' => 'employees',
-        ]);
+
+      
 
         ///انشاء الموقع الافتراضي
-        $location = Location::create([
-            'name' => 'Main Location',
-        ]);
-
+      
         //  إنشاء المخزن الافتراضي
 
 
         $warehouse = Warehouse::create([
             'name' => 'Main Warehouse',
-            'code' => 'WH-001',
             'company_id' => $company->id,
-            'location_id' => $location->id,
+            'location' => "location1",
             'active' => true,
         ]);
 
@@ -56,11 +47,11 @@ class CompanySeeder extends Seeder
             'password' => Hash::make('password123'),
             'phone' => '01000000000',
             'address' => 'Cairo',
-            'role_id' => $managerRole->id,
             'warehouse_id' => $warehouse->id,
             'company_id' => $company->id,
             'active' => true,
         ]);
+        $manager->assignRole('company_owner');
 
         $this->command->info(" Company, warehouse, role, and manager created successfully!");
         $this->command->warn(" Manager Login: manager@company.com / password123");

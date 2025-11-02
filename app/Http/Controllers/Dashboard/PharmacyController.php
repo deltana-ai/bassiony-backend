@@ -5,8 +5,10 @@ use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\PharmacyRequest;
 use App\Http\Resources\Dashboard\PharmacyResource;
+use App\Http\Resources\PharmacistResource;
 use App\Interfaces\PharmacyRepositoryInterface;
 use App\Models\CartItem;
+use App\Models\Pharmacist;
 use App\Models\Pharmacy;
 use Exception;
 use Illuminate\Http\Request;
@@ -38,9 +40,13 @@ class PharmacyController extends BaseController
     public function store(PharmacyRequest $request)
     {
             try {
-                $pharmacy = $this->crudRepository->createPharmacywithUser($request->validated());
-
-                return new PharmacyResource($pharmacy);
+                $employee = $this->crudRepository->createPharmacywithUser($request->validated());
+                
+                $employee["employee"]->load("roles");
+                
+                return JsonResponse::respondSuccess('Item created Successfully', ["pharmacy owner"=>new PharmacistResource($employee["employee"]),"password"=>$employee["password"]]);
+            
+                
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
             }
@@ -58,10 +64,14 @@ class PharmacyController extends BaseController
 
     public function update(PharmacyRequest $request, Pharmacy $pharmacy)
     {
-        $this->crudRepository->updatePharmacywithUser($request->validated(), $pharmacy->id);
 
+        $employee = $this->crudRepository->updatePharmacywithUser($request->validated(), $pharmacy->id);
+       
+        $employee["employee"]->load("roles");
+                
+        return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), ["pharmacy owner"=>new PharmacistResource($employee["employee"]),"password"=>$employee["password"]]);
+           
 
-        return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
     }
 
 

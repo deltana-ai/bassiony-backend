@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\CompanyRequest;
-use App\Http\Resources\CompanyResource;
+use App\Http\Resources\{CompanyResource,EmployeeResource};
 use App\Http\Resources\ProductResource;
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Models\Company;
@@ -43,9 +43,13 @@ class CompanyController extends BaseController
             try {
 
                 $this->authorize('create', Company::class);
-                $company = $this->crudRepository->createCompanywithUser($request->validated());
 
-                return new CompanyResource($company);
+                $employee = $this->crudRepository->createCompanywithUser($request->validated());
+                
+                $employee["employee"]->load("roles");
+                
+                return JsonResponse::respondSuccess('Item created Successfully', ["company owner"=>new EmployeeResource($employee["employee"]),"password"=>$employee["password"]]);
+            
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
             }
@@ -67,13 +71,15 @@ class CompanyController extends BaseController
     public function update(CompanyRequest $request, Company $company)
     {
         try {
-            if(Auth()->guard('employees')->check()) {
-              $company = $this->crudRepository->find(auth("employees")->user()->company_id);
-            }
+            
             $this->authorize('update', $company);
-            $this->crudRepository->updateCompanywithUser($request->validated(), $company->id);
 
-            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+            $employee = $this->crudRepository->updateCompanywithUser($request->validated(), $company->id);
+
+            $employee["employee"]->load("roles");
+                
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), ["company owner"=>new EmployeeResource($employee["employee"]),"password"=>$employee["password"]]);
+           
 
         } catch (\Throwable $th) {
             return JsonResponse::respondError($th->getMessage());
