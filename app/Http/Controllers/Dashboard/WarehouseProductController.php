@@ -72,10 +72,15 @@ class WarehouseProductController extends BaseController
                     $q->wherePivot('batch_number', $request->batch_number);
                 }
 
-                if ($request->filled('expiry_date')) {
-                    $expiry_date = Carbon::parse($request->expiry_date)->format('Y-m-d');
-                    $q->wherePivot('expiry_date', $expiry_date);
+            if ($request->filled('expiry_date')) {
+                try {
+                    $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date);
+                } catch (\Exception $e) {
+                    $expiry_date = Carbon::parse($request->expiry_date);
                 }
+                $q->wherePivot('expiry_date', $expiry_date->format('Y-m-d'));
+            }
+
 
                 $q->withPivot(['stock', 'reserved_stock', 'expiry_date', 'batch_number']);
             }]);

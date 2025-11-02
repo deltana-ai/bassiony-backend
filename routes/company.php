@@ -105,8 +105,9 @@ Route::post('/pharmacy/cart', [PharmacyOrderController::class, 'store']);
 Route::delete('/pharmacy/cart', [PharmacyOrderController::class, 'destroy']);
 
 // 🧾 pharmacy Order
-Route::post('/pharmacy/orders', [PharmacyOrderController::class, 'storeOrder']);
-
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/pharmacy/orders', [PharmacyOrderController::class, 'storeOrder']);
+});
 Route::put('company/orders/{id}/status', [CompanyOrderController::class, 'updateStatus']);
 
 

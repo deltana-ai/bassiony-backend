@@ -168,7 +168,7 @@ Route::get('/get-slider', [SliderController::class, 'indexPublic']);
 
 //////////////////////////////////////// products /////////////////////////////////
 
-   
+
 
     Route::get('/get-product', [CategoryController::class, 'indexProduct']);
     Route::apiResource('products', ProductController::class);

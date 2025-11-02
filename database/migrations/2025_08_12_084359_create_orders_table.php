@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete(); // ✅ خليها nullable
             $table->foreignId('pharmacist_id')->nullable()->constrained('pharmacists')->nullOnDelete();
+            $table->foreignId('pharmacy_id')->constrained()->cascadeOnDelete(); // ✅ مضافة
             $table->foreignId('address_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('promo_code_id')->nullable()->constrained()->nullOnDelete();
             $table->enum('status', ['pending', 'approved', 'rejected', 'delivered'])->default('pending');
