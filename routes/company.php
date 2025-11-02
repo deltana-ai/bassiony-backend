@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, CompanyOrderController, EmployeeProfileController, EmployeeRoleController, PharmacyOrderController, ResponseOfferController, WarehouseController, WarehouseProductController};
+use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, CompanyOrderController, EmployeeProfileController, EmployeeRoleController, PharmacyOrderController, ResponseOfferController, WarehouseController, WarehouseProductController,WarehouseProductSearchController};
 use App\Http\Controllers\Dashboard\EmployeeController;
 use App\Http\Controllers\ProductController;
 
@@ -115,6 +115,8 @@ Route::prefix('company')->middleware('throttle:20')->group(function () {
     Route::post('reset-password', [EmployeeProfileController::class, 'resetPassword']);
 
 });
+
+Route::get('/warehouse-products/search', [WarehouseProductSearchController::class, 'search']);
 
 
 
