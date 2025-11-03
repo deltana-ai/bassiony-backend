@@ -5,9 +5,11 @@ namespace App\Models;
 use App\Policies\CompanyOfferPolicy;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CompanyOffer extends BaseModel
 {
+    use  SoftDeletes;
     protected $guarded = ['id'];
 
 

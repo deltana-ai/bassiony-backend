@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RoleRequest;
 use App\Http\Resources\RoleResource;
 use App\Interfaces\RoleRepositoryInterface;
+use App\Models\Employee;
 use App\Models\Role;
 use Exception;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class EmployeeRoleController extends Controller
 
             $roles = RoleResource::collection($this->crudRepository->all(
                 [],
-                [],
+                ["guard_name" => auth()->user()->guard_name],
                 ['*']
             ));
             return $roles->additional(JsonResponse::success());
@@ -38,8 +39,7 @@ class EmployeeRoleController extends Controller
     public function store(RoleRequest $request)
     {
             try {
-                $data = $this->prepareData($request);
-                $role = $this->crudRepository->create($data);
+                $role = $this->crudRepository->createRole($request->validated());
                
                 return new RoleResource($role);
             } catch (Exception $e) {
@@ -47,9 +47,21 @@ class EmployeeRoleController extends Controller
             }
     }
 
-    public function show(Role $role): ?\Illuminate\Http\JsonResponse
+    public function show( $id)
     {
         try {
+            
+            $role = $this->crudRepository->find($id);
+           
+            if(!$role){
+                return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_FOUND));
+            }
+            if ($role->guard_name !== auth()->user()->guard_name) {
+               
+                return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
+
+            }
+            $role->load(['permissions']);
             return JsonResponse::respondSuccess('Item Fetched Successfully', new RoleResource($role));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -57,11 +69,22 @@ class EmployeeRoleController extends Controller
     }
 
 
-    public function update(RoleRequest $request, Role $role)
+    public function update(RoleRequest $request, $id)
     {
         try {
-            $data = $this->prepareData($request);
-            $this->crudRepository->update($data, $role->id);
+            $role = $this->crudRepository->find($id);
+            if(!$role){
+                return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_FOUND));
+            }
+            if($role->name === 'company_owner' ){
+                return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
+            }
+            if ($role->guard_name !== auth()->user()->guard_name) {
+               
+                return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
+
+            }
+            $this->crudRepository->updateRole( $role ,$request->validated());
        
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
 
@@ -75,43 +98,30 @@ class EmployeeRoleController extends Controller
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $this->crudRepository->deleteRecords('roles', $request['items']);
+           
+            $this->crudRepository->deleteRoles($request['items'],Employee::class);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-    public function restore(Request $request): \Illuminate\Http\JsonResponse
+   
+
+
+    public function getPermissions(Request $request)
     {
         try {
-            $this->crudRepository->restoreItem(Role::class, $request['items']);
-            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_RESTORED_SUCCESSFULLY));
+            $permissions = RoleResource::collection($this->crudRepository->getPermissions());
+            return $permissions->additional(JsonResponse::success());
+
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
 
-
-
-    public function forceDelete(Request $request): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $this->crudRepository->deleteRecordsFinial(Role::class, $request['items']);
-            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_FORCE_DELETED_SUCCESSFULLY));
-        } catch (Exception $e) {
-            return JsonResponse::respondError($e->getMessage());
-        }
-    }
-
-
-    private Function prepareData(RoleRequest $request)
-    {  
-        $data = $request->validated();
-        $data['guard_name'] = "employees";
-        return $data;
-    }
+    
 
 
 }

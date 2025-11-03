@@ -20,8 +20,8 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
 
 
      /////////////////////////////////show product details//////////////////////////////////////////////////
-    Route::post('product/index', [ProductController::class, 'index']);
-    Route::get('product/{product}', [ProductController::class,"show"]);
+    Route::post('master-products/index', [ProductController::class, 'index']);
+    Route::get('master-products/{product}', [ProductController::class,"show"]);
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

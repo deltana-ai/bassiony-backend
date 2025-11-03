@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Policies\ResponseOfferPolicy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ResponseOffer extends BaseModel
 {
+    use SoftDeletes;
     protected $table = 'response_offer'; 
     protected $guarded = ['id'];
 

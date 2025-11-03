@@ -35,9 +35,8 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
     ////////////////////////////////// roles //////////////////////////////////////////////////////
     Route::post('roles/index', [EmployeeRoleController::class, 'index'])->name('roles.index');
-    Route::post('roles/restore', [EmployeeRoleController::class, 'restore']);
     Route::delete('roles/delete', [EmployeeRoleController::class, 'destroy']);
-    Route::delete('roles/force-delete', [EmployeeRoleController::class, 'forceDelete']);
+    Route::get('permissions', [EmployeeRoleController::class, 'getPermissions']);
     Route::apiResource('roles', EmployeeRoleController::class)->except(['index']);
     //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -70,8 +69,8 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
     /////////////////////////////////show product details//////////////////////////////////////////////////
-    Route::post('product/index', [ProductController::class, 'index']);
-    Route::get('product/{product}', [ProductController::class,"show"]);
+    Route::post('master-products/index', [ProductController::class, 'index']);
+    Route::get('master-products/{product}', [ProductController::class,"show"]);
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -82,6 +81,9 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::post('offers/index', [CompanyOfferController::class, 'index']);
     Route::delete('offers/delete', [CompanyOfferController::class, 'destroy']);
     Route::put('/offers/{id}/{column}', [CompanyOfferController::class, 'toggle']);
+    Route::post('offers/restore', [CompanyOfferController::class, 'restore']);
+    Route::delete('offers/force-delete', [CompanyOfferController::class, 'forceDelete']);
+
     Route::apiResource('offers', CompanyOfferController::class)->except(['destroy','index']);
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 

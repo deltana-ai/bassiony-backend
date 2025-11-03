@@ -21,17 +21,36 @@ class CompanyOfferRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'company_id' => ['required', 'exists:companies,id'],
-            'warehouse_product_id' => ['required', 'exists:warehouse_product,id'],
-            'discount' => ['required', 'numeric', 'min:0'],
-            'active' => ['boolean'],
-            'min_quantity' => ['required', 'integer', 'min:1'],
-            'total_quantity' => ['required', 'integer', 'min:1'],
+        
+        if ($this->isMethod('post')) {
+            return [
+                'warehouse_product_id' => ['required', 'exists:warehouse_product,id'],
+                'discount' => ['required', 'numeric', 'min:0'],
+                'active' => ['boolean'],
+                'min_quantity' => ['required', 'integer', 'min:1'],
+                'total_quantity' => ['required', 'integer', 'min:1'],
 
-            'description' => ['nullable', 'string'],
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
-        ];
+                'description' => ['nullable', 'string'],
+                'start_date' => ['required', 'date'],
+                'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            ];
+        }
+        else{
+            
+            return [
+                'warehouse_product_id' => ['nullable', 'exists:warehouse_product,id'],
+                'discount' => ['nullable', 'numeric', 'min:0'],
+                'active' => ['nullable','boolean'],
+                'min_quantity' => ['nullable', 'integer', 'min:1'],
+                'total_quantity' => ['nullable', 'integer', 'min:1'],
+
+                'description' => ['nullable', 'string'],
+                'start_date' => ['nullable', 'date'],
+                'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            ];
+        
+        }
+
+       
     }
 }

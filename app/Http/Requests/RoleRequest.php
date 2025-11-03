@@ -24,13 +24,19 @@ class RoleRequest extends FormRequest
     {
         $rules = [
             'name' => ['required', 'string', 'max:90'],
+            'permissions' => ['required', 'array'],
+            'permissions.*' => ['exists:permissions,id'],
         ];
         if ($this->isMethod('post')) {
-            $rules['name'][] = 'unique:brands,name';
+            $rules['name'][] = Rule::unique('roles','name')->where(function ($query) {
+                return $query->where('guard_name', $this->guard_name);
+            });
         }
         else{
-            $role = $this->route('role')?? $this->route('id');
-            $rules['name'][] = Rule::unique('roles','name')->ignore($role->id);
+            $role = $this->route('id')?? $this->route('id');
+            $rules['name'][] = Rule::unique('roles','name')->where(function ($query) {
+                return $query->where('guard_name', $this->guard_name);
+            })->ignore($role);
         }
 
         return $rules;

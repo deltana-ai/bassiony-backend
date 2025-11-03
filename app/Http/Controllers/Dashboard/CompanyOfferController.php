@@ -12,6 +12,7 @@ use App\Http\Resources\CompanyOfferResource;
 use Exception;
 use App\Models\Company;
 use App\Models\CompanyOffer;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CompanyOfferController extends Controller
@@ -45,8 +46,8 @@ class CompanyOfferController extends Controller
     {
             try {
                 $this->authorize('create', CompanyOffer::class);
-
-                $offer = $this->crudRepository->create($request->validated());
+                $data = $this->handleData( $request);
+                $offer = $this->crudRepository->create($data);
 
                 return new CompanyOfferResource($offer);
             } catch (Exception $e) {
@@ -66,13 +67,13 @@ class CompanyOfferController extends Controller
     }
 
 
-    public function update(CompanyOfferRequest $request, CompanyOffer $companyOffer)
+    public function update(CompanyOfferRequest $request, $id)
     {
         try {
-
-            $this->authorize('update', $companyOffer);
-
-            $this->crudRepository->update($request->validated(), $companyOffer->id);
+            $companyOffer = $this->crudRepository->find($id);
+            $this->authorize('update',$companyOffer);
+            $data = $this->handleData( $request);
+            $this->crudRepository->update($data, $companyOffer->id);
 
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
 
@@ -99,6 +100,60 @@ class CompanyOfferController extends Controller
         }
     }
 
+
+    public function restore(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $responses = CompanyOffer::whereIn('id', $request->items)->get();
+
+            foreach ($responses as $response) {
+                $this->authorize('delete', $response); 
+            }
+            $this->crudRepository->restoreItem(CompanyOffer::class, $request['items']);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_RESTORED_SUCCESSFULLY));
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+
+
+
+    public function forceDelete(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $responses = CompanyOffer::whereIn('id', $request->items)->get();
+
+            foreach ($responses as $response) {
+                $this->authorize('delete', $response); 
+            }
+            $this->crudRepository->deleteRecordsFinial(CompanyOffer::class, $request['items']);
+
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_FORCE_DELETED_SUCCESSFULLY));
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+
+    private function handleData(CompanyOfferRequest $request)
+    {
+            $data = $request->validated();
+            if (!empty($data['start_date'])) {
+                $start_date = Carbon::createFromFormat('d-m-Y', $request->start_date)
+                ->format('Y-m-d');
+                $data['start_date'] = $start_date;
+            }
+            if (!empty($data['end_date'])) {
+                $end_date = Carbon::createFromFormat('d-m-Y', $request->end_date)
+                ->format('Y-m-d');
+                $data['end_date'] = $end_date;
+            }
+            
+            
+            $data['company_id'] = auth()->user()->company_id;
+            return $data ;
+    }
   
 
 

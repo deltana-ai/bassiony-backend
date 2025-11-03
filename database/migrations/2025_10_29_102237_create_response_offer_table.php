@@ -20,6 +20,7 @@ return new class extends Migration
 
             $table->integer('quantity');
             $table->enum('status',["pending","approved","rejected","delivered","canceled"])->default("pending");
+            $table->softDeletes();
             $table->timestamps();
         });
     }
