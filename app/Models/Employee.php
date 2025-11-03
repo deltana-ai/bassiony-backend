@@ -89,6 +89,10 @@ class Employee extends Authenticatable
     {
         return $this->role && $this->role->name === $role;
     }
+public function company()
+{
+    return $this->belongsTo(Company::class, 'company_id');
+}
 
     public function warehouse()
     {

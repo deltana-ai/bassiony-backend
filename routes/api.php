@@ -3,7 +3,7 @@
 use App\Http\Controllers\{AddressController, BrandController, CardController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
 
 use App\Http\Controllers\PharmacyController;
-use App\Http\Controllers\Dashboard\{BranchController};
+use App\Http\Controllers\Dashboard\{BranchController,BranchProductController, CompanyController, WarehouseController,ProductBranchController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
@@ -125,6 +125,7 @@ Route::get('/offers/public', [OfferController::class, 'indexPublic']);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+Route::get('/product/branches/search', [ProductBranchController::class, 'searchProductInBranches']);
 
 
 
