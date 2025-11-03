@@ -28,11 +28,17 @@ class UniqueOfferResponse implements ValidationRule
             return;
         }
 
+        if ($value != auth()->user()->pharmacy_id) {
+            $fail('هذه الصيدلية غير مطابقة لحسابك.');
+            return;
+        }
+
         $exists = ResponseOffer::where('company_offer_id', $this->companyOfferId)
             ->where('pharmacy_id', $value)
-            ->whereIn('status', ['pending', 'approved', 'delivered','canceled'])
+            ->whereIn('status', [ 'pending'])
             ->exists();
 
+            // ->whereIn('status', ['pending', 'approved', 'delivered','canceled'])
 
         if ($exists) {
             $fail('تم استخدام هذا العرض بالفعل.');

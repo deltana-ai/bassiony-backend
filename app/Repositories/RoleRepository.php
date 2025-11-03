@@ -20,8 +20,14 @@ class RoleRepository extends CrudRepository implements RoleRepositoryInterface
     public function createRole(array $data)
     {
         $permissions = $data["permissions"];
-
-        $role = Role::create(['name' => $data["name"],'guard_name'=> auth()->user()->guard_name]);
+        $data_create = ['name' => $data["name"],'guard_name'=> auth()->user()->guard_name];
+        if (auth()->guard("employees")->check()) {
+           $data_create["company_id"]  =  auth()->user()->company_id;
+        }
+        if (auth()->guard("pharmacists")->check()) {
+           $data_create["pharmacy_id"]  =  auth()->user()->pharmacy_id;
+        }
+        $role = Role::create($data_create);
        
         $permissions = Permission::whereIn('id', $permissions)->get(['name'])->toArray();
     
@@ -52,6 +58,9 @@ class RoleRepository extends CrudRepository implements RoleRepositoryInterface
         DB::transaction(function () use ($roleIds,$user_model) {
             $roles = Role::whereIn('id', $roleIds)->get();
             foreach ($roles as $role) {
+                if ($role->guard_name !== auth()->user()->guard_name || $role->comapany !== auth()->user()->company_id ) {
+                   continue;
+                }
                 if($role->name === 'company_owner' ){
                     continue;
                 }

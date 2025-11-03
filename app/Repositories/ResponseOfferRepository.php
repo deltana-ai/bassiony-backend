@@ -20,6 +20,47 @@ class ResponseOfferRepository extends CrudRepository implements ResponseOfferRep
         $this->model = $model;
     }
 
+   
+
+
+    public function allForCompany($companyId = null)
+    {
+        $options = [];
+
+        if (auth()->guard('pharmacists')->check()) {
+            $options["pharmacy_id"] = auth()->guard('pharmacists')->user()->pharmacy_id;
+
+            return $this->all(
+                ['offer'],
+                $options,
+                ['*']
+            );
+        }
+
+        if (auth()->guard('admins')->check()) {
+            return $this->all(['offer']);
+        }
+
+        if ($companyId) {
+            return $this->all(
+                ['offer'],
+                $options,
+                ['*'],
+                function ($query) use ($companyId) {
+                    return $query->whereHas('offer', function ($q) use ($companyId) {
+                        $q->where('company_id', $companyId);
+                    });
+                }
+            );
+        }
+
+        return $this->all(['offer'], $options, ['*']);
+    }
+
+    
+
+
+
     public function getBaseOffer($offerid)
     {
         return CompanyOffer::findOrFail($offerid);
@@ -31,11 +72,12 @@ class ResponseOfferRepository extends CrudRepository implements ResponseOfferRep
     public function updateResponse( string $status, ResponseOffer $responseOffer)
     {
         $warehouseProduct = $responseOffer->offer->warehouseProduct;
-
-        DB::transaction(function () use ($responseOffer, $warehouseProduct, $status) {
+        $offer = $responseOffer->offer;
+        DB::transaction(function () use ($responseOffer, $warehouseProduct, $status,$offer) {
             switch ($status) {
                 case 'approved':
                     $warehouseProduct->decrement('stock', $responseOffer->quantity);
+                    $offer->decrement('total_quantity', $responseOffer->quantity);
                     break;
 
             }
@@ -45,18 +87,7 @@ class ResponseOfferRepository extends CrudRepository implements ResponseOfferRep
 
     }
 
-    private function handleData(ResponseOfferRequest $request ,$offer)
-    {
-        $data = $request->validated();
-        $data['item_price'] = $offer->product->price ;
-
-        $data['total_price'] = round($request->quantity * $offer->product->price *($offer->discount/100),2) ;
-        $data['status'] = 'pending';
-
-        return $data;
-
-    }
-
+   
    
 }
 

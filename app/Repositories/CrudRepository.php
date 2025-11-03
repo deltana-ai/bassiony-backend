@@ -19,7 +19,7 @@ class CrudRepository implements ICrudRepository
         $this->model = $model;
     }
 
-    public function all($with = [], $conditions = [], $columns = array('*'))
+    public function all($with = [], $conditions = [], $columns = array('*') , $customQuery = null)
     {
         $order_by = request(Constants::ORDER_BY) ?? "id";
         $deleted = request(Constants::Deleted) ?? false;
@@ -49,6 +49,10 @@ class CrudRepository implements ICrudRepository
             $query = $query->orderBy($order_by, $order_by_direction);
         if ($paginate)
             return $query->paginate($per_page, $columns);
+        if (is_callable($customQuery)) 
+          return $customQuery($query);
+    
+    
         if (!empty($with))
             return $query->with($with)->get($columns);
         else

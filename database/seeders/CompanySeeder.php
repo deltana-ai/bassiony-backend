@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Company;
 use App\Models\Warehouse;
 use App\Models\Employee;
-
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 class CompanySeeder extends Seeder
 {
     public function run(): void
@@ -51,6 +52,10 @@ class CompanySeeder extends Seeder
             'company_id' => $company->id,
             'active' => true,
         ]);
+        $superManger = Role::firstOrCreate(['name' => 'company_owner','guard_name'=>'employees',"company_id"=>$company->id]);
+        $company_permissions = Permission::where('guard_name','employees')->pluck('name')->toArray();
+        $superManger->givePermissionTo($company_permissions);
+
         $manager->assignRole('company_owner');
 
         $this->command->info(" Company, warehouse, role, and manager created successfully!");

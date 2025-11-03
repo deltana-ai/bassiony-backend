@@ -13,7 +13,7 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
          $owner_permissions = [
-            
+            'manage-site',
             //////////////////////////////////////////
             'brand-list','brand-create' ,'brand-edit' ,'brand-delete',
             ////////////////////////////////////////
@@ -44,6 +44,8 @@ class PermissionSeeder extends Seeder
          ];
 
          $company_permissions = [
+          'manage-company',
+          ///////////////////////////////////////////////
             'employee-list' , 'employee-create' , 'employee-edit' , 'employee-delete',
             ////////////////////////////////////////
             'role-list' ,'role-create' ,'role-edit' ,'role-delete' ,
@@ -66,6 +68,7 @@ class PermissionSeeder extends Seeder
          ];
 
           $pharmacist_permissions = [
+            'manage-pharmacy',
             'pharmacist-list' , 'pharmacist-create' , 'pharmacist-edit' , 'pharmacist-delete',
             ////////////////////////////////////////
             'role-list' ,'role-create' ,'role-edit' ,'role-delete' ,

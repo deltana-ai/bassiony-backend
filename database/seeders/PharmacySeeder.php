@@ -11,7 +11,8 @@ use App\Models\Pharmacy;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 class PharmacySeeder extends Seeder
 {
     public function run(): void
@@ -54,6 +55,10 @@ class PharmacySeeder extends Seeder
             'pharmacy_id' => Pharmacy::first()->id,
             'branch_id' => Branch::first()->id,
         ]);
+        $pharmacy_permissions = Permission::where('guard_name','pharmacists')->pluck('name')->toArray();
+        $superpharmacist = Role::firstOrCreate(['name' => 'pharmacy_owner','guard_name'=>'pharmacists','pharmacy_id'=>Pharmacy::first()->id]);
+        $superpharmacist->givePermissionTo($pharmacy_permissions);
+
         $manager->assignRole('pharmacy_owner');
     }
 }

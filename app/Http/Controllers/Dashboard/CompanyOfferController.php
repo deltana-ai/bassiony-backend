@@ -30,10 +30,13 @@ class CompanyOfferController extends Controller
     {
         try {
             $this->authorize('viewAny', CompanyOffer::class);
-
+            $options = [];
+            if (auth()->guard("employees")->check()) {
+                $options["company_id"] = auth()->user()->company_id ;
+            }
             $offers = CompanyOfferResource::collection($this->crudRepository->all(
                 [],
-                [],
+                $options,
                 ['*']
             ));
             return $offers->additional(JsonResponse::success());

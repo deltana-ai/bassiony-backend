@@ -45,7 +45,7 @@ class CompanyOffer extends BaseModel
 
     public function isCurrentlyActive(): bool
     {
-        if (!$this->is_active) {
+        if (!$this->active) {
             return false;
         }
 

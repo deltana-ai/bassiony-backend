@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('item_price',10,2)->default(1);
 
             $table->integer('quantity');
-            $table->enum('status',["pending","approved","rejected","delivered","canceled"])->default("pending");
+            $table->enum('status',["pending","approved","rejected","delivered","canceled","returned","completed"])->default("pending");
             $table->softDeletes();
             $table->timestamps();
         });

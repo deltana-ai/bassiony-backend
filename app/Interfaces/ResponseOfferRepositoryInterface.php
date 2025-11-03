@@ -8,6 +8,10 @@ use App\Models\ResponseOffer;
 
 interface ResponseOfferRepositoryInterface extends ICrudRepository
 {
+
+   public function allForCompany($companyId = null);
+
+
    public function getBaseOffer($offerid);
 
    

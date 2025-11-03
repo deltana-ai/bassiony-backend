@@ -92,9 +92,11 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     //////////////////////////////////////////////////////////////////////////////////////////////////
     Route::post('response-offers/index', [ResponseOfferController::class, 'index']);
     Route::delete('response-offers/delete', [ResponseOfferController::class, 'destroy']);
-    Route::put('/response-offers/{id}/{column}', [ResponseOfferController::class, 'toggle']);
-    Route::put('response-offers/update/{responseOffer}', [ResponseOfferController::class, 'updateStatus']);
-    Route::put('response-offers/show/{responseOffer}', [ResponseOfferController::class, 'show']);
+    Route::put('response-offers/update/{id}', [ResponseOfferController::class, 'updateStatus']);
+    Route::get('response-offers/{id}', [ResponseOfferController::class, 'show']);
+    Route::post('response-offers/restore', [ResponseOfferController::class, 'restore']);
+    Route::delete('response-offers/force-delete', [ResponseOfferController::class, 'forceDelete']);
+
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
 

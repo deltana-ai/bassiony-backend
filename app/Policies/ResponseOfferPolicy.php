@@ -37,8 +37,8 @@ class ResponseOfferPolicy
         if ($guard === 'employees' && $user->company_id === $responseOffer->offer->company_id) {
             return true;
         }
-
-        if ($guard === 'pharmacists' && $user->id === $responseOffer->pharmacy_id) {
+        if ($guard === 'pharmacists' && $user->pharmacy_id === $responseOffer->pharmacy_id) {
+           
             return true;
         }
 
@@ -77,7 +77,7 @@ class ResponseOfferPolicy
     public function cancel($user, ResponseOffer $responseOffer): bool
     {
         return $this->getGuard() === 'pharmacists'
-            && $user->id === $responseOffer->pharmacy_id
+            && $user->pharmacy_id === $responseOffer->pharmacy_id
             && $responseOffer->status === 'pending';
     }
 }

@@ -27,7 +27,7 @@ class EmployeeRoleController extends Controller
 
             $roles = RoleResource::collection($this->crudRepository->all(
                 [],
-                ["guard_name" => auth()->user()->guard_name],
+                ["guard_name" => auth()->user()->guard_name,"company_id"=>auth()->user()->company_id],
                 ['*']
             ));
             return $roles->additional(JsonResponse::success());
@@ -56,7 +56,7 @@ class EmployeeRoleController extends Controller
             if(!$role){
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_FOUND));
             }
-            if ($role->guard_name !== auth()->user()->guard_name) {
+            if ($role->guard_name !== auth()->user()->guard_name || $role->comapany !== auth()->user()->company_id ) {
                
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
 
@@ -79,7 +79,7 @@ class EmployeeRoleController extends Controller
             if($role->name === 'company_owner' ){
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
             }
-            if ($role->guard_name !== auth()->user()->guard_name) {
+            if ($role->guard_name !== auth()->user()->guard_name || $role->comapany !== auth()->user()->company_id ) {
                
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
 
