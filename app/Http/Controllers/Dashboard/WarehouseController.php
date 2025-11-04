@@ -10,9 +10,11 @@ use App\Models\Warehouse;
 use Exception;
 use Illuminate\Http\Request;
 use SebastianBergmann\CodeUnit\FunctionUnit;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class WarehouseController extends BaseController
 {
+    use AuthorizesRequests;
     protected mixed $crudRepository;
 
     public function __construct(WarehouseRepositoryInterface $pattern)
@@ -26,7 +28,7 @@ class WarehouseController extends BaseController
 
             $warehouses = WarehouseResource::collection($this->crudRepository->all(
                 ["company"],
-                [],
+                ["company_id"=>auth()->user()->company_id],
                 ['*']
             ));
             return $warehouses->additional(JsonResponse::success());
@@ -51,6 +53,8 @@ class WarehouseController extends BaseController
     {
         try {
             $warehouse->load([ 'company','products']);
+            $this->authorize('manage', $warehouse);
+
             return JsonResponse::respondSuccess('Item Fetched Successfully', new WarehouseResource($warehouse));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -60,6 +64,7 @@ class WarehouseController extends BaseController
 
     public function update(WarehouseRequest $request, Warehouse $warehouse)
     {
+        $this->authorize('manage', $warehouse);
 
         $data = $this->prepareData( $request);
         $this->crudRepository->update($data, $warehouse->id);
@@ -72,6 +77,11 @@ class WarehouseController extends BaseController
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
+            $warehouses = Warehouse::whereIn('id', $request->items)->get();
+
+            foreach ($warehouses as $warehouse) {
+                $this->authorize('manage', $warehouse); 
+            }
             $this->crudRepository->deleteRecords('warehouses', $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
@@ -82,6 +92,11 @@ class WarehouseController extends BaseController
     public function restore(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
+            $warehouses = Warehouse::whereIn('id', $request->items)->get();
+
+            foreach ($warehouses as $warehouse) {
+                $this->authorize('manage', $warehouse); 
+            }
             $this->crudRepository->restoreItem(Warehouse::class, $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_RESTORED_SUCCESSFULLY));
         } catch (Exception $e) {
@@ -95,6 +110,11 @@ class WarehouseController extends BaseController
     public function forceDelete(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
+            $warehouses = Warehouse::whereIn('id', $request->items)->get();
+
+            foreach ($warehouses as $warehouse) {
+                $this->authorize('manage', $warehouse); 
+            }
             $this->crudRepository->deleteRecordsFinial(Warehouse::class, $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_FORCE_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {

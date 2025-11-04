@@ -4,16 +4,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, 
     PharmacyOrderController, ResponseOfferController };
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\{ProductController,PharmacistController};
 
 Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pharmacy.')->group(function () {
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    Route::post('/pharmacist/index', [PharmacistController::class, 'index']);
+    Route::post('pharmacist/restore', [PharmacistController::class, 'restore']);
+    Route::delete('pharmacist/delete', [PharmacistController::class, 'destroy']);
+    Route::put('/pharmacist/{id}/{column}', [PharmacistController::class, 'toggle']);
+    Route::delete('pharmacist/force-delete', [PharmacistController::class, 'forceDelete']);
+    Route::apiResource('pharmacist', PharmacistController::class);
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    
+
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     Route::post('companies/index', [CompanyController::class, 'index']);
     Route::apiResource('companies', CompanyController::class)->only(['show']);
     /////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 
  
@@ -23,6 +34,7 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     Route::post('master-products/index', [ProductController::class, 'index']);
     Route::get('master-products/{product}', [ProductController::class,"show"]);
     /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 
@@ -56,4 +68,15 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
 
 
 
+});
+
+Route::prefix('pharmacist')->group(function () {
+    Route::post('logout', [PharmacistController::class, 'logout'])
+        ->middleware('auth:pharmacists');
+});
+
+Route::prefix('pharmacist')->middleware('throttle:20')->group(function () {
+    Route::post('register', [PharmacistController::class, 'register']);
+    Route::post('login', [PharmacistController::class, 'login']);
+    Route::post('change-password', [PharmacistController::class, 'changePassword']);
 });

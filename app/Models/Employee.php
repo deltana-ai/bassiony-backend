@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Policies\EmployeePolicy;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -80,19 +81,15 @@ class Employee extends Authenticatable
         'updated_at' => 'datetime',
     ];
 
-    public function role()
+    public static function policy()
     {
-        return $this->belongsTo(Role::class);
+        return EmployeePolicy::class;
     }
-
-    public function hasRole($role)
+    
+    public function company()
     {
-        return $this->role && $this->role->name === $role;
+        return $this->belongsTo(Company::class, 'company_id');
     }
-public function company()
-{
-    return $this->belongsTo(Company::class, 'company_id');
-}
 
     public function warehouse()
     {

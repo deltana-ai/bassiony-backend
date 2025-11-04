@@ -118,26 +118,26 @@ class PharmacistController extends BaseController
         }
     }
 
-    public function register(RegisterPharmacistRequest $request)
-    {
-        $validated = $request->validated();
+    // public function register(RegisterPharmacistRequest $request)
+    // {
+    //     $validated = $request->validated();
 
-        try {
-            $pharmacist = $this->crudRepository->createPharmacist($validated);
+    //     try {
+    //         $pharmacist = $this->crudRepository->createPharmacist($validated);
 
-            $token = $pharmacist->createToken('user-token')->plainTextToken;
+    //         $token = $pharmacist->createToken('user-token')->plainTextToken;
 
-            return response()->json([
-                'status'  => true,
-                'pharmacist'    => new PharmacistResource($pharmacist),
-                'message' => 'User Registered Successfully',
-                'token'   => $token
-            ], 200);
+    //         return response()->json([
+    //             'status'  => true,
+    //             'pharmacist'    => new PharmacistResource($pharmacist),
+    //             'message' => 'User Registered Successfully',
+    //             'token'   => $token
+    //         ], 200);
 
-        } catch (\Throwable $th) {
-            return JsonResponse::respondError($th->getMessage());
-        }
-    }
+    //     } catch (\Throwable $th) {
+    //         return JsonResponse::respondError($th->getMessage());
+    //     }
+    // }
 
 
     public function login(Request $request)

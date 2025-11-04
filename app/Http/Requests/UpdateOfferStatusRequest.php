@@ -24,6 +24,7 @@ class UpdateOfferStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', 'in:pending,approved,rejected,delivered,returned,completed,canceled'],
+
         ];
 
     }

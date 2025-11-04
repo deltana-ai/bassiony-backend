@@ -15,6 +15,18 @@ class EmployeeRepository extends CrudRepository implements EmployeeRepositoryInt
     {
         $this->model = $model;
     }
+    public function createEmployee( array $data)
+    {
+       return DB::transaction(function () use ($data) {
+        
+            $role_id = $data["role_id"];
+            $employee = $this->create($data);
+            $employee ->assignRole("company_owner");
+            return $employee;
+
+
+       });
+    }
 
 
     public function assignToWarehouse(string $tableName, array $ids, int $warehouse_id )

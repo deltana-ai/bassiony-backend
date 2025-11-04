@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Policies\BranchPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class Branch extends BaseModel
@@ -19,6 +20,11 @@ class Branch extends BaseModel
     public function pharmacy()
     {
         return $this->belongsTo(Pharmacy::class);
+    }
+
+    public static function policy()
+    {
+        return BranchPolicy::class;
     }
 
    

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Pharmacist;
 use App\Models\ResponseOffer;
 use Illuminate\Support\Facades\Auth;
 
@@ -48,8 +49,9 @@ class ResponseOfferPolicy
     /**
      * الإنشاء — فقط الصيدلية
      */
-    public function create($user): bool
+    public function create(Pharmacist $user): bool
     {
+       
         return $this->getGuard() === 'pharmacists';
     }
 

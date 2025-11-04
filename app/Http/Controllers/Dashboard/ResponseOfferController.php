@@ -46,7 +46,8 @@ class ResponseOfferController extends Controller
     public function store(ResponseOfferRequest $request)
     {
         try {
-            $this->authorize('create');
+            $this->authorize('create', ResponseOffer::class);
+           // dd(auth()->guard("pharmacists")->check());
 
             $offer = $this->crudRepository->getBaseOffer($request->company_offer_id); 
             

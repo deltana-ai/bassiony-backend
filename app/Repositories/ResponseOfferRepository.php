@@ -76,7 +76,7 @@ class ResponseOfferRepository extends CrudRepository implements ResponseOfferRep
         DB::transaction(function () use ($responseOffer, $warehouseProduct, $status,$offer) {
             switch ($status) {
                 case 'approved':
-                    $warehouseProduct->decrement('stock', $responseOffer->quantity);
+                    // $warehouseProduct->decrement('stock', $responseOffer->quantity);
                     $offer->decrement('total_quantity', $responseOffer->quantity);
                     break;
 

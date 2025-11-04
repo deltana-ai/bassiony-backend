@@ -40,32 +40,6 @@ Route::prefix('user')->middleware('throttle:20')->group(function () {
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
 
 
-//////////////////////////////////////// User ////////////////////////////////
-
-//////////////////////////////////////// Pharmacist ////////////////////////////////
-Route::middleware(['auth:admins'])->group(function () {
-    Route::post('/pharmacist/index', [PharmacistController::class, 'index']);
-    Route::post('pharmacist/restore', [PharmacistController::class, 'restore']);
-    Route::delete('pharmacist/delete', [PharmacistController::class, 'destroy']);
-    Route::put('/pharmacist/{id}/{column}', [PharmacistController::class, 'toggle']);
-    Route::delete('pharmacist/force-delete', [PharmacistController::class, 'forceDelete']);
-    Route::apiResource('pharmacist', PharmacistController::class);
-});
-Route::prefix('pharmacist')->middleware('throttle:20')->group(function () {
-    Route::post('register', [PharmacistController::class, 'register']);
-    Route::post('login', [PharmacistController::class, 'login']);
-    Route::post('change-password', [PharmacistController::class, 'changePassword']);
-});
-
-Route::prefix('pharmacist')->group(function () {
-    Route::post('logout', [PharmacistController::class, 'logout'])
-        ->middleware('auth:pharmacists');
-});
-
-
-//////////////////////////////////////// Pharmacist ////////////////////////////////
-
-
 
 
 
@@ -105,7 +79,6 @@ Route::get('categories/show/{id}', [CategoryController::class, 'show']);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 Route::middleware(['auth:pharmacists' , 'auth:admins'])->group(function () {
 
     Route::post('/offer/index', [OfferController::class, 'index']);
@@ -119,6 +92,7 @@ Route::middleware(['auth:pharmacists' , 'auth:admins'])->group(function () {
     Route::post('/offer/{offer}/products/remove', [OfferController::class, 'removeProductFromOffer']);
 
 });
+
 Route::get('/offers/public', [OfferController::class, 'indexPublic']);
 
 
