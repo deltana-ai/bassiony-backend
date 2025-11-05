@@ -62,6 +62,7 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::delete('warehouses/{warehouse}/products/delete', [WarehouseProductController::class, 'destroy']);
     Route::post('warehouses/{warehouse}/products/store/batch',[WarehouseProductController::class,"addBatch"]);
     Route::post('warehouses/{warehouse}/products/store',[WarehouseProductController::class,"addReservedStock"]);
+    Route::post('warehouses/{warehouse}/products/import',[WarehouseProductController::class,"import"]);
 
     Route::apiResource('warehouses/{warehouse}/products', WarehouseProductController::class)->only(['show']);
    
@@ -83,8 +84,10 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::post('company-products/index', [CompanyProductController::class,"index"]);
 
     ////////////////////////////////////////////////////////////////////////////////////////
+    
 
 
+   
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////

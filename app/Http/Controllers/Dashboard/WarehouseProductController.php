@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\DeleteBatchRequest;
+use App\Http\Requests\FileImportRequest;
 use App\Http\Requests\ReservedStockRequest;
 use App\Http\Requests\WarehouseProductRequest;
 use App\Http\Resources\BatchResource;
 use App\Http\Resources\WarehouseProduct2Resource;
 use App\Http\Resources\WarehouseProductResource ;
+use App\Imports\WarehouseProductBatchImport;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Models\Warehouse;
 use App\Models\WarehouseProduct;
@@ -18,6 +20,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class WarehouseProductController extends BaseController
 {
@@ -49,25 +52,30 @@ class WarehouseProductController extends BaseController
             $data = $this->handleData( $request, $warehouse->id);
             $check_data = $data;
             unset($check_data["stock"]);
-            $batch = WarehouseProductBatch::where($check_data)->first();
-             if ($batch) {
-                $batch->increment('stock', $data["stock"]);
-            } else {
-               if( !$warehouse->products()->where("product_id" ,$request->product_id)->exists())
-                {
-                    $warehouse->products()->attach($request->product_id, [
-                        'reserved_stock' => 0,
-                    ]);
+            DB::transaction(function () use ($check_data, $data, $warehouse, $request) {
+                $batch = WarehouseProductBatch::where($check_data)->first();
+
+                if ($batch) {
+                    $batch->increment('stock', $data['stock']);
+                } else {
+                    if (!$warehouse->products()->where('product_id', $request->product_id)->exists()) {
+                        $warehouse->products()->attach($request->product_id, [
+                            'reserved_stock' => 0,
+                        ]);
+                    }
+
+                    WarehouseProductBatch::create($data);
                 }
-                WarehouseProductBatch::create($data);
-            }
-            
+            });
+                        
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
 
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public function addReservedStock(Warehouse $warehouse ,ReservedStockRequest $request)
     {
@@ -93,6 +101,8 @@ class WarehouseProductController extends BaseController
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public function show(Warehouse $warehouse, Request $request, int $productId)
     {
         try {
@@ -104,7 +114,7 @@ class WarehouseProductController extends BaseController
         }
     }
 
-
+    //////////////////////////////////////////////////////////////////////////////////////////////////
 
     public function destroy(Warehouse $warehouse,DeleteBatchRequest $request): ?\Illuminate\Http\JsonResponse
     {
@@ -128,6 +138,29 @@ class WarehouseProductController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    public function import(FileImportRequest $request, Warehouse $warehouse)
+    {
+        try {
+            $import = new WarehouseProductBatchImport($warehouse);
+            Excel::import($import, $request->file('file'));
+
+            if ($import->failures()->isNotEmpty()) {
+                return JsonResponse::respondError($import->failures());
+            }
+
+            return JsonResponse::respondSuccess( ' تم استيراد البيانات بنجاح');
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+        
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
 
     private function handleData(WarehouseProductRequest $request,int $warehouse_id)
     {

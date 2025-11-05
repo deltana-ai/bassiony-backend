@@ -56,7 +56,7 @@ class EmployeeRoleController extends Controller
             if(!$role){
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_FOUND));
             }
-            if ($role->guard_name !== auth()->user()->guard_name || $role->comapany !== auth()->user()->company_id ) {
+            if ($role->guard_name !== auth()->user()->guard_name || $role->company_id!== auth()->user()->company_id ) {
                
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
 

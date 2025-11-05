@@ -49,18 +49,22 @@ class BranchProductController extends BaseController
             $data = $this->handleData( $request, $branch->id);
             $check_data = $data;
             unset($check_data["stock"]);
-            $batch = BranchProductBatch::where($check_data)->first();
-             if ($batch) {
-                $batch->increment('stock', $data["stock"]);
-            } else {
-                if(!$branch->products()->where("product_id" ,$request->product_id)->exists())
-                {
-                    $branch->products()->attach($request->product_id, [
-                        'reserved_stock' => 0,
-                    ]);
+
+            DB::transaction(function () use ($check_data, $data, $branch, $request) {
+                $batch = BranchProductBatch::where($check_data)->first();
+
+                if ($batch) {
+                    $batch->increment('stock', $data['stock']);
+                } else {
+                    if (!$branch->products()->where('product_id', $request->product_id)->exists()) {
+                        $branch->products()->attach($request->product_id, [
+                            'reserved_stock' => 0,
+                        ]);
+                    }
+
+                    BranchProductBatch::create($data);
                 }
-               BranchProductBatch::create($data);
-            }
+            });
             
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
 
