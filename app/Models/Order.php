@@ -35,4 +35,16 @@ class Order extends BaseModel
     {
         return $this->belongsTo(Pharmacy::class);
     }
+
+    public function pharmacist()
+    {
+        return $this->belongsTo(Pharmacist::class); // ✅ العلاقة المفقودة
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
+
 }

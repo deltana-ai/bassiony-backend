@@ -2,9 +2,22 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{BranchProductController, CompanyController, CompanyOfferController, 
-    PharmacyOrderController, PharmacyProductController, ResponseOfferController };
-use App\Http\Controllers\{ProductController,PharmacistController};
+
+use App\Http\Controllers\Dashboard\{
+    BranchProductController,
+    CompanyController,
+    CompanyOfferController,
+    PharmacyOrderController,
+    PharmacyProductController,
+    ResponseOfferController
+};
+
+use App\Http\Controllers\{
+    OrderController,
+    ProductController,
+    PharmacistController
+};
+
 
 Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pharmacy.')->group(function () {
 
@@ -17,7 +30,7 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     Route::delete('pharmacist/force-delete', [PharmacistController::class, 'forceDelete']);
     Route::apiResource('pharmacist', PharmacistController::class);
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
 
 
 
@@ -27,7 +40,7 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
- 
+
 
     ///////////////////////////////////////////////////////////////////////////////////////
     Route::post('branches/{branch}/products/index', [BranchProductController::class, 'index'])->name('warehouse.products.index');
@@ -89,6 +102,9 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
 
 
 });
+Route::get('pharmacies/{id}/orders', [OrderController::class, 'getPharmacyOrders']);
+Route::get('company/{companyId}/orders', [OrderController::class, 'companyOrders']);
+Route::get('warehouses/{warehouse}/orders', [OrderController::class, 'ordersByWarehouse']);
 
 Route::prefix('pharmacist')->group(function () {
     Route::post('logout', [PharmacistController::class, 'logout'])

@@ -1016,9 +1016,7 @@ namespace PHPSTORM_META {
     override(\auth()->user(), map([
         '' => \App\Models\User::class,
     ]));
-    override(\Illuminate\Contracts\Auth\Guard::user(), map([
-        '' => \App\Models\User::class,
-    ]));
+   
     override(\Illuminate\Support\Facades\Auth::user(), map([
         '' => \App\Models\User::class,
     ]));
@@ -1274,7 +1272,7 @@ namespace PHPSTORM_META {
             'filesystems.disks.s3.endpoint' => 'NULL',
             'filesystems.disks.s3.use_path_style_endpoint' => 'boolean',
             'filesystems.disks.s3.throw' => 'boolean',
-            'filesystems.links.C:\wamp64\www\bassiony-backend\public\storage' => 'string',
+            'filesystems.links.C:\laragon\www\bassiony-backend\public\storage' => 'string',
             'logging.default' => 'string',
             'logging.deprecations.channel' => 'NULL',
             'logging.deprecations.trace' => 'boolean',
@@ -1326,9 +1324,9 @@ namespace PHPSTORM_META {
             'mail.mailers.smtp.url' => 'NULL',
             'mail.mailers.smtp.host' => 'string',
             'mail.mailers.smtp.port' => 'string',
-            'mail.mailers.smtp.encryption' => 'NULL',
-            'mail.mailers.smtp.username' => 'NULL',
-            'mail.mailers.smtp.password' => 'NULL',
+            'mail.mailers.smtp.encryption' => 'string',
+            'mail.mailers.smtp.username' => 'string',
+            'mail.mailers.smtp.password' => 'string',
             'mail.mailers.smtp.timeout' => 'NULL',
             'mail.mailers.smtp.local_domain' => 'string',
             'mail.mailers.ses.transport' => 'string',
@@ -1428,7 +1426,7 @@ namespace PHPSTORM_META {
             'session.lottery' => 'array',
             'session.cookie' => 'string',
             'session.path' => 'string',
-            'session.domain' => 'NULL',
+            'session.domain' => 'string',
             'session.secure' => 'NULL',
             'session.http_only' => 'boolean',
             'session.same_site' => 'string',
@@ -1581,6 +1579,7 @@ namespace PHPSTORM_META {
             'excel.temporary_files.remote_disk' => 'NULL',
             'excel.temporary_files.remote_prefix' => 'NULL',
             'excel.temporary_files.force_resync_remote' => 'NULL',
+
             'ide-helper.filename' => 'string',
             'ide-helper.models_filename' => 'string',
             'ide-helper.meta_filename' => 'string',
@@ -1857,7 +1856,7 @@ namespace PHPSTORM_META {
             'filesystems.disks.s3.endpoint' => 'NULL',
             'filesystems.disks.s3.use_path_style_endpoint' => 'boolean',
             'filesystems.disks.s3.throw' => 'boolean',
-            'filesystems.links.C:\wamp64\www\bassiony-backend\public\storage' => 'string',
+            'filesystems.links.C:\laragon\www\bassiony-backend\public\storage' => 'string',
             'logging.default' => 'string',
             'logging.deprecations.channel' => 'NULL',
             'logging.deprecations.trace' => 'boolean',
@@ -1909,9 +1908,9 @@ namespace PHPSTORM_META {
             'mail.mailers.smtp.url' => 'NULL',
             'mail.mailers.smtp.host' => 'string',
             'mail.mailers.smtp.port' => 'string',
-            'mail.mailers.smtp.encryption' => 'NULL',
-            'mail.mailers.smtp.username' => 'NULL',
-            'mail.mailers.smtp.password' => 'NULL',
+            'mail.mailers.smtp.encryption' => 'string',
+            'mail.mailers.smtp.username' => 'string',
+            'mail.mailers.smtp.password' => 'string',
             'mail.mailers.smtp.timeout' => 'NULL',
             'mail.mailers.smtp.local_domain' => 'string',
             'mail.mailers.ses.transport' => 'string',
@@ -2011,7 +2010,7 @@ namespace PHPSTORM_META {
             'session.lottery' => 'array',
             'session.cookie' => 'string',
             'session.path' => 'string',
-            'session.domain' => 'NULL',
+            'session.domain' => 'string',
             'session.secure' => 'NULL',
             'session.http_only' => 'boolean',
             'session.same_site' => 'string',
@@ -2164,6 +2163,7 @@ namespace PHPSTORM_META {
             'excel.temporary_files.remote_disk' => 'NULL',
             'excel.temporary_files.remote_prefix' => 'NULL',
             'excel.temporary_files.force_resync_remote' => 'NULL',
+
             'ide-helper.filename' => 'string',
             'ide-helper.models_filename' => 'string',
             'ide-helper.meta_filename' => 'string',
@@ -2440,7 +2440,7 @@ namespace PHPSTORM_META {
             'filesystems.disks.s3.endpoint' => 'NULL',
             'filesystems.disks.s3.use_path_style_endpoint' => 'boolean',
             'filesystems.disks.s3.throw' => 'boolean',
-            'filesystems.links.C:\wamp64\www\bassiony-backend\public\storage' => 'string',
+            'filesystems.links.C:\laragon\www\bassiony-backend\public\storage' => 'string',
             'logging.default' => 'string',
             'logging.deprecations.channel' => 'NULL',
             'logging.deprecations.trace' => 'boolean',
@@ -2492,9 +2492,9 @@ namespace PHPSTORM_META {
             'mail.mailers.smtp.url' => 'NULL',
             'mail.mailers.smtp.host' => 'string',
             'mail.mailers.smtp.port' => 'string',
-            'mail.mailers.smtp.encryption' => 'NULL',
-            'mail.mailers.smtp.username' => 'NULL',
-            'mail.mailers.smtp.password' => 'NULL',
+            'mail.mailers.smtp.encryption' => 'string',
+            'mail.mailers.smtp.username' => 'string',
+            'mail.mailers.smtp.password' => 'string',
             'mail.mailers.smtp.timeout' => 'NULL',
             'mail.mailers.smtp.local_domain' => 'string',
             'mail.mailers.ses.transport' => 'string',
@@ -2594,7 +2594,7 @@ namespace PHPSTORM_META {
             'session.lottery' => 'array',
             'session.cookie' => 'string',
             'session.path' => 'string',
-            'session.domain' => 'NULL',
+            'session.domain' => 'string',
             'session.secure' => 'NULL',
             'session.http_only' => 'boolean',
             'session.same_site' => 'string',
@@ -2747,6 +2747,7 @@ namespace PHPSTORM_META {
             'excel.temporary_files.remote_disk' => 'NULL',
             'excel.temporary_files.remote_prefix' => 'NULL',
             'excel.temporary_files.force_resync_remote' => 'NULL',
+
             'ide-helper.filename' => 'string',
             'ide-helper.models_filename' => 'string',
             'ide-helper.meta_filename' => 'string',
@@ -2800,18 +2801,7 @@ namespace PHPSTORM_META {
     override(\Illuminate\Support\Arr::sort(0), type(0));
     override(\Illuminate\Support\Arr::sortRecursive(0), type(0));
     override(\Illuminate\Support\Arr::where(0), type(0));
-    override(\array_add(0), type(0));
-    override(\array_except(0), type(0));
-    override(\array_first(0), elementType(0));
-    override(\array_last(0), elementType(0));
-    override(\array_get(0), elementType(0));
-    override(\array_only(0), type(0));
-    override(\array_prepend(0), type(0));
-    override(\array_pull(0), elementType(0));
-    override(\array_set(0), type(0));
-    override(\array_sort(0), type(0));
-    override(\array_sort_recursive(0), type(0));
-    override(\array_where(0), type(0));
+  
     override(\head(0), elementType(0));
     override(\last(0), elementType(0));
     override(\with(0), type(0));
@@ -2869,7 +2859,7 @@ namespace PHPSTORM_META {
 'filesystems.disks.local.root','filesystems.disks.local.throw','filesystems.disks.public.driver','filesystems.disks.public.root','filesystems.disks.public.url',
 'filesystems.disks.public.visibility','filesystems.disks.public.throw','filesystems.disks.s3.driver','filesystems.disks.s3.key','filesystems.disks.s3.secret',
 'filesystems.disks.s3.region','filesystems.disks.s3.bucket','filesystems.disks.s3.url','filesystems.disks.s3.endpoint','filesystems.disks.s3.use_path_style_endpoint',
-'filesystems.disks.s3.throw','filesystems.links.C:\\wamp64\\www\\bassiony-backend\\public\\storage','logging.default','logging.deprecations.channel','logging.deprecations.trace',
+'filesystems.disks.s3.throw','filesystems.links.C:\\laragon\\www\\bassiony-backend\\public\\storage','logging.default','logging.deprecations.channel','logging.deprecations.trace',
 'logging.channels.stack.driver','logging.channels.stack.channels','logging.channels.stack.ignore_exceptions','logging.channels.single.driver','logging.channels.single.path',
 'logging.channels.single.level','logging.channels.single.replace_placeholders','logging.channels.daily.driver','logging.channels.daily.path','logging.channels.daily.level',
 'logging.channels.daily.days','logging.channels.daily.replace_placeholders','logging.channels.slack.driver','logging.channels.slack.url','logging.channels.slack.username',
@@ -2937,8 +2927,8 @@ namespace PHPSTORM_META {
 'ide-helper.magic','ide-helper.interfaces','ide-helper.model_camel_case_properties','ide-helper.type_overrides.integer','ide-helper.type_overrides.boolean',
 'ide-helper.include_class_docblocks','ide-helper.force_fqn','ide-helper.use_generics_annotations','ide-helper.macro_default_return_types.Illuminate\\Http\\Client\\Factory','ide-helper.additional_relation_types',
 'ide-helper.additional_relation_return_types','ide-helper.enforce_nullable_relationships','ide-helper.post_migrate','tinker.commands','tinker.alias',
-'tinker.dont_alias',);
-        registerArgumentsSet('middleware', 
+'tinker.dont_alias');
+registerArgumentsSet('middleware', 
 'web','api','auth','auth.basic','auth.session',
 'cache.headers','can','guest','password.confirm','precognitive',
 'signed','throttle','verified',);
@@ -2988,35 +2978,35 @@ namespace PHPSTORM_META {
 'pagination::bootstrap-4','pagination::bootstrap-5','pagination::default','pagination::semantic-ui','pagination::simple-bootstrap-4',
 'pagination::simple-bootstrap-5','pagination::simple-default','pagination::simple-tailwind','pagination::tailwind','telescope::layout',);
         registerArgumentsSet('translations', 
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.auth.failed','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.auth.password','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.auth.throttle','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.pagination.previous','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.pagination.next',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.reset','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.sent','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.throttled','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.token','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.user',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.accepted','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.accepted_if','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.active_url','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.after','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.after_or_equal',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.alpha','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.alpha_dash','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.alpha_num','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.array','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ascii',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.before','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.before_or_equal','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.between.array','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.between.file','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.between.numeric',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.between.string','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.boolean','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.can','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.confirmed','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.contains',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.current_password','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.date','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.date_equals','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.date_format','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.decimal',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.declined','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.declined_if','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.different','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.digits','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.digits_between',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.dimensions','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.distinct','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.doesnt_end_with','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.doesnt_start_with','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.email',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ends_with','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.enum','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.exists','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.extensions','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.file',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.filled','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gt.array','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gt.file','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gt.numeric','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gt.string',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gte.array','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gte.file','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gte.numeric','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gte.string','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.hex_color',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.image','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.in','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.in_array','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.integer','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ip',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ipv4','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ipv6','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.json','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.list','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lowercase',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lt.array','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lt.file','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lt.numeric','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lt.string','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lte.array',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lte.file','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lte.numeric','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lte.string','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.mac_address','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max.array',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max.file','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max.numeric','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max.string','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max_digits','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.mimes',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.mimetypes','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min.array','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min.file','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min.numeric','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min.string',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min_digits','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing_if','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing_unless','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing_with',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing_with_all','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.multiple_of','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.not_in','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.not_regex','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.numeric',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.letters','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.mixed','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.numbers','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.symbols','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.uncompromised',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present_if','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present_unless','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present_with','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present_with_all',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited_if','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited_if_accepted','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited_if_declined','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited_unless',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibits','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.regex','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_array_keys','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_if',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_if_accepted','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_if_declined','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_unless','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_with','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_with_all',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_without','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_without_all','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.same','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.size.array','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.size.file',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.size.numeric','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.size.string','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.starts_with','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.string','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.timezone',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.unique','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.uploaded','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.uppercase','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.url','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ulid',
-'C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.uuid','C:.wamp64.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.custom.attribute-name.rule-name',);
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.auth.failed','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.auth.password','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.auth.throttle','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.pagination.previous','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.pagination.next',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.reset','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.sent','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.throttled','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.token','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.user',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.accepted','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.accepted_if','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.active_url','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.after','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.after_or_equal',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.alpha','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.alpha_dash','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.alpha_num','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.array','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ascii',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.before','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.before_or_equal','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.between.array','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.between.file','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.between.numeric',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.between.string','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.boolean','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.can','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.confirmed','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.contains',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.current_password','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.date','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.date_equals','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.date_format','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.decimal',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.declined','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.declined_if','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.different','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.digits','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.digits_between',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.dimensions','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.distinct','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.doesnt_end_with','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.doesnt_start_with','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.email',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ends_with','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.enum','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.exists','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.extensions','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.file',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.filled','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gt.array','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gt.file','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gt.numeric','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gt.string',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gte.array','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gte.file','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gte.numeric','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.gte.string','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.hex_color',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.image','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.in','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.in_array','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.integer','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ip',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ipv4','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ipv6','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.json','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.list','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lowercase',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lt.array','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lt.file','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lt.numeric','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lt.string','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lte.array',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lte.file','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lte.numeric','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.lte.string','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.mac_address','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max.array',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max.file','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max.numeric','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max.string','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.max_digits','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.mimes',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.mimetypes','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min.array','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min.file','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min.numeric','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min.string',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.min_digits','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing_if','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing_unless','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing_with',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.missing_with_all','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.multiple_of','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.not_in','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.not_regex','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.numeric',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.letters','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.mixed','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.numbers','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.symbols','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.password.uncompromised',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present_if','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present_unless','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present_with','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.present_with_all',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited_if','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited_if_accepted','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited_if_declined','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibited_unless',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.prohibits','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.regex','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_array_keys','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_if',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_if_accepted','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_if_declined','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_unless','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_with','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_with_all',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_without','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.required_without_all','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.same','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.size.array','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.size.file',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.size.numeric','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.size.string','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.starts_with','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.string','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.timezone',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.unique','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.uploaded','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.uppercase','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.url','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ulid',
+'C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.uuid','C:.laragon.www.bassiony-backend.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.custom.attribute-name.rule-name',);
         registerArgumentsSet('env', 
 'APP_NAME','APP_ENV','APP_KEY','APP_DEBUG','APP_TIMEZONE',
 'APP_URL','APP_LOCALE','APP_FALLBACK_LOCALE','APP_FAKER_LOCALE','APP_MAINTENANCE_DRIVER',
@@ -3043,10 +3033,6 @@ namespace PHPSTORM_META {
     expectedArguments(\Illuminate\Support\Facades\Auth::can(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Auth::cannot(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Auth::cant(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::can(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::cannot(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::cant(), 0, argumentsSet('auth'));
-                expectedArguments(\Illuminate\Contracts\Auth\Access\Authorizable::can(), 0, argumentsSet('auth'));
                 expectedArguments(\Illuminate\Config\Repository::getMany(), 0, argumentsSet('configs'));
     expectedArguments(\Illuminate\Config\Repository::set(), 0, argumentsSet('configs'));
     expectedArguments(\Illuminate\Config\Repository::string(), 0, argumentsSet('configs'));
@@ -3071,7 +3057,6 @@ namespace PHPSTORM_META {
     expectedArguments(\Illuminate\Routing\Router::withoutMiddleware(), 0, argumentsSet('middleware'));
                 expectedArguments(\route(), 0, argumentsSet('routes'));
     expectedArguments(\to_route(), 0, argumentsSet('routes'));
-    expectedArguments(\signedRoute(), 0, argumentsSet('routes'));
                 expectedArguments(\Illuminate\Support\Facades\Redirect::route(), 0, argumentsSet('routes'));
     expectedArguments(\Illuminate\Support\Facades\Redirect::signedRoute(), 0, argumentsSet('routes'));
     expectedArguments(\Illuminate\Support\Facades\Redirect::temporarySignedRoute(), 0, argumentsSet('routes'));
@@ -3089,7 +3074,6 @@ namespace PHPSTORM_META {
     expectedArguments(\Illuminate\View\Factory::make(), 0, argumentsSet('views'));
                 expectedArguments(\__(), 0, argumentsSet('translations'));
     expectedArguments(\trans(), 0, argumentsSet('translations'));
-                expectedArguments(\Illuminate\Contracts\Translation\Translator::get(), 0, argumentsSet('translations'));
                 expectedArguments(\env(), 0, argumentsSet('env'));
                 expectedArguments(\Illuminate\Support\Env::get(), 0, argumentsSet('env'));
             

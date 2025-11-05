@@ -30,7 +30,11 @@ class Warehouse extends BaseModel
         return $this->belongsTo(Company::class);
     }
 
-    
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function products()
     {
         return $this->belongsToMany(Product::class, 'warehouse_product', 'warehouse_id', 'product_id')->withPivot( 'reserved_stock')->withTimestamps();
@@ -62,7 +66,7 @@ class Warehouse extends BaseModel
             ->pluck('total_stock', 'product_id')
             ->toArray();
     }
-    
+
       /**
      * Get detailed stock information with product details
      */
