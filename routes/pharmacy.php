@@ -2,9 +2,22 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{BranchProductController, CompanyController, CompanyOfferController,
-    PharmacyOrderController, ResponseOfferController };
-use App\Http\Controllers\{OrderController, ProductController,PharmacistController};
+
+use App\Http\Controllers\Dashboard\{
+    BranchProductController,
+    CompanyController,
+    CompanyOfferController,
+    PharmacyOrderController,
+    PharmacyProductController,
+    ResponseOfferController
+};
+
+use App\Http\Controllers\{
+    OrderController,
+    ProductController,
+    PharmacistController
+};
+
 
 Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pharmacy.')->group(function () {
 
@@ -34,14 +47,8 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     Route::delete('branches/{branch}/products/delete', [BranchProductController::class, 'destroy']);
     Route::post('branches/{branch}/products/store/batch',[BranchProductController::class,"addBatch"]);
     Route::post('branches/{branch}/products/store',[BranchProductController::class,"addReservedStock"]);
-
     Route::apiResource('branches/{branch}/products', BranchProductController::class)->only(['show']);
-
     //////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-    //////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -51,6 +58,15 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     Route::post('master-products/index', [ProductController::class, 'index']);
     Route::get('master-products/{product}', [ProductController::class,"show"]);
     /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+     /////////////////////////////////////////////////////////////////////////////////////////
+    Route::post('pharmacy-products/index', [PharmacyProductController::class,"index"]);
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 

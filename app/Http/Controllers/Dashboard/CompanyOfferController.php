@@ -32,7 +32,7 @@ class CompanyOfferController extends Controller
             $this->authorize('viewAny', CompanyOffer::class);
             $options = [];
             if (auth()->guard("employees")->check()) {
-                $options["company_id"] = auth()->user()->company_id ;
+                $options["company_id"] = auth()->guard("employees")->user()->company_id ;
             }
             $offers = CompanyOfferResource::collection($this->crudRepository->all(
                 [],
@@ -156,7 +156,7 @@ class CompanyOfferController extends Controller
             }
             
             
-            $data['company_id'] = auth()->user()->company_id;
+            $data['company_id'] = auth()->guard("employees")->user()->company_id;
             return $data ;
     }
   
