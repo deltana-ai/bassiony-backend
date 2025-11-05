@@ -53,7 +53,13 @@ class WarehouseProductController extends BaseController
              if ($batch) {
                 $batch->increment('stock', $data["stock"]);
             } else {
-               WarehouseProductBatch::create($data);
+               if( !$warehouse->products()->where("product_id" ,$request->product_id)->exists())
+                {
+                    $warehouse->products()->attach($request->product_id, [
+                        'reserved_stock' => 0,
+                    ]);
+                }
+                WarehouseProductBatch::create($data);
             }
             
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));

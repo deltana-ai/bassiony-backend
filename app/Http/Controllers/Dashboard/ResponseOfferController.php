@@ -33,7 +33,7 @@ class ResponseOfferController extends Controller
             $company_id = null;
 
             if (auth()->guard('employees')->check()) {
-                $company_id = auth()->user()->company_id;
+                $company_id = auth()->guard('employees')->user()->company_id;
             }
             
             $offers = ResponseOfferResource::collection($this->crudRepository->allForCompany($company_id ));
@@ -107,8 +107,8 @@ class ResponseOfferController extends Controller
             $responseOffer = $this->crudRepository->find($id);
 
             $this->authorize('cancel', $responseOffer);
-
-            $this->crudRepository->updateResponse(  "canceled",  $responseOffer);
+            $data["status"] = "canceled";
+            $this->crudRepository->updateResponse(  $data,  $responseOffer);
 
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_CANCELED_SUCCESSFULLY));
         } catch (Exception $e) {

@@ -53,6 +53,12 @@ class BranchProductController extends BaseController
              if ($batch) {
                 $batch->increment('stock', $data["stock"]);
             } else {
+                if(!$branch->products()->where("product_id" ,$request->product_id)->exists())
+                {
+                    $branch->products()->attach($request->product_id, [
+                        'reserved_stock' => 0,
+                    ]);
+                }
                BranchProductBatch::create($data);
             }
             

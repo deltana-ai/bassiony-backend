@@ -36,7 +36,7 @@ class CompanyProductController extends BaseController
 
         try {
             $companyId = auth()->guard("employees")->user()->company_id;
-            $products = ProductCompanyResource::collection($this->crudRepository->getCompanyProducts($companyId, $filters));
+            $products = ProductCompanyResource::collection($this->crudRepository->getCompanyProducts($companyId));
             
           
             return $products->additional(JsonResponse::success());

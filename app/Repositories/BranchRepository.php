@@ -25,20 +25,27 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
     public function getBranchProducts(int $branchId)
     {
        
+    
         $filters = request(Constants::FILTERS) ?? [];
-        $per_page = request(Constants::PER_PAGE) ?? 15;
+        $perPage = request(Constants::PER_PAGE) ?? 15;
         $paginate = request(Constants::PAGINATE) ?? true;
-        $query = Product::query()
+        $sortOrder = request(Constants::ORDER_By_DIRECTION) ?? "asc";
+        $sortBy = request(Constants::ORDER_BY) ?? "products.id";
+
+         $query = Product::query()
             ->select([
                 'products.id',
                 'products.name',
                 'products.description',
                 'products.price',
+                'products.bar_code',
                 'products.active',
+                'products.show_home',
                 'branch_product.reserved_stock',
                 DB::raw('COALESCE(SUM(branch_product_batches.stock), 0) as total_stock'),
                 DB::raw('COUNT(DISTINCT branch_product_batches.id) as total_batches')
             ])
+            ->with(['media']) // Load images/media
             ->join('branch_product', function ($join) use ($branchId) {
                 $join->on('products.id', '=', 'branch_product.product_id')
                      ->where('branch_product.branch_id', '=', $branchId);
@@ -53,17 +60,28 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
                 'products.description',
                 'products.price',
                 'products.active',
+                'products.show_home',
                 'branch_product.reserved_stock'
             ]);
-       
+
+        // Apply filters
+        $query = $this->applyFilters($query, $filters);
+
+        // Apply sorting
+        $query->orderBy($sortBy, $sortOrder);
 
         
+        if ($paginate) {
+            $products = $query->paginate($perPage);
+            
+            
+            
+            return $products;
+        } else {
+            $products = $query->get();
+            return $products;
 
-        $products = $query->paginate($per_page);
-
-        return $products;
-
-
+        }
         
     }
 
@@ -73,6 +91,10 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
      */
     public function getProductBatches(int $productId, int $branchId)
     {
+
+        $filters = request(Constants::FILTERS) ?? [];
+        $sortOrder = request(Constants::ORDER_By_DIRECTION) ?? "asc";
+        $sortBy = request(Constants::ORDER_BY) ?? "products.id";
         // Verify product exists in branch
         $exists = DB::table('branch_product')
             ->where('product_id', $productId)
@@ -83,19 +105,244 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
             throw new \Exception('Product not found in this branch');
         }
 
-        $batches = BranchProductBatch::with(['product:id,name','branch:id,name'])        // DB::table('branch_product_batches')
+        
+
+        $query = BranchProductBatch::query()
+            ->with([
+                'product:id,name,bar_code,price',
+                'branch:id,name,location'
+            ])
             ->where('product_id', $productId)
-            ->where('branch_id', $branchId)
-            ->orderBy('expiry_date', 'asc')
-            ->orderBy('created_at', 'desc')
-            
-            ->get();
+            ->where('branch_id', $branchId);
+
+        // Apply filters
+        $query = $this->applyBatchFilters($query, $filters);
+
+        // Apply sorting
+        $query->orderBy($sortBy, $sortOrder);
+
+        if ($sortBy !== 'created_at') {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $batches = $query->get();
 
         return $batches;
 
        
     }
 
+    /**
+     * Apply filters to query
+     */
+    protected function applyFilters($query, array $filters)
+    {
+        foreach ($filters as $key => $value) {
+            if (empty($value) && $value !== '0' && $value !== 0) {
+                continue;
+            }
+
+            switch ($key) {
+                // Text search (product name or description)
+                case 'search':
+                    $query->where(function ($q) use ($value) {
+                        $q->where('products.name', 'LIKE', '%' . $value . '%')
+                          ->orWhere('products.description', 'LIKE', '%' . $value . '%');
+                    });
+                    break;
+
+                
+
+                case 'active':
+                    $query->where('products.active', (bool) $value);
+                    break;
+
+                case 'show_home':
+                    $query->where('products.show_home', (bool) $value);
+                    break;
+
+                // Price range filters
+                case 'min_price':
+                    $query->where('products.price', '>=', $value);
+                    break;
+
+                case 'max_price':
+                    $query->where('products.price', '<=', $value);
+                    break;
+
+                // Stock filters (using HAVING because of aggregation)
+                case 'min_stock':
+                    $query->havingRaw('SUM(branch_product_batches.stock) >= ?', [$value]);
+                    break;
+
+                case 'max_stock':
+                    $query->havingRaw('SUM(branch_product_batches.stock) <= ?', [$value]);
+                    break;
+
+                case 'out_of_stock':
+                    if ($value) {
+                        $query->havingRaw('COALESCE(SUM(branch_product_batches.stock), 0) = 0');
+                    }
+                    break;
+
+                case 'low_stock':
+                    if ($value) {
+                        $threshold = request('low_stock_threshold') ?? 10;
+                        $query->havingRaw('COALESCE(SUM(branch_product_batches.stock), 0) > 0')
+                              ->havingRaw('COALESCE(SUM(branch_product_batches.stock), 0) <= ?', [$threshold]);
+                    }
+                    break;
+
+                // Reserved stock filter
+                case 'min_reserved_stock':
+                    $query->where('branch_product.reserved_stock', '>=', $value);
+                    break;
+
+                case 'max_reserved_stock':
+                    $query->where('branch_product.reserved_stock', '<=', $value);
+                    break;
+
+                case 'has_reserved_stock':
+                    if ($value) {
+                        $query->where('branch_product.reserved_stock', '>', 0);
+                    }
+                    break;
+
+                
+
+                // Batch count filter
+                case 'min_batches':
+                    $query->havingRaw('COUNT(DISTINCT branch_product_batches.id) >= ?', [$value]);
+                    break;
+
+                case 'has_batches':
+                    if ($value) {
+                        $query->havingRaw('COUNT(DISTINCT branch_product_batches.id) > 0');
+                    } else {
+                        $query->havingRaw('COUNT(DISTINCT branch_product_batches.id) = 0');
+                    }
+                    break;
+
+
+                // Default: Try to match on products table
+                default:
+                    if (is_numeric($value)) {
+                        $query->where("products.{$key}", '=', $value);
+                    } else {
+                        $query->where("products.{$key}", 'LIKE', '%' . $value . '%');
+                    }
+                    break;
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * Apply filters to batch query
+     */
+    protected function applyBatchFilters($query, array $filters)
+    {
+        foreach ($filters as $key => $value) {
+            if (empty($value) && $value !== '0' && $value !== 0) {
+                continue;
+            }
+
+            switch ($key) {
+                case 'batch_number':
+                    $query->where('batch_number', 'LIKE', '%' . $value . '%');
+                    break;
+
+                case 'min_stock':
+                    $query->where('stock', '>=', $value);
+                    break;
+
+                case 'max_stock':
+                    $query->where('stock', '<=', $value);
+                    break;
+
+                case 'has_expiry':
+                    if ($value) {
+                        $query->whereNotNull('expiry_date');
+                    } else {
+                        $query->whereNull('expiry_date');
+                    }
+                    break;
+
+                case 'expired':
+                    if ($value) {
+                        $query->where('expiry_date', '<', now());
+                    }
+                    break;
+
+                case 'not_expired':
+                    if ($value) {
+                        $query->where(function ($q) {
+                            $q->whereNull('expiry_date')
+                              ->orWhere('expiry_date', '>=', now());
+                        });
+                    }
+                    break;
+
+                case 'expiring_soon':
+                    if ($value) {
+                        $days = request('expiring_days') ?? 90;
+                        $query->whereBetween('expiry_date', [
+                            now(),
+                            now()->addDays($days)
+                        ]);
+                    }
+                    break;
+
+                case 'expiry_from':
+                    $query->where('expiry_date', '>=', $value);
+                    break;
+
+                case 'expiry_to':
+                    $query->where('expiry_date', '<=', $value);
+                    break;
+
+                case 'created_from':
+                    $query->where('created_at', '>=', $value);
+                    break;
+
+                case 'created_to':
+                    $query->where('created_at', '<=', $value);
+                    break;
+
+                case 'status':
+                    // Filter by status (expired, expiring_soon, good)
+                    $now = now();
+                    switch ($value) {
+                        case 'expired':
+                            $query->where('expiry_date', '<', $now);
+                            break;
+                        case 'expiring_soon':
+                            $days = request('expiring_days') ?? 90;
+                            $query->whereBetween('expiry_date', [$now, $now->copy()->addDays($days)]);
+                            break;
+                        case 'good':
+                            $days = request('expiring_days') ?? 90;
+                            $query->where(function ($q) use ($now, $days) {
+                                $q->whereNull('expiry_date')
+                                  ->orWhere('expiry_date', '>', $now->copy()->addDays($days));
+                            });
+                            break;
+                    }
+                    break;
+
+                default:
+                    if (is_numeric($value)) {
+                        $query->where($key, '=', $value);
+                    } else {
+                        $query->where($key, 'LIKE', '%' . $value . '%');
+                    }
+                    break;
+            }
+        }
+
+        return $query;
+    }
 
     /**
      * Get batch status label
