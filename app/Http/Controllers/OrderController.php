@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderStatusRequest;
-
+use App\Http\Resources\OrderPharmacistResource;
 use App\Http\Resources\OrderResource;
 use App\Models\CartItem;
 use App\Models\Order;
@@ -102,6 +102,47 @@ public function updateStatus(UpdateOrderStatusRequest $request, $orderId)
         return JsonResponse::respondError($e->getMessage());
     }
 }
+
+    public function getPharmacyOrders($pharmacyId)
+    {
+        $orders = Order::where('pharmacy_id', $pharmacyId)
+            ->with(['user', 'pharmacist', 'promoCode', 'address']) // لو محتاج علاقات
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return JsonResponse::respondSuccess('Orders Fetched Successfully', OrderPharmacistResource::collection($orders));
+    }
+
+    public function companyOrders($companyId)
+    {
+        $orders = Order::whereHas('warehouse', function ($q) use ($companyId) {
+            $q->where('company_id', $companyId);
+        })
+        ->with(['warehouse', 'pharmacy', 'pharmacist']) // العلاقات اللي تحتاجها
+        ->latest()
+        ->get();
+
+        return JsonResponse::respondSuccess('Orders fetched successfully', $orders);
+    }
+
+    public function ordersByWarehouse($warehouseId)
+    {
+        $orders = Order::where('warehouse_id', $warehouseId)
+            ->with([
+                'user:id,name',
+                'pharmacist:id,name',
+                'pharmacy:id,name',
+                'items.product:id,name'
+            ])
+            ->orderBy('id', 'DESC')
+            ->get();
+
+        return JsonResponse::respondSuccess(
+            'Orders fetched successfully',
+            OrderPharmacistResource::collection($orders)
+        );
+    }
+
 
 
 }

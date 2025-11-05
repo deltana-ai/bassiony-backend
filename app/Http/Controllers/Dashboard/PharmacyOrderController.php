@@ -94,11 +94,13 @@ class PharmacyOrderController extends BaseController
         }
     }
 
-     public function storeOrder(Request $request): ?\Illuminate\Http\JsonResponse
+    public function storeOrder(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
+
             $validated = $request->validate([
                 'pharmacy_id' => 'required|exists:pharmacies,id',
+                'warehouse_id' => 'required|exists:warehouses,id',
             ]);
 
             $pharmacyId = $validated['pharmacy_id'];
@@ -112,12 +114,14 @@ class PharmacyOrderController extends BaseController
             }
 
             DB::beginTransaction();
+
             $order = Order::create([
-                'pharmacy_id' => $pharmacyId,
+                'pharmacy_id'   => $pharmacyId,
                 'pharmacist_id' => auth()->user()->id,
-                'status' => 'pending',
-                'payment_method' => 'cash',
-                'total_price' => 0,
+                'warehouse_id'  => $validated['warehouse_id'], // ✅ أضفنا المخزن
+                'status'        => 'pending',
+                'payment_method'=> 'cash',
+                'total_price'   => 0,
             ]);
 
             $total = 0;
@@ -137,7 +141,6 @@ class PharmacyOrderController extends BaseController
 
             $order->update(['total_price' => $total]);
 
-            // تفريغ الكارت بعد إنشاء الأوردر
             CartItem::where('pharmacy_id', $pharmacyId)->delete();
 
             DB::commit();
@@ -147,17 +150,21 @@ class PharmacyOrderController extends BaseController
                 [
                     'order_id'    => $order->id,
                     'total_price' => $total,
+                    'warehouse_id'=> $validated['warehouse_id'],
                     'status'      => 'pending',
                 ],
                 200
             );
+
         } catch (\Throwable $e) {
             DB::rollBack();
+
             return JsonResponse::respondError(
                 'حدث خطأ أثناء إنشاء الأوردر: ' . $e->getMessage(),
                 500
             );
         }
     }
+
 
 }
