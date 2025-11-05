@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
+            $table->string('bar_code')->nullable();
             $table->integer('position')->nullable();
             $table->boolean('active')->default(1);
             $table->boolean('show_home')->default(1);

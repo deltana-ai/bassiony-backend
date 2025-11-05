@@ -24,7 +24,7 @@ class UpdateOfferStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', 'in:pending,approved,rejected,delivered,returned,completed,canceled'],
-
+            'warehouse_id'=> ['required','exists:warehouses,id','required_if:status,approved'],
         ];
 
     }

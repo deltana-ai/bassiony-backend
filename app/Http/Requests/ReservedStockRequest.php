@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class WarehouseProductRequest extends FormRequest
+class ReservedStockRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,10 @@ class WarehouseProductRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'reserved_stock' => 'required|integer|min:0',
             'product_id' => 'required|exists:products,id',
-            'batch_number' => 'nullable|string',
-            'stock' => 'integer|min:0',
-            'expiry_date' => 'nullable|date|date_format:d-m-Y',
+
+
         ];
     }
 }

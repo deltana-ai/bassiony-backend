@@ -90,7 +90,7 @@ class ResponseOfferController extends Controller
         
         try {
             
-            $this->crudRepository->updateResponse(  $request->status,  $responseOffer);
+            $this->crudRepository->updateResponse(  $request->validated(),  $responseOffer);
 
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
 

@@ -53,6 +53,8 @@ class CompanyOfferController extends Controller
                 $offer = $this->crudRepository->create($data);
 
                 return new CompanyOfferResource($offer);
+                //return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
+
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
             }

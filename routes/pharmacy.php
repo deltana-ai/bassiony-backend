@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, 
+use App\Http\Controllers\Dashboard\{BranchProductController, CompanyController, CompanyOfferController, 
     PharmacyOrderController, ResponseOfferController };
 use App\Http\Controllers\{ProductController,PharmacistController};
 
@@ -28,6 +28,23 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
 
 
  
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    Route::post('branches/{branch}/products/index', [BranchProductController::class, 'index'])->name('warehouse.products.index');
+    Route::delete('branches/{branch}/products/delete', [BranchProductController::class, 'destroy']);
+    Route::post('branches/{branch}/products/store/batch',[BranchProductController::class,"addBatch"]);
+    Route::post('branches/{branch}/products/store',[BranchProductController::class,"addReservedStock"]);
+
+    Route::apiResource('branches/{branch}/products', BranchProductController::class)->only(['show']);
+   
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 
      /////////////////////////////////show product details//////////////////////////////////////////////////

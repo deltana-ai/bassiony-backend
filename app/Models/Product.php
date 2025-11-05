@@ -42,6 +42,24 @@ class Product extends BaseModel
         return $this->belongsTo(Brand::class);
     }
 
+    public function warehouseBatches()
+    {
+        return $this->hasMany(WarehouseProductBatch::class);
+    }
+
+
+
+    public function warehouses()
+    {
+        return $this->belongsToMany(Warehouse::class, 'warehouse_product') ->withPivot( 'reserved_stock')
+                    ->withTimestamps();;
+    }
+
+    public function warehouseProducts()
+    {
+        return $this->hasMany(WarehouseProduct::class);
+    }
+
 
     public function pharmacies()
     {
@@ -53,15 +71,28 @@ class Product extends BaseModel
     public function branches()
     {
         return $this->belongsToMany(Branch::class, 'branch_product')
-                    ->withPivot('branch_price', 'stock','reserved_stock','expiry_date','batch_number')
+                    ->withPivot('reserved_stock')
                     ->withTimestamps();
     }
 
-
-
-    public function warehouses()
+    public function branchPatches()
     {
-        return $this->belongsToMany(Warehouse::class, 'warehouse_product') ->withPivot( 'stock','reserved_stock','expiry_date','batch_number')
-                    ->withTimestamps();;
+        return $this->hasMany(WarehouseProduct::class);
     }
+
+
+    public function getTotalStockInWarehouse(int $warehouseId): int
+    {
+        return $this->warehouseBatches()
+            ->where('warehouse_id', $warehouseId)
+            ->sum('stock');
+    }
+
+    public function getTotalStockInBranch(int $branch_id): int
+    {
+        return $this->branchPatches()
+            ->where('branch_id', $branch_id)
+            ->sum('stock');
+    }
+   
 }

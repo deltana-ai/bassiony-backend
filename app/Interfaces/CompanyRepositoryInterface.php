@@ -13,4 +13,8 @@ interface CompanyRepositoryInterface extends ICrudRepository
     public function deleteCompanywithUsers(array $ids );
     
     public function restoreCompanywithUsers(array $ids );
+
+    public function getCompanyProducts(int $companyId, array $filters = []);
+
+
 }

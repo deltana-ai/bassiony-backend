@@ -15,7 +15,7 @@ interface ResponseOfferRepositoryInterface extends ICrudRepository
    public function getBaseOffer($offerid);
 
    
-   public function updateResponse( string $status, ResponseOffer $responseOffer);
+   public function updateResponse( array $data, ResponseOffer $responseOffer);
 
 
 }

@@ -7,7 +7,8 @@ use App\Interfaces\ResponseOfferRepositoryInterface;
 use App\Models\CompanyOffer;
 use App\Models\ResponseOffer;
 use App\Models\Role;
-
+use App\Models\WarehouseProductBatch;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -69,22 +70,68 @@ class ResponseOfferRepository extends CrudRepository implements ResponseOfferRep
 
     
 
-    public function updateResponse( string $status, ResponseOffer $responseOffer)
+    public function updateResponse( array $data, ResponseOffer $responseOffer)
     {
-        $warehouseProduct = $responseOffer->offer->warehouseProduct;
-        $offer = $responseOffer->offer;
-        DB::transaction(function () use ($responseOffer, $warehouseProduct, $status,$offer) {
-            switch ($status) {
+       
+        DB::transaction(function () use ($responseOffer, $data) {
+            
+            $product = $responseOffer->offer->product;
+        
+            $offer = $responseOffer->offer;
+
+            switch ($data["status"]) {
                 case 'approved':
-                    // $warehouseProduct->decrement('stock', $responseOffer->quantity);
+                    $this->deductStockByBatch($product->id, $data["warehouse_id"], $responseOffer->quantity);
                     $offer->decrement('total_quantity', $responseOffer->quantity);
                     break;
 
             }
 
-            $responseOffer->update(['status' => $status]);
+            $responseOffer->update(['status' => $data["status"]]);
         });
 
+    }
+
+
+    protected function deductStockByBatch($productId, $warehouseId,$quantity)
+    {
+            
+            $totalStock = WarehouseProductBatch::where('product_id', $productId)->where('warehouse_id', $warehouseId)->sum('stock');
+          
+            $reservedStock = DB::table('warehouse_product')->where('product_id', $productId)->where('warehouse_id', $warehouseId)->value('reserved_stock') ?? 0;
+           
+            $availableStock = $totalStock - $reservedStock;
+            
+            if ($availableStock < $quantity) {
+                throw new Exception("الكمية المطلوبة غير متوفرة", 1);
+            }
+           
+            $batches = WarehouseProductBatch::where('product_id', $productId)
+                ->where('warehouse_id', $warehouseId)->where('stock','>',0)
+                ->orderBy('expiry_date','asc')->get();
+            
+            $remaining = $quantity ;
+
+            foreach ($batches as  $batch) {
+                if ($remaining <= 0) {
+                    break;
+                }
+                $available = $batch->stock;
+                if ($available  >= $remaining ) {
+                    $batch->decrement('stock', $remaining);
+                    $remaining = 0;
+                }
+                else {
+                    $batch->update(['stock'=> 0]);
+                    $remaining -= $available ;
+                }
+            }
+            if ($remaining > 0) {
+                throw new Exception("الكمية المطلوبة غير متوفرة", 1);
+                ;
+            }
+        
+       
     }
 
    

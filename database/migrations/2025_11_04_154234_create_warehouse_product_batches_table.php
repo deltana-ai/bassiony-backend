@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('warehouse_product', function (Blueprint $table) {
+        Schema::create('warehouse_product_batches', function (Blueprint $table) {
             $table->id();
             $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->integer('reserved_stock')->default(0);
-            
+            $table->string('batch_number')->nullable();
+            $table->integer('stock')->default(0)->index();
+
+            $table->date('expiry_date')->nullable();
             $table->timestamps();
+            $table->index(['warehouse_id', 'product_id']);
         });
     }
 
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('warehouse_products');
+        Schema::dropIfExists('warehouse_product_batches');
     }
 };

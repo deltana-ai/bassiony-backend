@@ -3,15 +3,21 @@
 namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
+use App\Http\Requests\DeleteBatchRequest;
+use App\Http\Requests\ReservedStockRequest;
 use App\Http\Requests\WarehouseProductRequest;
+use App\Http\Resources\BatchResource;
+use App\Http\Resources\WarehouseProduct2Resource;
 use App\Http\Resources\WarehouseProductResource ;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Models\Warehouse;
 use App\Models\WarehouseProduct;
+use App\Models\WarehouseProductBatch;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
 
 class WarehouseProductController extends BaseController
 {
@@ -25,119 +31,108 @@ class WarehouseProductController extends BaseController
     }
 
 
-    public function index()
+    public function index($id)
     {
         try {
-            $warehouse_product_products = WarehouseProductResource::collection($this->crudRepository->all(
-                [ 'products' ],
-                [],
-                ['id','name']
-            ));
+        
+            $warehouse_product_products = WarehouseProduct2Resource::collection($this->crudRepository->getWarehouseProducts( $id));
             return $warehouse_product_products->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
-    public function store(Warehouse $warehouse,WarehouseProductRequest $request)
-    {
-            try {
-                $this->authorize('manage', $warehouse);
-                $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date)
-                ->format('Y-m-d');
-                $exists = $warehouse->products()
-                ->where('product_id', $request->product_id)
-                ->wherePivot('batch_number', $request->batch_number)
-                ->wherePivot('expiry_date', $expiry_date)
-                ->exists();
-
-                if ($exists) {
-                    return JsonResponse::respondError('This product with the same batch number and expiry date already exists in this warehouse.');
-                }
-                $warehouse_product = $warehouse->products()->attach($request->product_id,['stock' => $request->stock, 'reserved_stock' => $request->reserved_stock, 'expiry_date' => $expiry_date, 'batch_number' => $request->batch_number]);
-
-                return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
-            } catch (Exception $e) {
-                return JsonResponse::respondError($e->getMessage());
+    
+    public function addBatch(Warehouse $warehouse,WarehouseProductRequest $request){
+        try {
+            $this->authorize('manage', $warehouse);
+            $data = $this->handleData( $request, $warehouse->id);
+            $check_data = $data;
+            unset($check_data["stock"]);
+            $batch = WarehouseProductBatch::where($check_data)->first();
+             if ($batch) {
+                $batch->increment('stock', $data["stock"]);
+            } else {
+               WarehouseProductBatch::create($data);
             }
+            
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
+
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
     }
 
-    public function show(Warehouse $warehouse, Request $request, int $productId): ?\Illuminate\Http\JsonResponse
+    public function addReservedStock(Warehouse $warehouse ,ReservedStockRequest $request)
+    {
+       try {
+            $this->authorize('manage', $warehouse);
+            if($warehouse->products()->where("product_id" ,$request->product_id)->exists())
+            {
+                $warehouse->products()->updateExistingPivot($request->product_id, [
+                    'reserved_stock' => $request->reserved_stock,
+                ]);
+            }
+            else {
+                $warehouse->products()->attach($request->product_id, [
+                    'reserved_stock' => $request->reserved_stock,
+                ]);
+            
+            }
+            
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
+
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+    public function show(Warehouse $warehouse, Request $request, int $productId)
     {
         try {
-            $warehouse->load(['products' => function ($q) use ($productId, $request) {
-                $q->where('products.id', $productId);
-
-                if ($request->filled('batch_number')) {
-                    $q->wherePivot('batch_number', $request->batch_number);
-                }
-
-            if ($request->filled('expiry_date')) {
-                try {
-                    $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date);
-                } catch (\Exception $e) {
-                    $expiry_date = Carbon::parse($request->expiry_date);
-                }
-                $q->wherePivot('expiry_date', $expiry_date->format('Y-m-d'));
-            }
-
-
-                $q->withPivot(['stock', 'reserved_stock', 'expiry_date', 'batch_number']);
-            }]);
-
-            return JsonResponse::respondSuccess('Item Fetched Successfully', new WarehouseProductResource($warehouse));
+            
+            $batches = $this->crudRepository->getProductBatches( $productId, $warehouse->id);
+            return JsonResponse::respondSuccess('Item Fetched Successfully', BatchResource::collection($batches));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
     }
 
 
-    public function update(WarehouseProductRequest $request, Warehouse $warehouse)
+
+    public function destroy(Warehouse $warehouse,DeleteBatchRequest $request): ?\Illuminate\Http\JsonResponse
     {
         try {
+
             $this->authorize('manage', $warehouse);
-            $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date)
-                ->format('Y-m-d');
-
-            $warehouse->products()->updateExistingPivot(
-                $request->product_id,
-                [
-                    'stock' => $request->stock,
-                    'reserved_stock' => $request->reserved_stock,
-                    'expiry_date' => $expiry_date,
-                    'batch_number' => $request->batch_number,
-                ]
-            );
-
-            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
-        }
-
-        catch (Exception $e) {
-            return JsonResponse::respondError($e->getMessage());
-        }
-    }
-
-
-    public function destroy(Warehouse $warehouse,Request $request): ?\Illuminate\Http\JsonResponse
-    {
-        try {
-            $this->authorize('manage', $warehouse);
-            if (!$request->has('items') || !$request->has('batch_number')) {
-                return JsonResponse::respondError('Product IDs and batch number are required.');
+            $batch = WarehouseProductBatch::where("batch_number",$request->batch_number)
+            ->where("product_id",$request->product_id)
+            ->where("warehouse_id",$warehouse->id)
+            ->first();
+            if ($batch ) {
+                $batch->delete();
             }
+            else{
+                return JsonResponse::respondError("هذا الباتش غير متاح ");
+            }
+            
 
-            $productIds = (array) $request->items;
-            $batchNumber = $request->batch_number;
-
-
-            $warehouse->products()
-                ->wherePivot('batch_number', $batchNumber)
-                ->whereIn('product_id', $productIds)
-                ->detach();
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
+    }
+
+    private function handleData(WarehouseProductRequest $request,int $warehouse_id)
+    {
+        $expiry_date = Carbon::createFromFormat('d-m-Y', $request->expiry_date)
+                ->format('Y-m-d');
+        $data['warehouse_id'] = $warehouse_id;
+        $data['product_id'] = $request->product_id;
+        $data['stock'] = $request->stock;
+        $data['expiry_date'] = $expiry_date;
+        $data['batch_number'] = $request->batch_number;
+        return $data;
     }
 
 

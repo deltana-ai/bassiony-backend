@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
-use App\Http\Requests\BranchProductRequest;
 use App\Http\Requests\BranchRequest;
 use App\Http\Resources\BranchResource ;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Models\Branch;
 use Exception;
 use Illuminate\Http\Request;
+use SebastianBergmann\CodeUnit\FunctionUnit;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class BranchController extends BaseController
@@ -27,7 +27,7 @@ class BranchController extends BaseController
         try {
 
             $branches = BranchResource::collection($this->crudRepository->all(
-                ["pharmacy:id,name"],
+                ["pharmacy"],
                 ["pharmacy_id"=>auth()->user()->pharmacy_id],
                 ['*']
             ));
@@ -40,8 +40,9 @@ class BranchController extends BaseController
     public function store(BranchRequest $request)
     {
             try {
-                $branch = $this->crudRepository->create($request->validated());
-                
+                $data = $this->prepareData( $request);
+                $branch = $this->crudRepository->create($data);
+               
                 return new BranchResource($branch);
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
@@ -51,9 +52,8 @@ class BranchController extends BaseController
     public function show(Branch $branch): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $this->authorize('manage', $branch); 
-
-            $branch->load([ 'pharmacy:id,name','products']);
+            $branch->load([ 'pharmacy','products']);
+            $this->authorize('manage', $branch);
 
             return JsonResponse::respondSuccess('Item Fetched Successfully', new BranchResource($branch));
         } catch (Exception $e) {
@@ -62,19 +62,17 @@ class BranchController extends BaseController
     }
 
 
-
     public function update(BranchRequest $request, Branch $branch)
     {
-        $this->authorize('manage', $branch); 
+        $this->authorize('manage', $branch);
 
-        $this->crudRepository->update($request->validated(), $branch->id);
+        $data = $this->prepareData( $request);
+        $this->crudRepository->update($data, $branch->id);
 
        
         return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
     }
 
-
- 
 
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
@@ -90,8 +88,6 @@ class BranchController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
-
-    
 
     public function restore(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -124,6 +120,13 @@ class BranchController extends BaseController
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
+    }
+
+    private Function prepareData(BranchRequest $request)
+    {  
+        $data = $request->validated();
+        $data['pharmacy_id'] = auth("employees")->user()->pharmacy_id??0;
+        return $data;
     }
 
 

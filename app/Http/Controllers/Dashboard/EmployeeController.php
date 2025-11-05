@@ -35,7 +35,7 @@ class EmployeeController extends BaseController
 
             $employee = EmployeeResource::collection($this->crudRepository->all(
                 ["warehouse"],
-                ["company_id"=>auth()->user()->company_id],
+                ["company_id"=>auth()->guard("employees")->user()->company_id],
                 ['*']
             ));
             return $employee->additional(JsonResponse::success());
@@ -48,7 +48,7 @@ class EmployeeController extends BaseController
     {
         try {
             $data = $this->prepareData($request);
-            $employee = $this->crudRepository->create($data);
+            $employee = $this->crudRepository->createEmployee($data);
             return new EmployeeResource($employee);
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -74,7 +74,7 @@ class EmployeeController extends BaseController
         try {
             $this->authorize('manage', $employee);
             $data = $this->prepareData($request);
-            $this->crudRepository->update($data, $employee->id);
+            $this->crudRepository->updateEmployee( $employee,$data);
             activity()->performedOn($employee)->withProperties(['attributes' => $employee])->log('update');
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
         } catch (Exception $e) {
@@ -123,6 +123,7 @@ class EmployeeController extends BaseController
 
             foreach ($employees as $employee) {
                 $this->authorize('manage', $employee); 
+                $employee->roles()->detach();
             }
             $this->crudRepository->deleteRecordsFinial(Employee::class, $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_FORCE_DELETED_SUCCESSFULLY));

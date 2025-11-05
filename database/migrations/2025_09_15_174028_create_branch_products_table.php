@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('branch_products', function (Blueprint $table) {
+        Schema::create('branch_product', function (Blueprint $table) {
             $table->id();
             $table->foreignId('branch_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->integer('stock')->default(0)->index();
             $table->integer('reserved_stock')->default(0);
-            $table->date('expiry_date')->nullable()->index();
-            $table->decimal('branch_price', 10, 2)->nullable(); 
-            $table->string('batch_number')->nullable();
 
             $table->timestamps();
         });

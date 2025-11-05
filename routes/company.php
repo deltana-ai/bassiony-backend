@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, CompanyOrderController, EmployeeProfileController, EmployeeRoleController, PharmacyOrderController, ResponseOfferController, WarehouseController, WarehouseProductController,WarehouseProductSearchController};
+use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, CompanyOrderController, CompanyProductController, EmployeeProfileController, EmployeeRoleController, PharmacyOrderController, ResponseOfferController, WarehouseController, WarehouseProductController,WarehouseProductSearchController};
 use App\Http\Controllers\Dashboard\EmployeeController;
 use App\Http\Controllers\ProductController;
 
@@ -60,7 +60,11 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     ////////////////////////////////// warehouse product crud //////////////////////////////////////////////////////
     Route::post('warehouses/{warehouse}/products/index', [WarehouseProductController::class, 'index'])->name('warehouse.products.index');
     Route::delete('warehouses/{warehouse}/products/delete', [WarehouseProductController::class, 'destroy']);
-    Route::apiResource('warehouses/{warehouse}/products', WarehouseProductController::class);
+    Route::post('warehouses/{warehouse}/products/store/batch',[WarehouseProductController::class,"addBatch"]);
+    Route::post('warehouses/{warehouse}/products/store',[WarehouseProductController::class,"addReservedStock"]);
+
+    Route::apiResource('warehouses/{warehouse}/products', WarehouseProductController::class)->only(['show']);
+   
     //////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -73,6 +77,12 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::get('master-products/{product}', [ProductController::class,"show"]);
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    Route::post('company-products/index', [CompanyProductController::class,"index"]);
+
+    ////////////////////////////////////////////////////////////////////////////////////////
 
 
 

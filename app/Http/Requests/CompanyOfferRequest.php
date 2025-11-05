@@ -31,8 +31,8 @@ class CompanyOfferRequest extends FormRequest
                 'total_quantity' => ['required', 'integer', 'min:1'],
 
                 'description' => ['nullable', 'string'],
-                'start_date' => ['required', 'date'],
-                'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+                'start_date' => ['required', 'date','date_format:d-m-Y'],
+                'end_date' => ['required', 'date','date_format:d-m-Y', 'after_or_equal:start_date']
             ];
         }
         else{
@@ -45,8 +45,8 @@ class CompanyOfferRequest extends FormRequest
                 'total_quantity' => ['nullable', 'integer', 'min:1'],
 
                 'description' => ['nullable', 'string'],
-                'start_date' => ['nullable', 'date'],
-                'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+                'start_date' => ['nullable', 'date','date_format:d-m-Y'],
+                'end_date' => ['nullable', 'date','date_format:d-m-Y', 'after_or_equal:start_date']
             ];
         
         }
