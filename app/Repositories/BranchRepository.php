@@ -94,7 +94,7 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
 
         $filters = request(Constants::FILTERS) ?? [];
         $sortOrder = request(Constants::ORDER_By_DIRECTION) ?? "asc";
-        $sortBy = request(Constants::ORDER_BY) ?? "products.id";
+        $sortBy = request(Constants::ORDER_BY) ?? "id";
         // Verify product exists in branch
         $exists = DB::table('branch_product')
             ->where('product_id', $productId)
