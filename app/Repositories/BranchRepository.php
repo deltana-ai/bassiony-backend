@@ -60,7 +60,7 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
                 'products.description',
                 'products.price',
                 'products.active',
-               // 'products.bar_code',
+                'products.bar_code',
                 'products.show_home',
                 'branch_product.reserved_stock'
             ]);
@@ -111,7 +111,7 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
         $query = BranchProductBatch::query()
             ->with([
                 'product:id,name,bar_code,price',
-                'branch:id,name,location'
+                'branch:id,name,address'
             ])
             ->where('product_id', $productId)
             ->where('branch_id', $branchId);
