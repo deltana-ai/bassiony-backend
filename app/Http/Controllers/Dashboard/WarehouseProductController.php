@@ -37,7 +37,7 @@ class WarehouseProductController extends BaseController
     public function index($id)
     {
         try {
-        
+             
             $warehouse_product_products = WarehouseProduct2Resource::collection($this->crudRepository->getWarehouseProducts( $id));
             return $warehouse_product_products->additional(JsonResponse::success());
         } catch (Exception $e) {

@@ -9,9 +9,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\ToCollection;
-
-class WarehouseProductBatchImport implements ToCollection
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+class WarehouseProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnFailure
 {
+    use SkipsFailures;
     protected $warehouse;
     protected $errors = [];
 
@@ -26,13 +29,15 @@ class WarehouseProductBatchImport implements ToCollection
 
         // المرحلة الأولى: التحقق من صحة البيانات (Validation فقط)
         foreach ($rows as $index => $row) {
-            if ($index === 0) continue; // تجاهل صف العناوين
+            if (empty($row['bar_code']) || empty($row['batch_number'])) {
+                continue;
+            }
 
             $data = [
-                'bar_code'     => trim($row[0]),
-                'batch_number' => trim($row[1]),
-                'stock'        => (int) $row[2],
-                'expiry_date'  => $row[3] ?? null,
+                'bar_code'     => trim($row['bar_code'] ?? ''),
+                'batch_number' => trim($row['batch_number'] ?? ''),
+                'stock'        => (int) ($row['stock'] ?? 0),
+                'expiry_date'  => $row['expiry_date'] ?? null,
             ];
 
             $validator = Validator::make($data, [
@@ -76,16 +81,17 @@ class WarehouseProductBatchImport implements ToCollection
 
         DB::transaction(function () use ($validRows) {
             foreach ($validRows as $data) {
-                $exists = WarehouseProductBatch::where([
+                $batch = WarehouseProductBatch::where([
                     'warehouse_id' => $data['warehouse_id'],
                     'product_id'   => $data['product_id'],
                     'batch_number' => $data['batch_number'],
                     'expiry_date'  => $data['expiry_date'],
-                ])->exists();
+                ])->first();
 
-                if ($exists) {
-                    throw new \Exception("تم العثور على batch مكررة للمنتج ID {$data['product_id']}");
+                if ($batch) {
+                    $batch->increment('stock', $data['stock']);
                 }
+              else{
 
                 $warehouse = $this->warehouse;
 
@@ -94,6 +100,7 @@ class WarehouseProductBatchImport implements ToCollection
                 }
 
                 WarehouseProductBatch::create($data);
+              }
             }
         });
     }

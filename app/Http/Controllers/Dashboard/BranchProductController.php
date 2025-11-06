@@ -13,12 +13,14 @@ use App\Interfaces\BranchRepositoryInterface;
 use App\Models\Branch;
 use App\Models\BranchProduct;
 use App\Models\BranchProductBatch;
+use App\Imports\BranchProductBatchImport;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
-
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Requests\FileImportRequest;
 class BranchProductController extends BaseController
 {
 
@@ -132,6 +134,25 @@ class BranchProductController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	 public function import(FileImportRequest $request, Branch $branch)
+    {
+        try {
+            $import = new BranchProductBatchImport($branch);
+            Excel::import($import, $request->file('file'));
+
+            if ($import->failures()->isNotEmpty()) {
+                return JsonResponse::respondError($import->failures());
+            }
+
+            return JsonResponse::respondSuccess( ' تم استيراد البيانات بنجاح');
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+        
+    }
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private function handleData(BranchProductRequest $request,int $branch_id)
     {

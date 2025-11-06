@@ -45,7 +45,7 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                 DB::raw('COALESCE(SUM(warehouse_product_batches.stock), 0) as total_stock'),
                 DB::raw('COUNT(DISTINCT warehouse_product_batches.id) as total_batches')
             ])
-            ->with(['media']) // Load images/media
+           // ->with(['media']) // Load images/media
             ->join('warehouse_product', function ($join) use ($warehouseId) {
                 $join->on('products.id', '=', 'warehouse_product.product_id')
                      ->where('warehouse_product.warehouse_id', '=', $warehouseId);
