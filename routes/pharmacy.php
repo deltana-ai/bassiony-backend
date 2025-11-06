@@ -46,8 +46,9 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     Route::post('branches/{branch}/products/index', [BranchProductController::class, 'index'])->name('warehouse.products.index');
     Route::delete('branches/{branch}/products/delete', [BranchProductController::class, 'destroy']);
     Route::post('branches/{branch}/products/store/batch',[BranchProductController::class,"addBatch"]);
+    Route::put('branches/{branch}/products/update/batch',[BranchProductController::class,"updateBatchStock"]);
     Route::post('branches/{branch}/products/store',[BranchProductController::class,"addReservedStock"]);
-	Route::post('branches/{branch}/products/import',[BranchProductController::class,"import"]);
+    Route::post('branches/{branch}/products/import',[BranchProductController::class,"import"]);
     Route::apiResource('branches/{branch}/products', BranchProductController::class)->only(['show']);
     //////////////////////////////////////////////////////////////////////////////////////////////
 

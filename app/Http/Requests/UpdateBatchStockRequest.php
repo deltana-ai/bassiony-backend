@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BranchProductRequest extends FormRequest
+class UpdateBatchStockRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,13 +22,9 @@ class BranchProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
-            'product_id' => 'required|exists:products,id|unique:branch_product,product_id,NULL,id,branch_id,' . $this->branch_id,
-            
-            'batch_number' => 'nullable|string',
-            'stock' => 'integer|min:0',
-           
-            'expiry_date' => 'nullable|date|date_format:d-m-Y',
+              'product_id' => 'required|exists:products,id',
+              'batch_number' => 'required|string',
+              'stock' => 'integer|min:0',
         ];
     }
 }

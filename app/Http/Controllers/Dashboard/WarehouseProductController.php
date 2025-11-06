@@ -5,7 +5,7 @@ use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\DeleteBatchRequest;
 use App\Http\Requests\FileImportRequest;
-use App\Http\Requests\ReservedStockRequest;
+use App\Http\Requests\{ReservedStockRequest,UpdateBatchStockRequest };
 use App\Http\Requests\WarehouseProductRequest;
 use App\Http\Resources\BatchResource;
 use App\Http\Resources\WarehouseProduct2Resource;
@@ -115,6 +115,22 @@ class WarehouseProductController extends BaseController
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public function updateBatchStock(Warehouse $warehouse , UpdateBatchStockRequest $request)
+    {
+       try {
+            $this->authorize('manage', $warehouse);
+            
+             WarehouseProductBatch::where("product_id" ,$request->product_id)->where("warehouse_id" ,$warehouse->id )->where('batch_number' ,$request->batch_number )
+               ->update(["stock"=>$request->stock]);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public function destroy(Warehouse $warehouse,DeleteBatchRequest $request): ?\Illuminate\Http\JsonResponse
     {

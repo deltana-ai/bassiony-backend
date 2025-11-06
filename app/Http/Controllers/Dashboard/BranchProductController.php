@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\DeleteBatchRequest;
-use App\Http\Requests\ReservedStockRequest;
+use App\Http\Requests\{ReservedStockRequest,UpdateBatchStockRequest };
 use App\Http\Requests\BranchProductRequest;
 use App\Http\Resources\BatchResource;
 use App\Http\Resources\BranchProduct2Resource;
@@ -109,6 +109,24 @@ class BranchProductController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public function updateBatchStock(Branch $branch, UpdateBatchStockRequest $request)
+    {
+       try {
+            $this->authorize('manage', $branch);
+            
+             BranchProductBatch::where("product_id" ,$request->product_id)->where("branch_id" ,$branch->id )->where('batch_number' ,$request->batch_number )
+               ->update(["stock"=>$request->stock]);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 

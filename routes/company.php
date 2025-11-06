@@ -59,8 +59,9 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
     ////////////////////////////////// warehouse product crud //////////////////////////////////////////////////////
     Route::post('warehouses/{warehouse}/products/index', [WarehouseProductController::class, 'index'])->name('warehouse.products.index');
-    Route::delete('warehouses/{warehouse}/products/delete', [WarehouseProductController::class, 'destroy']);
+   // Route::delete('warehouses/{warehouse}/products/delete', [WarehouseProductController::class, 'destroy']);
     Route::post('warehouses/{warehouse}/products/store/batch',[WarehouseProductController::class,"addBatch"]);
+    Route::put('warehouses/{warehouse}/products/update/batch',[WarehouseProductController::class,"updateBatchStock"]);
     Route::post('warehouses/{warehouse}/products/store',[WarehouseProductController::class,"addReservedStock"]);
     Route::post('warehouses/{warehouse}/products/import',[WarehouseProductController::class,"import"]);
 

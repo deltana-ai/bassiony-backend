@@ -97,7 +97,7 @@ class ResponseOfferRepository extends CrudRepository implements ResponseOfferRep
     {
             
             $totalStock = WarehouseProductBatch::where('product_id', $productId)->where('warehouse_id', $warehouseId)->sum('stock');
-          
+             
             $reservedStock = DB::table('warehouse_product')->where('product_id', $productId)->where('warehouse_id', $warehouseId)->value('reserved_stock') ?? 0;
            
             $availableStock = $totalStock - $reservedStock;

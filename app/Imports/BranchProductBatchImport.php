@@ -12,9 +12,11 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+
 class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnFailure
 {
     use SkipsFailures;
+
     protected $branch;
     protected $errors = [];
 
@@ -27,7 +29,13 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
     {
         $validRows = [];
 
-        // المرحلة الأولى: التحقق من صحة البيانات (Validation فقط)
+        // استخراج الأكواد الفريدة من الملف مرة واحدة
+        $barcodes = $rows->pluck('bar_code')->filter()->unique()->toArray();
+
+        // جلب المنتجات المطابقة للكود
+        $products = Product::whereIn('bar_code', $barcodes)->pluck('id', 'bar_code');
+
+        // التحقق من صحة البيانات
         foreach ($rows as $index => $row) {
             if (empty($row['bar_code']) || empty($row['batch_number'])) {
                 continue;
@@ -55,9 +63,7 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
                 continue;
             }
 
-            $product = Product::where('bar_code', $data['bar_code'])->first();
-
-            if (!$product) {
+            if (!isset($products[$data['bar_code']])) {
                 $this->errors[] = [
                     'row' => $index + 1,
                     'errors' => ["المنتج ذو الكود {$data['bar_code']} غير موجود."],
@@ -65,42 +71,71 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
                 continue;
             }
 
-            //  data handeling to insert
             $validRows[] = [
                 'branch_id' => $this->branch->id,
-                'product_id'   => $product->id,
-                'batch_number' => $data['batch_number'],
+                'product_id'   => $products[$data['bar_code']],
+                'batch_number' => trim($data['batch_number']),
                 'stock'        => $data['stock'],
-                'expiry_date'  => $data['expiry_date'],
+                'expiry_date'  => $data['expiry_date'] ? date('Y-m-d', strtotime($data['expiry_date'])) : null,
             ];
         }
-        // if error exist stop importing
+
+        // لو في أخطاء → وقفي العملية
         if (!empty($this->errors)) {
             throw new \Exception(json_encode($this->errors, JSON_UNESCAPED_UNICODE));
         }
 
+        /**
+         *  الخطوة 1: دمج الصفوف المتكررة داخل نفس الملف
+         * نفس المنتج + نفس الباتش + نفس تاريخ الانتهاء = جمع المخزون
+         */
+        $mergedRows = [];
+        foreach ($validRows as $data) {
+            $key = $data['product_id'] . '-' . $data['batch_number'] . '-' . ($data['expiry_date'] ?? 'null');
+
+            if (isset($mergedRows[$key])) {
+                $mergedRows[$key]['stock'] += $data['stock'];
+            } else {
+                $mergedRows[$key] = $data;
+            }
+        }
+
+        $validRows = array_values($mergedRows);
+
+        /**
+         * الخطوة 2: إدخال أو تحديث البيانات في الداتابيز
+         */
         DB::transaction(function () use ($validRows) {
+            $branch = $this->branch;
+
+            // جلب كل الـ batches الموجودة بالفعل في المخزن
+            $existingBatches = BranchProductBatch::where('branch_id', $branch->id)
+                ->get(['product_id', 'batch_number', 'expiry_date', 'id', 'stock'])
+                ->mapWithKeys(function ($item) {
+                    $batchNumber = trim($item->batch_number);
+                    $expiryDate = $item->expiry_date ? date('Y-m-d', strtotime($item->expiry_date)) : 'null';
+                    return [
+                        $item->product_id . '-' . $batchNumber . '-' . $expiryDate => $item
+                    ];
+                });
+
             foreach ($validRows as $data) {
-                $batch = BranchProductBatch::where([
-                    'branch_id' => $data['branch_id'],
-                    'product_id'   => $data['product_id'],
-                    'batch_number' => $data['batch_number'],
-                    'expiry_date'  => $data['expiry_date'],
-                ])->first();
+                $batchNumber = trim($data['batch_number']);
+                $expiryDate = $data['expiry_date'] ? date('Y-m-d', strtotime($data['expiry_date'])) : 'null';
+                $key = $data['product_id'] . '-' . $batchNumber . '-' . $expiryDate;
 
-                if ($batch) {
-                    $batch->increment('stock', $data['stock']);
+                if (isset($existingBatches[$key])) {
+                    // لو batch موجودة بالفعل → زودي المخزون فقط
+                    $existingBatches[$key]->increment('stock', $data['stock']);
+                } else {
+                    // تأكدي إن المنتج مربوط بالمخزن
+                    if (!$branch->products()->where('product_id', $data['product_id'])->exists()) {
+                        $branch->products()->attach($data['product_id'], ['reserved_stock' => 0]);
+                    }
+
+                    // إنشاء batch جديدة
+                    BranchProductBatch::create($data);
                 }
-              else{
-
-                $branch = $this->branch;
-
-                if (!$branch->products()->where('product_id', $data['product_id'])->exists()) {
-                    $branch->products()->attach($data['product_id'], ['reserved_stock' => 0]);
-                }
-
-                BranchProductBatch::create($data);
-              }
             }
         });
     }
