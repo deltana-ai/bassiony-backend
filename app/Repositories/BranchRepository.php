@@ -60,6 +60,7 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
                 'products.description',
                 'products.price',
                 'products.active',
+               // 'products.bar_code',
                 'products.show_home',
                 'branch_product.reserved_stock'
             ]);
