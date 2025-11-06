@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
-use App\Models\Offer;
+use App\Models\ResponseOffer;
 class UpdateOfferStatusRequest extends FormRequest
 {
     /**
@@ -31,7 +31,8 @@ class UpdateOfferStatusRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $offer = Offer::find($this->route('id')); // أو حسب اسم الـ route parameter
+            $offerId = $this->route('id') ?? $this->id;
+            $offer = ResponseOffer::find($offerId); // أو حسب اسم الـ route parameter
             if (!$offer) {
                 throw ValidationException::withMessages([
                     'offer' => 'العرض غير موجود',
@@ -40,8 +41,10 @@ class UpdateOfferStatusRequest extends FormRequest
 
             $currentStatus = $offer->status;
             $newStatus = $this->status;
+logger(['current' => $currentStatus, 'new' => $offer]);
 
             $allowedTransitions = [
+                  null        => ['pending', 'approved'], // الحالة المبدئية
                 'pending'   => ['approved', 'rejected'],
                 'approved'  => ['delivered', 'canceled'],
                 'delivered' => ['returned', 'completed'],
