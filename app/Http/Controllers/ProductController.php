@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\JsonResponse;
+use App\Http\Requests\FileImportRequest;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Imports\ProductsImport;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+
 class ProductController extends BaseController
 
 {
@@ -121,6 +125,19 @@ class ProductController extends BaseController
     } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
+    }
+
+    	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	 public function import(FileImportRequest $request)
+    {
+        try {
+            $import = Excel::queueImport(new ProductsImport, $request->file('file'));
+
+            return JsonResponse::respondSuccess( 'جاري استيراد المنتجات في الخلفية، سيتم الإشعار عند الانتهاء ');
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+        
     }
  
 

@@ -257,20 +257,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-/////////////////////////////////////////////////////////////////////////////
 
-Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
-
-
-    Route::post('branches/index', [BranchController::class, 'index']);
-    Route::post('branches/restore', [BranchController::class, 'restore']);
-    Route::delete('branches/delete', [BranchController::class, 'destroy']);
-    Route::put('/branches/{id}/{column}', [BranchController::class, 'toggle']);
-    Route::delete('branches/force-delete', [BranchController::class, 'forceDelete']);
-    Route::apiResource('branches', BranchController::class);
-
-
-});
 
 
 

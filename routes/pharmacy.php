@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Dashboard\{
+    BranchController,
     BranchProductController,
     CompanyController,
     CompanyOfferController,
@@ -28,7 +29,7 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     Route::delete('pharmacist/delete', [PharmacistController::class, 'destroy']);
     Route::put('/pharmacist/{id}/{column}', [PharmacistController::class, 'toggle']);
     Route::delete('pharmacist/force-delete', [PharmacistController::class, 'forceDelete']);
-    Route::apiResource('pharmacist', PharmacistController::class);
+    Route::apiResource('pharmacist', PharmacistController::class)->only(["store","show","update"]);
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -38,6 +39,22 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     Route::post('companies/index', [CompanyController::class, 'index']);
     Route::apiResource('companies', CompanyController::class)->only(['show']);
     /////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    Route::post('branches/index', [BranchController::class, 'index']);
+    Route::post('branches/restore', [BranchController::class, 'restore']);
+    Route::delete('branches/delete', [BranchController::class, 'destroy']);
+    Route::put('/branches/{id}/{column}', [BranchController::class, 'toggle']);
+    Route::delete('branches/force-delete', [BranchController::class, 'forceDelete']);
+    Route::apiResource('branches', BranchController::class)->only(["store","show","update"]);
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 

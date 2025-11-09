@@ -43,6 +43,31 @@ class ResponseOfferController extends Controller
         }
     }
 
+    /**
+     *  get warehouse offer orders
+     */
+
+    public function getOfferOrders($warehouse_id)
+    {
+        try{
+
+            $this->authorize('viewAny', ResponseOffer::class);
+
+            if (auth()->guard("employees")->user()->warehouse_id == $warehouse_id) {
+                $offers = ResponseOfferResource::collection($this->crudRepository->all(
+                    ["offer"],
+                    ["warehouse_id"=>auth()->guard("employees")->user()->warehouse_id],
+                    ['*']
+                ));
+            }
+
+            return $offers->additional(JsonResponse::success());
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+        
+    }
+
     public function store(ResponseOfferRequest $request)
     {
         try {
@@ -89,7 +114,7 @@ class ResponseOfferController extends Controller
 
         
         try {
-            
+             
             $this->crudRepository->updateResponse(  $request->validated(),  $responseOffer);
 
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));

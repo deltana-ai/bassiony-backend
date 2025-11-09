@@ -162,14 +162,12 @@ class WarehouseProductController extends BaseController
     public function import(FileImportRequest $request, Warehouse $warehouse)
     {
         try {
-            $import = new WarehouseProductBatchImport($warehouse);
-            Excel::import($import, $request->file('file'));
+          
+            $file = $request->file('file');
 
-            if ($import->failures()->isNotEmpty()) {
-                return JsonResponse::respondError($import->failures());
-            }
-
-            return JsonResponse::respondSuccess( ' تم استيراد البيانات بنجاح');
+            Excel::queueImport(new WarehouseProductBatchImport($warehouse), $file);
+            
+            return JsonResponse::respondSuccess( 'جاري استيراد بيانات الباتشات في الخلفية. سيتم تحديث المخزون تلقائيًا ');
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }

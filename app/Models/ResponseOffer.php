@@ -24,6 +24,11 @@ class ResponseOffer extends BaseModel
         return $this->belongsTo(Pharmacy::class);
     }
 
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
     public static function policy()
     {
         return ResponseOfferPolicy::class;

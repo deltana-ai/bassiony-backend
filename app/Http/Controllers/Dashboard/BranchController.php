@@ -28,7 +28,7 @@ class BranchController extends BaseController
 
             $branches = BranchResource::collection($this->crudRepository->all(
                 ["pharmacy"],
-                ["pharmacy_id"=>auth()->user()->pharmacy_id],
+                ["pharmacy_id"=>auth()->guard("pharmacies")->user()->pharmacy_id],
                 ['*']
             ));
             return $branches->additional(JsonResponse::success());

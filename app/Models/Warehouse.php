@@ -45,6 +45,11 @@ class Warehouse extends BaseModel
         return $this->hasMany(WarehouseProductBatch::class);
     }
 
+    public function responseOffers()
+    {
+        return $this->hasMany(ResponseOffer::class,"warehouse_id");
+    }
+
 
      public function getProductStock(int $productId): int
     {

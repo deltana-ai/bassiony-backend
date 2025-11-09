@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\Constants;
 use App\Models\Product;
+use App\Models\ResponseOffer;
 use App\Models\WarehouseProductBatch;
 
 class WarehouseRepository extends CrudRepository implements WarehouseRepositoryInterface
@@ -132,6 +133,9 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
 
        
     }
+
+    
+    
 
     /**
      * Apply filters to query
@@ -345,6 +349,10 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
         return $query;
     }
 
+
+
+
+    
     /**
      * Get batch status label
      */

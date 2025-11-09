@@ -29,13 +29,10 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
     {
         $validRows = [];
 
-        // استخراج الأكواد الفريدة من الملف مرة واحدة
         $barcodes = $rows->pluck('bar_code')->filter()->unique()->toArray();
 
-        // جلب المنتجات المطابقة للكود
         $products = Product::whereIn('bar_code', $barcodes)->pluck('id', 'bar_code');
 
-        // التحقق من صحة البيانات
         foreach ($rows as $index => $row) {
             if (empty($row['bar_code']) || empty($row['batch_number'])) {
                 continue;
@@ -80,7 +77,6 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
             ];
         }
 
-        // لو في أخطاء → وقفي العملية
         if (!empty($this->errors)) {
             throw new \Exception(json_encode($this->errors, JSON_UNESCAPED_UNICODE));
         }
@@ -125,15 +121,15 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
                 $key = $data['product_id'] . '-' . $batchNumber . '-' . $expiryDate;
 
                 if (isset($existingBatches[$key])) {
-                    // لو batch موجودة بالفعل → زودي المخزون فقط
+                    
                     $existingBatches[$key]->increment('stock', $data['stock']);
                 } else {
-                    // تأكدي إن المنتج مربوط بالمخزن
+                   
                     if (!$branch->products()->where('product_id', $data['product_id'])->exists()) {
                         $branch->products()->attach($data['product_id'], ['reserved_stock' => 0]);
                     }
 
-                    // إنشاء batch جديدة
+                   
                     BranchProductBatch::create($data);
                 }
             }

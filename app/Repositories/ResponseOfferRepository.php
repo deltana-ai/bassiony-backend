@@ -21,7 +21,11 @@ class ResponseOfferRepository extends CrudRepository implements ResponseOfferRep
         $this->model = $model;
     }
 
-   
+    /**
+     *  get warehouse offer orders
+     */
+
+    
 
 
     public function allForCompany($companyId = null)
@@ -83,6 +87,7 @@ class ResponseOfferRepository extends CrudRepository implements ResponseOfferRep
                 case 'approved':
                     $this->deductStockByBatch($product->id, $data["warehouse_id"], $responseOffer->quantity);
                     $offer->decrement('total_quantity', $responseOffer->quantity);
+                    $offer->update(["warehouse_id"=>$data["warehouse_id"]]);
                     break;
 
             }

@@ -132,7 +132,10 @@ Route::middleware(['auth:admins'])->group(function () {
     Route::delete('product/delete', [ProductController::class, 'destroy']);
     Route::put('/product/{id}/{column}', [ProductController::class, 'toggle']);
     Route::delete('product/force-delete', [ProductController::class, 'forceDelete']);
+    Route::post('product/import',[ProductController::class,"import"]);
+
     Route::apiResource('product', ProductController::class)->except(['destroy','index']);
+
 });
 //////////////////////////////////product///////////////////////////////////////////////
 

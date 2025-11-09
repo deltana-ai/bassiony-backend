@@ -11,14 +11,12 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
     /////////////////////////////////////// warehouses //////////////////////////////////////////////
-
-
     Route::post('warehouses/index', [WarehouseController::class, 'index'])->name('warehouses.index');
     Route::post('warehouses/restore', [WarehouseController::class, 'restore']);
     Route::delete('warehouses/delete', [WarehouseController::class, 'destroy']);
     Route::put('/warehouses/{id}/{column}', [WarehouseController::class, 'toggle']);
     Route::delete('warehouses/force-delete', [WarehouseController::class, 'forceDelete']);
-    Route::apiResource('warehouses', WarehouseController::class)->except(['index']);
+    Route::apiResource('warehouses', WarehouseController::class)->except(['index','destroy']);
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -33,12 +31,16 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
 
+
+
     ////////////////////////////////// roles //////////////////////////////////////////////////////
     Route::post('roles/index', [EmployeeRoleController::class, 'index'])->name('roles.index');
     Route::delete('roles/delete', [EmployeeRoleController::class, 'destroy']);
     Route::get('permissions', [EmployeeRoleController::class, 'getPermissions']);
-    Route::apiResource('roles', EmployeeRoleController::class)->except(['index']);
+    Route::apiResource('roles', EmployeeRoleController::class)->except(['index','destroy']);
     //////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 
@@ -50,10 +52,10 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::delete('employees/force-delete', [EmployeeController::class, 'forceDelete']);
     Route::put('/employees/assign-warehouse', [EmployeeController::class, 'assignWarehouse']);
     Route::put('/employees/assign-role', [EmployeeController::class, 'assignRole']);
-    Route::apiResource('employees', EmployeeController::class)->except(['index']);
-
-
+    Route::apiResource('employees', EmployeeController::class)->except(['index','destroy']);
     //////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 
@@ -64,9 +66,7 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::put('warehouses/{warehouse}/products/update/batch',[WarehouseProductController::class,"updateBatchStock"]);
     Route::post('warehouses/{warehouse}/products/store',[WarehouseProductController::class,"addReservedStock"]);
     Route::post('warehouses/{warehouse}/products/import',[WarehouseProductController::class,"import"]);
-
     Route::apiResource('warehouses/{warehouse}/products', WarehouseProductController::class)->only(['show']);
-   
     //////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -81,9 +81,11 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
 
+
+
+
     /////////////////////////////////////////////////////////////////////////////////////////
     Route::post('company-products/index', [CompanyProductController::class,"index"]);
-
     ////////////////////////////////////////////////////////////////////////////////////////
     
 
@@ -97,9 +99,10 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::put('/offers/{id}/{column}', [CompanyOfferController::class, 'toggle']);
     Route::post('offers/restore', [CompanyOfferController::class, 'restore']);
     Route::delete('offers/force-delete', [CompanyOfferController::class, 'forceDelete']);
-
     Route::apiResource('offers', CompanyOfferController::class)->except(['destroy','index']);
     //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 
@@ -110,10 +113,10 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::get('response-offers/{id}', [ResponseOfferController::class, 'show']);
     Route::post('response-offers/restore', [ResponseOfferController::class, 'restore']);
     Route::delete('response-offers/force-delete', [ResponseOfferController::class, 'forceDelete']);
-
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    
 
 
     ////////////////////////profile employee///////////////////////////////////////////////////////////////
