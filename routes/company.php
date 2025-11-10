@@ -141,19 +141,5 @@ Route::get('/warehouse-products/search', [WarehouseProductSearchController::clas
 
 
 
-Route::get('companies/{companyId}/available-products', [CompanyController::class, 'availableProducts']);
 
 
-// pharmacy Order & Cart Routes
-Route::get('/pharmacy/cart', [PharmacyOrderController::class, 'index']);
-Route::post('/pharmacy/cart', [PharmacyOrderController::class, 'store']);
-Route::delete('/pharmacy/cart', [PharmacyOrderController::class, 'destroy']);
-
-// 🧾 pharmacy Order
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/pharmacy/orders', [PharmacyOrderController::class, 'storeOrder']);
-});
-Route::put('company/orders/{id}/status', [CompanyOrderController::class, 'updateStatus']);
-
-
-Route::post('company/orders/{id}/assign', [CompanyOrderController::class, 'assignWarehouse']);

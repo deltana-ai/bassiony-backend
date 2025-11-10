@@ -30,12 +30,14 @@ class PharmacyOrderController extends BaseController
     //     return CartItemResource::collection($items);
     // }
 
-    public function index(Request $request): ?\Illuminate\Http\JsonResponse
+    public function index(Request $request ,$id): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $pharmacyId = $request->pharmacy_id;
+            if ($id != auth()->guard("pharmacists")->user()->pharmacy_id) {
+               return JsonResponse::respondError("Unauthorized"); 
+            }
 
-            $items = CartItem::where('pharmacy_id', $pharmacyId)
+            $items = CartItem::where('pharmacy_id', $id)
                 ->with('product:id,name,price')
                 ->get();
 

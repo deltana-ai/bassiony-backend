@@ -3,7 +3,7 @@
 use App\Http\Controllers\{AddressController, BrandController, CardController, CartController, CategoryController, ProductController,OfferController,FavoriteController, OrderController, PharmacistController, RateController,PillReminderController};
 
 use App\Http\Controllers\PharmacyController;
-use App\Http\Controllers\Dashboard\{BranchController,BranchProductController, CompanyController, WarehouseController,ProductBranchController};
+use App\Http\Controllers\Dashboard\{BranchController,BranchProductController, CompanyController, CompanyOrderController, PharmacyOrderController, WarehouseController,ProductBranchController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
@@ -255,9 +255,23 @@ Route::middleware('auth:sanctum')->group(function () {
 /////////////////////////////////////////////////////////////////////////////
 
 
+Route::get('companies/{companyId}/available-products', [CompanyController::class, 'availableProducts']);
 
 
 
+// pharmacy Order & Cart Routes
+Route::get('/pharmacy/cart/{id}', [PharmacyOrderController::class, 'index']);
+Route::post('/pharmacy/cart', [PharmacyOrderController::class, 'store']);
+Route::delete('/pharmacy/cart', [PharmacyOrderController::class, 'destroy']);
+
+// 🧾 pharmacy Order
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/pharmacy/orders', [PharmacyOrderController::class, 'storeOrder']);
+});
+Route::put('company/orders/{id}/status', [CompanyOrderController::class, 'updateStatus']);
+
+
+Route::post('company/orders/{id}/assign', [CompanyOrderController::class, 'assignWarehouse']);
 
 
 
