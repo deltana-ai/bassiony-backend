@@ -55,7 +55,7 @@ class ResponseOfferController extends Controller
 
             if (auth()->guard("employees")->user()->warehouse_id == $warehouse_id) {
                 $offers = ResponseOfferResource::collection($this->crudRepository->all(
-                    ["offer"],
+                    ["offer","pharmacy","warehouse"],
                     ["warehouse_id"=>auth()->guard("employees")->user()->warehouse_id],
                     ['*']
                 ));
@@ -94,7 +94,7 @@ class ResponseOfferController extends Controller
     {
         try {
             
-            $responseOffer = $this->crudRepository->find($id)->load('offer');
+            $responseOffer = $this->crudRepository->find($id)->load("offer","pharmacy","warehouse");
 
             $this->authorize('view', $responseOffer);
             return JsonResponse::respondSuccess('Item Fetched Successfully', new ResponseOfferResource($responseOffer));
