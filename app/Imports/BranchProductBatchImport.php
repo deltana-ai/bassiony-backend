@@ -122,4 +122,8 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
     {
         return 500; // حجم الـ Chunk
     }
+    public function getErrors()
+    {
+        return $this->errors;
+    }
 }

@@ -159,7 +159,11 @@ class BranchProductController extends BaseController
         try {
             $import = new BranchProductBatchImport($branch);
             Excel::import($import, $request->file('file'));
+            $errors = $import->getErrors();
 
+            if (!empty($errors)) {
+                return JsonResponse::respondError($errors);
+            }
             if ($import->failures()->isNotEmpty()) {
                 return JsonResponse::respondError($import->failures());
             }

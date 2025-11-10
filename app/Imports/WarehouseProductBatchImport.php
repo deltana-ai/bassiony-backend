@@ -122,4 +122,8 @@ class WarehouseProductBatchImport implements ToCollection, WithHeadingRow, Skips
     {
         return 500; // حجم الـ Chunk
     }
+    public function getErrors()
+    {
+        return $this->errors;
+    }
 }

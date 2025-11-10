@@ -165,7 +165,12 @@ class WarehouseProductController extends BaseController
           
             $import = new WarehouseProductBatchImport($warehouse);
             Excel::import($import, $request->file('file'));
+            
+            $errors = $import->getErrors();
 
+            if (!empty($errors)) {
+                return JsonResponse::respondError($errors);
+            }
             if ($import->failures()->isNotEmpty()) {
                 return JsonResponse::respondError($import->failures());
             }

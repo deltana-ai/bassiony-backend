@@ -6,6 +6,7 @@ use App\Helpers\JsonResponse;
 use App\Http\Requests\FileImportRequest;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Imports\ProductImport;
 use App\Imports\ProductsImport;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
@@ -130,13 +131,18 @@ class ProductController extends BaseController
     	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public function import(FileImportRequest $request, Warehouse $warehouse)
+    public function import(FileImportRequest $request)
     {
         try {
           
-            $import = new ProductImport($warehouse);
+            $import = new ProductImport();
             Excel::import($import, $request->file('file'));
+            
+            $errors = $import->getErrors();
 
+            if (!empty($errors)) {
+                return JsonResponse::respondError($errors);
+            }
             if ($import->failures()->isNotEmpty()) {
                 return JsonResponse::respondError($import->failures());
             }
