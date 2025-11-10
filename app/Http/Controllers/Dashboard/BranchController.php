@@ -28,7 +28,7 @@ class BranchController extends BaseController
 
             $branches = BranchResource::collection($this->crudRepository->all(
                 ["pharmacy"],
-                ["pharmacy_id"=>auth()->guard("pharmacies")->user()->pharmacy_id],
+                ["pharmacy_id"=>auth()->guard("pharmacists")->user()->pharmacy_id],
                 ['*']
             ));
             return $branches->additional(JsonResponse::success());
@@ -40,6 +40,7 @@ class BranchController extends BaseController
     public function store(BranchRequest $request)
     {
             try {
+				
                 $data = $this->prepareData( $request);
                 $branch = $this->crudRepository->create($data);
                
@@ -125,7 +126,7 @@ class BranchController extends BaseController
     private Function prepareData(BranchRequest $request)
     {  
         $data = $request->validated();
-        $data['pharmacy_id'] = auth("employees")->user()->pharmacy_id??0;
+        $data['pharmacy_id'] = auth("pharmacists")->user()->pharmacy_id??0;
         return $data;
     }
 

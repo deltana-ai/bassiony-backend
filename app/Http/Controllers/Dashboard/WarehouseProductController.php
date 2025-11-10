@@ -163,11 +163,14 @@ class WarehouseProductController extends BaseController
     {
         try {
           
-            $file = $request->file('file');
+            $import = new WarehouseProductBatchImport($warehouse);
+            Excel::import($import, $request->file('file'));
 
-            Excel::queueImport(new WarehouseProductBatchImport($warehouse), $file);
-            
-            return JsonResponse::respondSuccess( 'جاري استيراد بيانات الباتشات في الخلفية. سيتم تحديث المخزون تلقائيًا ');
+            if ($import->failures()->isNotEmpty()) {
+                return JsonResponse::respondError($import->failures());
+            }
+
+            return JsonResponse::respondSuccess( ' تم استيراد البيانات بنجاح');
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }

@@ -5,109 +5,121 @@ namespace App\Imports;
 use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\WarehouseProductBatch;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Maatwebsite\Excel\Concerns\OnEachRow;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Row;
 
-class WarehouseProductBatchImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, ShouldQueue
+class WarehouseProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnFailure, WithChunkReading, SkipsEmptyRows
 {
+    use SkipsFailures;
+
     protected $warehouse;
+    protected $errors = [];
 
     public function __construct(Warehouse $warehouse)
     {
         $this->warehouse = $warehouse;
     }
 
-    /**
-     * كل صف من الملف يتعامل هنا
-     */
-    public function onRow(Row $row)
+    public function collection(Collection $rows)
     {
-        $data = $row->toArray();
+        // استخراج الأكواد الفريدة في هذا الـ Chunk
+        $barcodes = $rows->pluck('bar_code')->filter()->unique()->toArray();
+        $products = Product::whereIn('bar_code', $barcodes)->pluck('id', 'bar_code');
 
-        if (empty($data['bar_code']) || empty($data['batch_number']) || empty($data['stock'])) {
-            return; // تجاهل الصفوف الفارغة أو الناقصة
-        }
+        $mergedRows = [];
 
-        $data = [
-            'bar_code'     => trim($data['bar_code']),
-            'batch_number' => trim($data['batch_number']),
-            'stock'        => (int) $data['stock'],
-            'expiry_date'  => $data['expiry_date'] ?? null,
-        ];
+        foreach ($rows as $index => $row) {
+            if (empty($row['bar_code']) || empty($row['batch_number'])) continue;
 
-        // التحقق من صحة البيانات
-        $validator = Validator::make($data, [
-            'bar_code'     => 'required|string|exists:products,bar_code',
-            'batch_number' => 'required|string',
-            'stock'        => 'required|integer|min:1',
-            'expiry_date'  => 'nullable|date',
-        ]);
+            $data = [
+                'bar_code'     => trim($row['bar_code']),
+                'batch_number' => trim($row['batch_number']),
+                'stock'        => (int) ($row['stock'] ?? 0),
+                'expiry_date'  => $row['expiry_date'] ?? null,
+            ];
 
-        if ($validator->fails()) {
-            Log::error("Row {$row->getIndex()} validation error: " . json_encode($validator->errors()->all()));
-            return;
-        }
+            $validator = Validator::make($data, [
+                'bar_code'     => 'required|string|exists:products,bar_code',
+                'batch_number' => 'required|string',
+                'stock'        => 'required|integer|min:1',
+                'expiry_date'  => 'nullable|date',
+            ]);
 
-        // جلب المنتج المطابق
-        $product = Product::where('bar_code', $data['bar_code'])->first();
-        if (!$product) {
-            Log::error("Row {$row->getIndex()} error: المنتج ذو الكود {$data['bar_code']} غير موجود.");
-            return;
-        }
+            if ($validator->fails()) {
+                $this->errors[] = [
+                    'row' => $index + 1,
+                    'errors' => $validator->errors()->all(),
+                ];
+                continue;
+            }
 
-        // تجهيز البيانات للـ DB
-        $insertData = [
-            'warehouse_id' => $this->warehouse->id,
-            'product_id'   => $product->id,
-            'batch_number' => $data['batch_number'],
-            'stock'        => $data['stock'],
-            'expiry_date'  => $data['expiry_date'] ? date('Y-m-d', strtotime($data['expiry_date'])) : null,
-        ];
+            if (!isset($products[$data['bar_code']])) {
+                $this->errors[] = [
+                    'row' => $index + 1,
+                    'errors' => ["المنتج ذو الكود {$data['bar_code']} غير موجود."],
+                ];
+                continue;
+            }
 
-        // استخدام Transaction + دمج المخزون
-        DB::transaction(function () use ($insertData) {
-            $key = $insertData['product_id'] . '-' . $insertData['batch_number'] . '-' . ($insertData['expiry_date'] ?? 'null');
+            // دمج الصفوف المتكررة داخل هذا الـ Chunk
+            $key = $products[$data['bar_code']] . '-' . $data['batch_number'] . '-' . ($data['expiry_date'] ?? 'null');
 
-            // جلب الـ batch الموجود إذا كان موجود مسبقًا
-            $existingBatch = WarehouseProductBatch::where('warehouse_id', $insertData['warehouse_id'])
-                ->where('product_id', $insertData['product_id'])
-                ->where('batch_number', $insertData['batch_number'])
-                ->where(function ($q) use ($insertData) {
-                    if ($insertData['expiry_date']) {
-                        $q->where('expiry_date', $insertData['expiry_date']);
-                    } else {
-                        $q->whereNull('expiry_date');
-                    }
-                })
-                ->first();
-
-            if ($existingBatch) {
-                // دمج المخزون
-                $existingBatch->increment('stock', $insertData['stock']);
+            if (isset($mergedRows[$key])) {
+                $mergedRows[$key]['stock'] += $data['stock'];
             } else {
-                // ربط المنتج بالمخزن إذا لم يكن موجود
-                $warehouse = $this->warehouse;
-                if (!$warehouse->products()->where('product_id', $insertData['product_id'])->exists()) {
-                    $warehouse->products()->attach($insertData['product_id'], ['reserved_stock' => 0]);
-                }
+                $mergedRows[$key] = [
+                    'warehouse_id' => $this->warehouse->id,
+                    'product_id'   => $products[$data['bar_code']],
+                    'batch_number' => $data['batch_number'],
+                    'stock'        => $data['stock'],
+                    'expiry_date'  => $data['expiry_date'] ? date('Y-m-d', strtotime($data['expiry_date'])) : null,
+                ];
+            }
+        }
 
-                // إنشاء Batch جديد
-                WarehouseProductBatch::create($insertData);
+        // إدخال أو تحديث البيانات لكل Chunk
+        DB::transaction(function () use ($mergedRows) {
+            $warehouse = $this->warehouse;
+
+            // جلب الـ batches الموجودة بالفعل في المخزن
+            $existingBatches = WarehouseProductBatch::where('warehouse_id', $warehouse->id)
+                ->get(['product_id', 'batch_number', 'expiry_date', 'id', 'stock'])
+                ->mapWithKeys(function ($item) {
+                    $batchNumber = trim($item->batch_number);
+                    $expiryDate = $item->expiry_date ? date('Y-m-d', strtotime($item->expiry_date)) : 'null';
+                    return [$item->product_id . '-' . $batchNumber . '-' . $expiryDate => $item];
+                });
+
+            $toInsert = [];
+
+            foreach ($mergedRows as $data) {
+                $key = $data['product_id'] . '-' . $data['batch_number'] . '-' . ($data['expiry_date'] ?? 'null');
+
+                if (isset($existingBatches[$key])) {
+                    $existingBatches[$key]->increment('stock', $data['stock']);
+                } else {
+                    if (!$warehouse->products()->where('product_id', $data['product_id'])->exists()) {
+                        $warehouse->products()->attach($data['product_id'], ['reserved_stock' => 0]);
+                    }
+                    $toInsert[] = $data;
+                }
+            }
+
+            if (!empty($toInsert)) {
+                WarehouseProductBatch::insert($toInsert);
             }
         });
     }
 
-    /**
-     * قراءة الملف على أجزاء لتقليل استهلاك الذاكرة
-     */
     public function chunkSize(): int
     {
-        return 500; // يمكن تغييره حسب حجم الملف
+        return 500; // حجم الـ Chunk
     }
 }

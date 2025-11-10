@@ -128,12 +128,20 @@ class ProductController extends BaseController
     }
 
     	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	 public function import(FileImportRequest $request)
+///////////////////////////////////////////////////////////////////////////////////////////
+
+    public function import(FileImportRequest $request, Warehouse $warehouse)
     {
         try {
-            $import = Excel::queueImport(new ProductsImport, $request->file('file'));
+          
+            $import = new ProductImport($warehouse);
+            Excel::import($import, $request->file('file'));
 
-            return JsonResponse::respondSuccess( 'جاري استيراد المنتجات في الخلفية، سيتم الإشعار عند الانتهاء ');
+            if ($import->failures()->isNotEmpty()) {
+                return JsonResponse::respondError($import->failures());
+            }
+
+            return JsonResponse::respondSuccess( ' تم استيراد البيانات بنجاح');
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }

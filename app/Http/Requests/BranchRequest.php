@@ -24,8 +24,7 @@ class BranchRequest extends FormRequest
     {
         $rules = [
             'name'        => ['required', 'string', 'max:255'],
-            'pharmacy_id' => ['required', 'exists:pharmacies,id'],
-            'location' => ['required', 'string', 'max:150'],
+           
             'address'     => ['required', 'string', 'max:500'],
             'active'      => ['nullable', 'boolean'],
         ];

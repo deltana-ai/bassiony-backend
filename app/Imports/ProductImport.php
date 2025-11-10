@@ -3,45 +3,71 @@
 namespace App\Imports;
 
 use App\Models\Product;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Maatwebsite\Excel\Concerns\OnEachRow;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Row;
 
-class ProductsImport implements OnEachRow, WithHeadingRow, WithChunkReading, SkipsEmptyRows, ShouldQueue
+class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, WithChunkReading, SkipsEmptyRows
 {
-    public function onRow(Row $row)
-    {
-        $data = $row->toArray();
+    use SkipsFailures;
 
-        if (empty($data['name']) || empty($data['bar_code'])) {
-            return;
+    protected $errors = [];
+
+    public function collection(Collection $rows)
+    {
+        $mergedRows = [];
+
+        foreach ($rows as $index => $row) {
+            if (empty($row['bar_code']) || empty($row['name']) || empty($row['price'])) {
+                continue;
+            }
+
+            $data = [
+                'name'     => trim($row['name']),
+                'bar_code' => trim($row['bar_code']),
+                'description' => $row['description'] ?? null,
+                'price'    => (float) ($row['price'] ?? 0),
+            ];
+
+            $validator = Validator::make($data, [
+                'name'     => 'required|string|max:255',
+                'bar_code' => 'required|string|unique:products,bar_code',
+                'price'    => 'required|numeric|min:0',
+                'description' => 'nullable|string|max:1000',
+            ]);
+
+            if ($validator->fails()) {
+                $this->errors[] = [
+                    'row' => $index + 1,
+                    'errors' => $validator->errors()->all(),
+                ];
+                continue;
+            }
+
+            $key = $data['bar_code'];
+            if (isset($mergedRows[$key])) {
+              
+            } else {
+                $mergedRows[$key] = $data;
+            }
         }
 
-        try {
-            Product::upsert(
-                [[
-                    'bar_code' => $data['bar_code'],
-                    'name' => $data['name'],
-                    'description' => $data['description'] ?? '',
-                    'price' => $data['price'] ?? 0,
-                    'updated_at' => now(),
-                    'created_at' => now(),
-                ]],
-                ['bar_code'],
-                ['name', 'description', 'price', 'updated_at']
-            );
-        } catch (\Exception $e) {
-            Log::error("خطأ في الصف {$row->getIndex()}: {$e->getMessage()}");
+        // Bulk Insert لكل Chunk
+        if (!empty($mergedRows)) {
+            DB::transaction(function () use ($mergedRows) {
+                Product::insert(array_values($mergedRows));
+            });
         }
     }
 
     public function chunkSize(): int
     {
-        return 1000;
+        return 500; // حجم الـ Chunk
     }
 }

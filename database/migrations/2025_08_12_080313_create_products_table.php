@@ -24,6 +24,8 @@ return new class extends Migration
             $table->decimal('rating', 2, 1)->default(0);
             $table->decimal('price', 5, 2)->default(0);
             $table->unsignedInteger('rating_count')->default(0);
+            $table->index(['bar_code']);
+            $table->fullText(['name', 'description']);
             $table->softDeletes();
             $table->timestamps();
         });

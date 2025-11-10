@@ -147,10 +147,14 @@ class CompanyController extends BaseController
             }])
             ->get();
 
-        return response()->json([
-            'company' => $company->name,
-            'products' => ProductResource::collection($products),
-        ]);        }
+           $data = [
+                'company' => $company->name,
+                'products' => ProductResource::collection($products),
+            ];
+          return JsonResponse::respondSuccess('products Fetched Successfully', $data);
+
+    }
+
 
 
 }

@@ -9,11 +9,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnFailure
+class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnFailure, WithChunkReading, SkipsEmptyRows
 {
     use SkipsFailures;
 
@@ -27,20 +29,18 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
 
     public function collection(Collection $rows)
     {
-        $validRows = [];
-
+        // استخراج الأكواد الفريدة في هذا الـ Chunk
         $barcodes = $rows->pluck('bar_code')->filter()->unique()->toArray();
-
         $products = Product::whereIn('bar_code', $barcodes)->pluck('id', 'bar_code');
 
+        $mergedRows = [];
+
         foreach ($rows as $index => $row) {
-            if (empty($row['bar_code']) || empty($row['batch_number'])) {
-                continue;
-            }
+            if (empty($row['bar_code']) || empty($row['batch_number'])) continue;
 
             $data = [
-                'bar_code'     => trim($row['bar_code'] ?? ''),
-                'batch_number' => trim($row['batch_number'] ?? ''),
+                'bar_code'     => trim($row['bar_code']),
+                'batch_number' => trim($row['batch_number']),
                 'stock'        => (int) ($row['stock'] ?? 0),
                 'expiry_date'  => $row['expiry_date'] ?? null,
             ];
@@ -68,71 +68,58 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
                 continue;
             }
 
-            $validRows[] = [
-                'branch_id' => $this->branch->id,
-                'product_id'   => $products[$data['bar_code']],
-                'batch_number' => trim($data['batch_number']),
-                'stock'        => $data['stock'],
-                'expiry_date'  => $data['expiry_date'] ? date('Y-m-d', strtotime($data['expiry_date'])) : null,
-            ];
-        }
-
-        if (!empty($this->errors)) {
-            throw new \Exception(json_encode($this->errors, JSON_UNESCAPED_UNICODE));
-        }
-
-        /**
-         *  الخطوة 1: دمج الصفوف المتكررة داخل نفس الملف
-         * نفس المنتج + نفس الباتش + نفس تاريخ الانتهاء = جمع المخزون
-         */
-        $mergedRows = [];
-        foreach ($validRows as $data) {
-            $key = $data['product_id'] . '-' . $data['batch_number'] . '-' . ($data['expiry_date'] ?? 'null');
+            // دمج الصفوف المتكررة داخل هذا الـ Chunk
+            $key = $products[$data['bar_code']] . '-' . $data['batch_number'] . '-' . ($data['expiry_date'] ?? 'null');
 
             if (isset($mergedRows[$key])) {
                 $mergedRows[$key]['stock'] += $data['stock'];
             } else {
-                $mergedRows[$key] = $data;
+                $mergedRows[$key] = [
+                    'branch_id' => $this->branch->id,
+                    'product_id'   => $products[$data['bar_code']],
+                    'batch_number' => $data['batch_number'],
+                    'stock'        => $data['stock'],
+                    'expiry_date'  => $data['expiry_date'] ? date('Y-m-d', strtotime($data['expiry_date'])) : null,
+                ];
             }
         }
 
-        $validRows = array_values($mergedRows);
-
-        /**
-         * الخطوة 2: إدخال أو تحديث البيانات في الداتابيز
-         */
-        DB::transaction(function () use ($validRows) {
+        // إدخال أو تحديث البيانات لكل Chunk
+        DB::transaction(function () use ($mergedRows) {
             $branch = $this->branch;
 
-            // جلب كل الـ batches الموجودة بالفعل في المخزن
+            // جلب الـ batches الموجودة بالفعل في المخزن
             $existingBatches = BranchProductBatch::where('branch_id', $branch->id)
                 ->get(['product_id', 'batch_number', 'expiry_date', 'id', 'stock'])
                 ->mapWithKeys(function ($item) {
                     $batchNumber = trim($item->batch_number);
                     $expiryDate = $item->expiry_date ? date('Y-m-d', strtotime($item->expiry_date)) : 'null';
-                    return [
-                        $item->product_id . '-' . $batchNumber . '-' . $expiryDate => $item
-                    ];
+                    return [$item->product_id . '-' . $batchNumber . '-' . $expiryDate => $item];
                 });
 
-            foreach ($validRows as $data) {
-                $batchNumber = trim($data['batch_number']);
-                $expiryDate = $data['expiry_date'] ? date('Y-m-d', strtotime($data['expiry_date'])) : 'null';
-                $key = $data['product_id'] . '-' . $batchNumber . '-' . $expiryDate;
+            $toInsert = [];
+
+            foreach ($mergedRows as $data) {
+                $key = $data['product_id'] . '-' . $data['batch_number'] . '-' . ($data['expiry_date'] ?? 'null');
 
                 if (isset($existingBatches[$key])) {
-                    
                     $existingBatches[$key]->increment('stock', $data['stock']);
                 } else {
-                   
                     if (!$branch->products()->where('product_id', $data['product_id'])->exists()) {
                         $branch->products()->attach($data['product_id'], ['reserved_stock' => 0]);
                     }
-
-                   
-                    BranchProductBatch::create($data);
+                    $toInsert[] = $data;
                 }
             }
+
+            if (!empty($toInsert)) {
+                BranchProductBatch::insert($toInsert);
+            }
         });
+    }
+
+    public function chunkSize(): int
+    {
+        return 500; // حجم الـ Chunk
     }
 }
