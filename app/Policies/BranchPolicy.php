@@ -11,8 +11,12 @@ class BranchPolicy
     /**
      * Create a new policy instance.
      */
+    protected $manger_role = "pharmacy_owner";
+    
     public function manage( Pharmacist $user, Branch $branch)
     {
-        return   $user->pharmacy_id === $branch->pharmacy_id;
+        
+        return  $user->pharmacy_id === $branch->id || $user->getRoleNames()->first() === $this->manger_role;
+
     }
 }

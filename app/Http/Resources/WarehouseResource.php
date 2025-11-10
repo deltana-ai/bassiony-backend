@@ -17,7 +17,11 @@ class WarehouseResource extends JsonResource
         return [
          'id' => $this->id,
          'name' => $this->name,
-         'company' => $this->company?->name,
+         'company' =>[
+            "id" =>$this->company?->id,
+            "name" =>$this->company?->name,
+         ],
+          
          'location' => $this->location,
          'active' => (bool) $this->active,
          'createdAt' => $this->created_at ? $this->created_at->format('Y-M-d H:i:s A') : null,

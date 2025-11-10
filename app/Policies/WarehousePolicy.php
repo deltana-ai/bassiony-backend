@@ -9,11 +9,11 @@ use Illuminate\Auth\Access\Response;
 
 class WarehousePolicy
 {
-
+    protected $manger_role = "company_owner";
 
     public function manage( Employee $user, Warehouse $warehouse)
     {
-        return  $user->warehouse_id === $warehouse->id;
+        return  $user->warehouse_id === $warehouse->id || $user->getRoleNames()->first() === $this->manger_role;
     }
     /**
      * Determine whether the user can view any models.
