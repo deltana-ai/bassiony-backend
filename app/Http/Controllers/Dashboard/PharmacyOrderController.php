@@ -104,77 +104,75 @@ class PharmacyOrderController extends BaseController
         }
     }
 
-    public function storeOrder(Request $request): ?\Illuminate\Http\JsonResponse
-    {
-        try {
+public function storeOrder(Request $request): ?\Illuminate\Http\JsonResponse
+{
+    try {
 
-            $validated = $request->validate([
-                'pharmacy_id' => 'required|exists:pharmacies,id',
-                'warehouse_id' => 'required|exists:warehouses,id',
-            ]);
+        $validated = $request->validate([
+            'pharmacy_id' => 'required|exists:pharmacies,id',
+        ]);
 
-            $pharmacyId = $validated['pharmacy_id'];
+        $pharmacyId = $validated['pharmacy_id'];
 
-            $cartItems = CartItem::where('pharmacy_id', $pharmacyId)
-                ->with('product')
-                ->get();
+        $cartItems = CartItem::where('pharmacy_id', $pharmacyId)
+            ->with('product')
+            ->get();
 
-            if ($cartItems->isEmpty()) {
-                return JsonResponse::respondError('السلة فارغة', 400);
-            }
-
-            DB::beginTransaction();
-
-            $order = Order::create([
-                'pharmacy_id'   => $pharmacyId,
-                'pharmacist_id' => auth()->user()->id,
-                'warehouse_id'  => $validated['warehouse_id'], // ✅ أضفنا المخزن
-                'status'        => 'pending',
-                'payment_method'=> 'cash',
-                'total_price'   => 0,
-            ]);
-
-            $total = 0;
-
-            foreach ($cartItems as $item) {
-                $price = $item->product->price ?? 0;
-
-                OrderItem::create([
-                    'order_id'   => $order->id,
-                    'product_id' => $item->product_id,
-                    'quantity'   => $item->quantity,
-                    'price'      => $price,
-                ]);
-
-                $total += $price * $item->quantity;
-            }
-
-            $order->update(['total_price' => $total]);
-
-            CartItem::where('pharmacy_id', $pharmacyId)->delete();
-
-            DB::commit();
-
-            return JsonResponse::respondSuccess(
-                'تم إنشاء الأوردر بنجاح',
-                [
-                    'order_id'    => $order->id,
-                    'total_price' => $total,
-                    'warehouse_id'=> $validated['warehouse_id'],
-                    'status'      => 'pending',
-                ],
-                200
-            );
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-
-            return JsonResponse::respondError(
-                'حدث خطأ أثناء إنشاء الأوردر: ' . $e->getMessage(),
-                500
-            );
+        if ($cartItems->isEmpty()) {
+            return JsonResponse::respondError('السلة فارغة', 400);
         }
+
+        DB::beginTransaction();
+
+        $order = Order::create([
+            'pharmacy_id'   => $pharmacyId,
+            'pharmacist_id' => auth()->user()->id,
+            'status'        => 'pending',
+            'payment_method'=> 'cash',
+            'total_price'   => 0,
+        ]);
+
+        $total = 0;
+
+        foreach ($cartItems as $item) {
+            $price = $item->product->price ?? 0;
+
+            OrderItem::create([
+                'order_id'   => $order->id,
+                'product_id' => $item->product_id,
+                'quantity'   => $item->quantity,
+                'price'      => $price,
+            ]);
+
+            $total += $price * $item->quantity;
+        }
+
+        $order->update(['total_price' => $total]);
+
+        CartItem::where('pharmacy_id', $pharmacyId)->delete();
+
+        DB::commit();
+
+        return JsonResponse::respondSuccess(
+            'تم إنشاء الأوردر بنجاح',
+            [
+                'order_id'    => $order->id,
+                'total_price' => $total,
+                'status'      => 'pending',
+            ],
+            200
+        );
+
+    } catch (\Throwable $e) {
+        DB::rollBack();
+
+        return JsonResponse::respondError(
+            'حدث خطأ أثناء إنشاء الأوردر: ' . $e->getMessage(),
+            500
+        );
     }
+}
+
 
 
 }
