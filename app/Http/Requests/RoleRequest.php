@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PermissionBelongToGuard;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,7 +25,7 @@ class RoleRequest extends FormRequest
     {
         $rules = [
             'name' => ['required', 'string', 'max:90'],
-            'permissions' => ['required', 'array'],
+            'permissions' => ['required', 'array', new PermissionBelongToGuard],
             'permissions.*' => ['exists:permissions,id'],
         ];
         if ($this->isMethod('post')) {

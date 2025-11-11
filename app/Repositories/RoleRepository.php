@@ -22,10 +22,10 @@ class RoleRepository extends CrudRepository implements RoleRepositoryInterface
         $permissions = $data["permissions"];
         $data_create = ['name' => $data["name"],'guard_name'=> auth()->user()->guard_name];
         if (auth()->guard("employees")->check()) {
-           $data_create["company_id"]  =  auth()->user()->company_id;
+           $data_create["company_id"]  =  auth()->guard("employees")->user()->company_id;
         }
         if (auth()->guard("pharmacists")->check()) {
-           $data_create["pharmacy_id"]  =  auth()->user()->pharmacy_id;
+           $data_create["pharmacy_id"]  =  auth()->guard("pharmacists")->user()->pharmacy_id;
         }
         $role = Role::create($data_create);
        
@@ -38,7 +38,7 @@ class RoleRepository extends CrudRepository implements RoleRepositoryInterface
     public function updateRole($role, array $data)
     {
         $permissions = $data["permissions"];
-
+        
         $permissions = Permission::whereIn('id', $permissions)->get(['name'])->toArray();
 
         $role->update(['name' => $data["name"]]);
@@ -58,16 +58,20 @@ class RoleRepository extends CrudRepository implements RoleRepositoryInterface
         DB::transaction(function () use ($roleIds,$user_model) {
             $roles = Role::whereIn('id', $roleIds)->get();
             foreach ($roles as $role) {
-                if ($role->guard_name !== auth()->user()->guard_name || $role->comapany !== auth()->user()->company_id ) {
+                if ($role->guard_name !== auth()->user()->guard_name  ) {
                    continue;
                 }
-                if($role->name === 'company_owner' ){
+                if ($role->guard_name ==="employees" && $role->company_id !== auth()->user()->company_id) {
                     continue;
                 }
-                if ($role->guard_name !== auth()->user()->guard_name) {
+                if ($role->guard_name ==="pharmacists" && $role->pharmacy_id !== auth()->user()->pharmacy_id) {
+                    continue;
+                }
                 
+                if($role->name === 'company_owner' || $role->name === "pharmacy_owner"|| $role->name === "site_owner"){
                     continue;
                 }
+                
                 $usersCount = DB::table('model_has_roles')->where('role_id', $role->id)->where('model_type', $user_model)->count();
                 if ($usersCount > 0 ) {
                     continue;

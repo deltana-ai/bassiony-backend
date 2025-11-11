@@ -24,6 +24,10 @@ class Warehouse extends BaseModel
         return WarehousePolicy::class;
     }
 
+    public function employees()
+    {
+       return $this->belongsToMany(Employee::class,'warehouse_employees'); 
+    }
 
      public function company()
     {

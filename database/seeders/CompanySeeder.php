@@ -48,7 +48,6 @@ class CompanySeeder extends Seeder
             'password' => Hash::make('password123'),
             'phone' => '01000000000',
             'address' => 'Cairo',
-            'warehouse_id' => $warehouse->id,
             'company_id' => $company->id,
             'active' => true,
         ]);

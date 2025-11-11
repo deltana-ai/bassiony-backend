@@ -52,13 +52,13 @@ class PermissionSeeder extends Seeder
             ///////////////////////////////////////////////////////////////
             'warehouse-list' , 'warehouse-create' , 'warehouse-edit' , 'warehouse-delete',
             ////////////////////////////////////////////////////////////////////////////////////////
-            'warehouse-product-list' , 'warehouse-product-create' , 'warehouse-product-edit' , 'warehouse-product-delete',
+            'warehouse-product-list' , 'warehouse-product-create' , 'warehouse-product-edit' , 'warehouse-product-import',
             //////////////////////////////////////////////////////////////////////////
             'company-list','pharmacy-list',
             /////////////////////////////////////////////////////////////////////////
-            'offer-list' , 'offer-create' , 'offer-edit' , 'offer-delete',
+            'company-offer-list' , 'company-offer-create' , 'company-offer-edit' , 'company-offer-delete',
             //////////////////////////////////////////////////////////////////
-            'response_offer-list' , 'response_offer-edit' , 'response_offer-delete',
+            'response_offer-list' , 'response_offer-edit' , 'response_offer-delete','response_offer-order',
             //////////////////////////////////////////////////////////////////
             'product-list' ,
             /////////////////////////////////////////////////////////////
@@ -75,13 +75,13 @@ class PermissionSeeder extends Seeder
             ///////////////////////////////////////////////////////////////
             'branch-list' , 'branch-create' , 'branch-edit' , 'branch-delete',
             ////////////////////////////////////////////////////////////////////////////////////////
-            'branch-product-list' , 'branch-product-create' , 'branch-product-edit' , 'branch-product-delete',
+            'branch-product-list' , 'branch-product-create' , 'branch-product-edit' , 'branch-product-import',
             //////////////////////////////////////////////////////////////////////////
             'company-list','pharmacy-list',
             /////////////////////////////////////////////////////////////////////////
             'offer-list' , 'offer-create' , 'offer-edit' , 'offer-delete',
             //////////////////////////////////////////////////////////////////
-            'response_offer-list' , 'response_offer-create' ,
+            'response_offer-list' , 'response_offer-create','response_offer-cancel' ,
             //////////////////////////////////////////////////////////////////
             'company-offer-list' ,
             //////////////////////////////////////////////////////////////////

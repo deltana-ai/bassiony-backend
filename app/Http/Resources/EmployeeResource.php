@@ -20,10 +20,9 @@ class EmployeeResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'active' => (bool)$this->active,
-            'role' => $this->getRoleNames()->first(),
+            'role' => $this->getRoleNames()?->first(),
             
-            'warehouse_id' => $this->warehouse_id,
-            'warehouse_name' => $this->warehouse?->name,
+            'warehouses' => $this->warehouses? WarehouseResource::collection($this->warehouses):null,
             'company' => $this->company?->id,
             'company' => $this->company?->name,
             'address' => $this->address,

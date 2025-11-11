@@ -31,6 +31,22 @@ class ResponseOfferPolicy
         return in_array($this->getGuard(), ['admins', 'employees', 'pharmacists']);
     }
 
+    public function viewOrders($user ,  $warehouse_id): bool
+    {
+        if($this->getGuard() === "employees")
+        {
+
+           return  $user->warehouses()->contains($warehouse_id) || $user->hasRole("company_owner");
+  
+        }
+        return false;
+        
+    }
+
+    
+
+
+
     public function view($user, ResponseOffer $responseOffer): bool
     {
         $guard = $this->getGuard();

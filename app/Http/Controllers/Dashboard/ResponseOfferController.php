@@ -22,6 +22,14 @@ class ResponseOfferController extends Controller
     public function __construct(ResponseOfferRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+         
+        $this->middleware('permission:response-offer-create|manage-pharmacy', ['only' => [ 'store']]);
+        $this->middleware('permission:response-offer-edit|manage-company', ['only' => [ 'updateStatus']]);
+        $this->middleware('permission:response-offer-order|manage-company', ['only' => [ 'getOfferOrders']]);
+        $this->middleware('permission:response-offer-cancel|manage-pharmacy', ['only' => [ 'cancel']]);
+        $this->middleware('permission:response-offer-list|manage-company|manage-pharmacy|mange-site', ['only' => [ 'show','index']]);
+        $this->middleware('permission:response-offe-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+
     }
 
 
@@ -51,15 +59,14 @@ class ResponseOfferController extends Controller
     {
         try{
 
-            $this->authorize('viewAny', ResponseOffer::class);
+            $this->authorize('viewOrders',$warehouse_id, ResponseOffer::class);
 
-            if (auth()->guard("employees")->user()->warehouse_id == $warehouse_id) {
-                $offers = ResponseOfferResource::collection($this->crudRepository->all(
-                    ["offer","pharmacy","warehouse"],
-                    ["warehouse_id"=>auth()->guard("employees")->user()->warehouse_id],
-                    ['*']
-                ));
-            }
+            $offers = ResponseOfferResource::collection($this->crudRepository->all(
+                ["offer","pharmacy","warehouse"],
+                ["warehouse_id"=>auth()->guard("employees")->user()->warehouse_id],
+                ['*']
+            ));
+            
 
             return $offers->additional(JsonResponse::success());
         } catch (Exception $e) {

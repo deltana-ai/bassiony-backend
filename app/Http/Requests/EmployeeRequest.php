@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\WarehouseBelongToCompany;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -30,7 +31,9 @@ class EmployeeRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\-\s()]+$/'],
             'address' => ['nullable', 'string', 'max:255'],
             'role_id' => ['nullable', 'exists:roles,id'],
-            'warehouse_id' => ['nullable', 'exists:warehouses,id'],
+            'warehouses' => ['nullable', 'array' ,new WarehouseBelongToCompany()],
+
+            'warehouses.*' => ['nullable','integer', 'exists:warehouses,id'],
 
         ];
 

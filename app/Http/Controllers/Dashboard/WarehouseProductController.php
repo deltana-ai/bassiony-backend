@@ -31,6 +31,12 @@ class WarehouseProductController extends BaseController
     public function __construct(WarehouseRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('auth:employees');
+        $this->middleware('permission:warehouse-product-list|manage-company', ['only' => ['index','show']]);
+        $this->middleware('permission:warehouse-product-create|manage-company', ['only' => [ 'addBatch','addReservedStock']]);
+        $this->middleware('permission:warehouse-product-edit|manage-company', ['only' => [ 'updateBatchStock']]);
+        $this->middleware('permission:warehouse-product-import|manage-company', ['only' => [ 'import']]);
+
     }
 
 

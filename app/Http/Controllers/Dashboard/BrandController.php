@@ -17,6 +17,7 @@ class BrandController extends BaseController
     public function __construct(BrandRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+     
     }
 
     public function index()

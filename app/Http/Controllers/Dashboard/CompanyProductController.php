@@ -18,6 +18,7 @@ class CompanyProductController extends BaseController
     public function __construct(CompanyRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+       
     }
     /**
      * Get all products for company with total stock

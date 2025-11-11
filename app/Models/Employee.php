@@ -90,10 +90,11 @@ class Employee extends Authenticatable
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
-
-    public function warehouse()
+    
+    public function warehouses()
     {
-       return $this->belongsTo(Warehouse::class); 
+       return $this->belongsToMany(Warehouse::class,'warehouse_employees'); 
     }
+    
 
 }

@@ -32,7 +32,7 @@ class PharmacyProductController extends BaseController
         ]);
 
         try {
-            $pharmacyId = auth()->guard("employees")->user()->pharmacy_id;
+            $pharmacyId = auth()->guard("pharmacists")->user()->pharmacy_id;
             $products = ProductPharmacyResource::collection($this->crudRepository->getPharmacyProducts($pharmacyId));
             
           

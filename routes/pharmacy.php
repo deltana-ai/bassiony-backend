@@ -10,6 +10,7 @@ use App\Http\Controllers\Dashboard\{
     CompanyOfferController,
     PharmacyOrderController,
     PharmacyProductController,
+    PharmacyRoleController,
     ResponseOfferController
 };
 
@@ -42,6 +43,15 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
 
 
 
+
+
+     ////////////////////////////////// roles //////////////////////////////////////////////////////
+    Route::post('roles/index', [PharmacyRoleController::class, 'index'])->name('roles.index');
+    Route::delete('roles/delete', [PharmacyRoleController::class, 'destroy']);
+    Route::get('permissions', [PharmacyRoleController::class, 'getPermissions']);
+ 
+    Route::apiResource('roles', PharmacyRoleController::class)->except(['index','destroy']);
+    //////////////////////////////////////////////////////////////////////////////////////////////
 
 
 

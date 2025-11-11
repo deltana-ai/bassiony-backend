@@ -7,23 +7,23 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RoleRequest;
 use App\Http\Resources\RoleResource;
 use App\Interfaces\RoleRepositoryInterface;
-use App\Models\Employee;
+use App\Models\Admin;
 use App\Models\Role;
 use Exception;
 use Illuminate\Http\Request;
 
-class EmployeeRoleController extends Controller
+class AdminRoleController extends Controller
 {
     protected mixed $crudRepository;
 
     public function __construct(RoleRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
-        $this->middleware('auth:employees');
-        $this->middleware('permission:role-list|manage-company', ['only' => ['index']]);
-        $this->middleware('permission:role-create|manage-company', ['only' => [ 'store']]);
-        $this->middleware('permission:role-edit|manage-company', ['only' => [ 'update']]);
-        $this->middleware('permission:role-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+        $this->middleware('auth:admins');
+        // $this->middleware('permission:role-list|manage-site', ['only' => ['index']]);
+        // $this->middleware('permission:role-create|manage-site', ['only' => [ 'store']]);
+        // $this->middleware('permission:role-edit|manage-site', ['only' => [ 'update']]);
+        // $this->middleware('permission:role-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
 
     }
 
@@ -33,7 +33,7 @@ class EmployeeRoleController extends Controller
 
             $roles = RoleResource::collection($this->crudRepository->all(
                 [],
-                ["guard_name" => auth()->guard("employees")->user()->guard_name,"company_id"=>auth()->guard("employees")->user()->company_id],
+                ["guard_name" => auth()->guard("admins")->user()->guard_name],
                 ['*']
             ));
             return $roles->additional(JsonResponse::success());
@@ -62,7 +62,7 @@ class EmployeeRoleController extends Controller
             if(!$role){
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_FOUND));
             }
-            if ($role->guard_name !== auth()->guard("employees")->user()->guard_name || $role->company_id!== auth()->guard("employees")->user()->company_id ) {
+            if ($role->guard_name !== auth()->guard("admins")->user()->guard_name ) {
                
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
 
@@ -82,14 +82,15 @@ class EmployeeRoleController extends Controller
             if(!$role){
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_FOUND));
             }
-            if($role->name === 'company_owner' ){
+            if($role->name === 'site_owner' ){
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
             }
-            if ($role->guard_name !== auth()->guard("employees")->user()->guard_name || $role->company_id !== auth()->guard("employees")->user()->company_id ) {
+            if ($role->guard_name !== auth()->guard("admins")->user()->guard_name ) {
                
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
 
             }
+            
             $this->crudRepository->updateRole( $role ,$request->validated());
        
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
@@ -105,7 +106,7 @@ class EmployeeRoleController extends Controller
     {
         try {
            
-            $this->crudRepository->deleteRoles($request['items'],Employee::class);
+            $this->crudRepository->deleteRoles($request['items'],Admin::class);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

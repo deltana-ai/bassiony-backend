@@ -13,7 +13,7 @@ class WarehousePolicy
 
     public function manage( Employee $user, Warehouse $warehouse)
     {
-        return  $user->warehouse_id === $warehouse->id || $user->getRoleNames()->first() === $this->manger_role;
+        return  $user->warehouses()->contains($warehouse->id) || $user->hasRole($this->manger_role);
     }
     /**
      * Determine whether the user can view any models.
