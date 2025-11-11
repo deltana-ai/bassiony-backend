@@ -260,10 +260,12 @@ Route::get('companies/{companyId}/available-products', [CompanyController::class
 
 
 // pharmacy Order & Cart Routes
+Route::middleware('auth:sanctum')->group(function () {
+
 Route::get('/pharmacy/cart/{id}', [PharmacyOrderController::class, 'index']);
 Route::post('/pharmacy/cart', [PharmacyOrderController::class, 'store']);
 Route::delete('/pharmacy/cart', [PharmacyOrderController::class, 'destroy']);
-
+});
 // 🧾 pharmacy Order
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/pharmacy/orders', [PharmacyOrderController::class, 'storeOrder']);

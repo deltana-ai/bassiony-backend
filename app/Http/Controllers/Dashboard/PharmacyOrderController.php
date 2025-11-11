@@ -30,24 +30,32 @@ class PharmacyOrderController extends BaseController
     //     return CartItemResource::collection($items);
     // }
 
-    public function index(Request $request ,$id): ?\Illuminate\Http\JsonResponse
-    {
-        try {
-            if ($id != auth()->guard("pharmacists")->user()->pharmacy_id) {
-               return JsonResponse::respondError("Unauthorized"); 
-            }
-
-            $items = CartItem::where('pharmacy_id', $id)
-                ->with('product:id,name,price')
-                ->get();
-
-            return CartItemResource::collection($items)
-                ->additional(JsonResponse::success())
-                ->response();
-        } catch (Exception $e) {
-            return JsonResponse::respondError($e->getMessage());
+  public function index(Request $request, $id): ?\Illuminate\Http\JsonResponse
+{
+    try {
+        $user = auth()->guard("pharmacists")->user();
+        
+        // تحقق إذا كان المستخدم موجود ومسجل دخوله
+        if (!$user) {
+            return JsonResponse::respondError("يجب تسجيل الدخول أولاً", 401);
         }
+
+        // تحقق إذا كان المستخدم مصرح له للصيدلية
+        if ($id != $user->pharmacy_id) {
+            return JsonResponse::respondError("غير مصرح لك للوصول لهذه الصيدلية"); 
+        }
+
+        $items = CartItem::where('pharmacy_id', $id)
+            ->with('product:id,name,price')
+            ->get();
+
+        return CartItemResource::collection($items)
+            ->additional(JsonResponse::success())
+            ->response();
+    } catch (Exception $e) {
+        return JsonResponse::respondError($e->getMessage());
     }
+}
 
 
 
