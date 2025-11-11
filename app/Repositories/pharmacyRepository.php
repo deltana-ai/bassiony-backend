@@ -49,7 +49,7 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
 
             $employee ->assignRole("pharmacy_owner");
 
-            $employee->notify(new SendPassword($password ,$this->dashboard_type));
+           // $employee->notify(new SendPassword($password ,$this->dashboard_type));
 
             return ["employee"=>$employee,"password"=>$password] ;
         });
