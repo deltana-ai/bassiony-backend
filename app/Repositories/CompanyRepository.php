@@ -35,22 +35,19 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             $employee_data = $this->handleData($data);
 
             unset($data["email"]);
+            unset($data["password"]);
             
             $company = $this->create($data);
 
             $employee_data["company_id"] = $company->id;
 
-            $password = $employee_data["un_hash"];
-
-            unset($employee_data["un_hash"]);
 
             $employee = $this->employee_repo->create($employee_data);
             
             $employee ->assignRole("company_owner");
             
-            //$employee->notify(new SendPassword($password ,$this->dashboard_type));
 
-            return ["employee"=>$employee,"password"=>$password] ;
+            return $employee ;
         });
 
     }
@@ -62,6 +59,7 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             $employee_data = $this->handleData($data);
 
             unset($data["email"]);
+            unset($data["password"]);
 
             $company = $this->find($company_id);
 
@@ -69,17 +67,11 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
              
             $employee_data["company_id"] = $company->id;
 
-            $password = $employee_data["un_hash"];
-
-            unset($employee_data["un_hash"]);
-
-            $employee = Employee::where('is_owner',1)->first();
+            $employee = Employee::where('company_id', $company_id)->where('is_owner',1)->first();
       
             $employee ->update($employee_data);
             
-         //   $employee->notify(new SendPassword($password ,$this->dashboard_type));
-
-            return ["employee"=>$employee,"password"=>$password] ;
+            return $employee ;
         });
 
     }
@@ -104,7 +96,7 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             ->whereIn('id', $ids)
             ->restore();
 
-            $this->employee_repo->model::withTrashed()
+            Employee::withTrashed()
                 ->whereIn('company_id', $ids)
                 ->restore();
         });
@@ -118,16 +110,13 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
 
         $code = rand(1000,9999);
 
-        $password = rand(1000,9999)."Admin".rand(1000,9999);
-
         $employee["name"] = $data["name"]."_admin".$code ;
 
         $employee["active"] = 1;
 
         $employee["email"] = $data["email"];
 
-        $employee["password"] = Hash::make($password) ;
-        $employee["un_hash"] = $password; 
+        $employee["password"] = Hash::make($data["password"]) ;
        
         $employee["is_owner"] = 1;
         return $employee;

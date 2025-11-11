@@ -29,6 +29,8 @@ class CompanyRequest extends FormRequest
             'address' => 'nullable|string|max:500',
             'phone'   => 'nullable|string|max:20|regex:/^[0-9+\-\s()]+$/',
             'email' => 'required|string|email',
+            'password' => 'required|string|min:6|confirmed',
+            
 
         ];
          if ($this->isMethod('post')) {
@@ -38,10 +40,11 @@ class CompanyRequest extends FormRequest
         }
         else{
             $company = $this->route('company')?? $this->route('id');
-            if(Auth::guard('employees')->check()){ 
-                $company = Company::find(auth("employees")->user()->company_id);
-            }
-            $employee = Employee::where('is_owner',1)->first();
+            // if(Auth::guard('employees')->check()){ 
+            //     $company = Company::find(auth("employees")->user()->company_id);
+            // }
+            $employee = Employee::where('company_id', $company->id)->where('is_owner',1)->first();
+            
             $rules['name'] = "$rules[name]|".Rule::unique('companies','name')->ignore($company->id);
             $rules['email'] = "$rules[email]|".Rule::unique('employees','email')->ignore($employee->id);
 

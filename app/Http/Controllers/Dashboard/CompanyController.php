@@ -46,9 +46,9 @@ class CompanyController extends BaseController
 
                 $employee = $this->crudRepository->createCompanywithUser($request->validated());
 
-                $employee["employee"]->load("roles");
+                $employee->load("roles");
 
-                return JsonResponse::respondSuccess('Item created Successfully', ["company owner"=>new EmployeeResource($employee["employee"]),"password"=>$employee["password"]]);
+                return JsonResponse::respondSuccess('Item created Successfully', new EmployeeResource($employee));
 
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
@@ -71,14 +71,13 @@ class CompanyController extends BaseController
     public function update(CompanyRequest $request, Company $company)
     {
         try {
-
             $this->authorize('update', $company);
 
             $employee = $this->crudRepository->updateCompanywithUser($request->validated(), $company->id);
 
-            $employee["employee"]->load("roles");
+            $employee->load("roles");
 
-            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), ["company owner"=>new EmployeeResource($employee["employee"]),"password"=>$employee["password"]]);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), new EmployeeResource($employee));
 
 
         } catch (\Throwable $th) {

@@ -42,9 +42,9 @@ class PharmacyController extends BaseController
             try {
                 $employee = $this->crudRepository->createPharmacywithUser($request->validated());
                 
-                $employee["employee"]->load("roles");
+                $employee->load("roles");
                 
-                return JsonResponse::respondSuccess('Item created Successfully', ["pharmacy owner"=>new PharmacistResource($employee["employee"]),"password"=>$employee["password"]]);
+                return JsonResponse::respondSuccess('Item created Successfully', new PharmacistResource($employee));
             
                 
             } catch (Exception $e) {
@@ -67,9 +67,9 @@ class PharmacyController extends BaseController
 
         $employee = $this->crudRepository->updatePharmacywithUser($request->validated(), $pharmacy->id);
        
-        $employee["employee"]->load("roles");
+        $employee->load("roles");
                 
-        return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), ["pharmacy owner"=>new PharmacistResource($employee["employee"]),"password"=>$employee["password"]]);
+        return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), new PharmacistResource($employee));
            
 
     }
