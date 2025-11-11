@@ -77,7 +77,7 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
       
             $employee ->update($employee_data);
             
-            $employee->notify(new SendPassword($password ,$this->dashboard_type));
+         //   $employee->notify(new SendPassword($password ,$this->dashboard_type));
 
             return ["employee"=>$employee,"password"=>$password] ;
         });
