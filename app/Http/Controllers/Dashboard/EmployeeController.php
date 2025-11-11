@@ -95,10 +95,10 @@ class EmployeeController extends BaseController
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $employees = Employee::whereIn('id', $request->items)->get();
-
-            foreach ($employees as $employee) {
-                $this->authorize('manage', $employee); 
+            $company_id = auth()->guard("employees")->user()->company_id;
+            $employees = Employee::whereIn('id', $request->items)->where("company_id",$company_id)->get();
+            if(count($request['items']) != $employees->count()){
+                return JsonResponse::respondError("يوجد موظفين غير موجودة");
             }
             $this->crudRepository->deleteRecords('employees', $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
@@ -110,11 +110,13 @@ class EmployeeController extends BaseController
     public function restore(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $employees = Employee::whereIn('id', $request->items)->get();
-
-            foreach ($employees as $employee) {
-                $this->authorize('manage', $employee); 
+            $company_id = auth()->guard("employees")->user()->company_id;
+            $employees = Employee::whereIn('id', $request->items)->where("company_id",$company_id)->get();
+            if(count($request['items']) != $employees->count()){
+                return JsonResponse::respondError("يوجد موظفين غير موجودة");
             }
+
+            
             $this->crudRepository->restoreItem(Employee::class, $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_RESTORED_SUCCESSFULLY));
         } catch (Exception $e) {
@@ -128,10 +130,13 @@ class EmployeeController extends BaseController
     public function forceDelete(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $employees = Employee::whereIn('id', $request->items)->get();
+            $company_id = auth()->guard("employees")->user()->company_id;
+            $employees = Employee::whereIn('id', $request->items)->where("company_id",$company_id)->get();
+            if(count($request['items']) != $employees->count()){
+                return JsonResponse::respondError("يوجد موظفين غير موجودة");
+            }
             DB::beginTransaction();
             foreach ($employees as $employee) {
-                $this->authorize('manage', $employee); 
                 $employee->roles()->detach();
                 $employee->warehouses()->detach();
             }

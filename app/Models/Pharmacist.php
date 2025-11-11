@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Policies\PharmacistPolicy;
 use App\Traits\HasMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,6 +30,10 @@ class Pharmacist extends Authenticatable
     public function points()
     {
         return $this->hasMany(Point::class, 'pharmacist_id');
+    }
+    public static function policy()
+    {
+        return PharmacistPolicy::class;
     }
 
     public function pharmacy()

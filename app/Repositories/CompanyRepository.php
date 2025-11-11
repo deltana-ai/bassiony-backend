@@ -115,8 +115,10 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
         $employee["active"] = 1;
 
         $employee["email"] = $data["email"];
+        if (isset($data["password"])) {
+             $employee["password"] = Hash::make($data["password"]) ;
 
-        $employee["password"] = Hash::make($data["password"]) ;
+        }
        
         $employee["is_owner"] = 1;
         return $employee;

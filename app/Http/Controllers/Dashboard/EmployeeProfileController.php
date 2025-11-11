@@ -34,7 +34,7 @@ class EmployeeProfileController extends Controller
         
         try {
             $user = auth('employees')->user();
-            $employee =Employee::where('email', $user->email)->first();
+            $employee = Employee::where('email', $user->email)->first();
             if (Hash::check($request->current_password, $employee->password)) {
 
                 $employee->update([

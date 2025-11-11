@@ -20,10 +20,10 @@ class PharmacyRoleController extends Controller
     {
         $this->crudRepository = $pattern;
         $this->middleware('auth:pharmacists');
-        $this->middleware('permission:role-list|manage-company', ['only' => ['index']]);
-        $this->middleware('permission:role-create|manage-company', ['only' => [ 'store']]);
-        $this->middleware('permission:role-edit|manage-company', ['only' => [ 'update']]);
-        $this->middleware('permission:role-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+        $this->middleware('permission:role-list|manage-pharmacy', ['only' => ['index','show']]);
+        $this->middleware('permission:role-create|manage-pharmacy', ['only' => [ 'store']]);
+        $this->middleware('permission:role-edit|manage-pharmacy', ['only' => [ 'update']]);
+        $this->middleware('permission:role-delete|manage-pharmacy', ['only' => ['destroy','restore','forceDelete']]);
 
     }
 

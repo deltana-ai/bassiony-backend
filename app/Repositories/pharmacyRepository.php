@@ -115,8 +115,10 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
         $employee["active"] = 1;
 
         $employee["email"] = $data["email"];
+        if (isset($data["password"])) {
+             $employee["password"] = Hash::make($data["password"]) ;
 
-        $employee["password"] = Hash::make($password) ;
+        }
      
         $employee["is_owner"] = 1;
         return $employee;

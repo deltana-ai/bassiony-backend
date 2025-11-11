@@ -10,6 +10,7 @@ use App\Models\Admin;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class AdminController extends BaseController
 {
@@ -18,6 +19,10 @@ class AdminController extends BaseController
     public function __construct(AdminRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('permission:admin-list|manage-site', ['only' => ['index']]);
+        $this->middleware('permission:admin-create|manage-site', ['only' => [ 'store']]);
+        $this->middleware('permission:admin-edit|manage-site', ['only' => [ 'update']]);
+        $this->middleware('permission:admin-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
     }
 
     public function index()
@@ -37,7 +42,14 @@ class AdminController extends BaseController
     public function store(AdminRequest $request)
     {
         try {
-            $admin = $this->crudRepository->create($request->validated());
+            $role = Role::where('id',$request->role_id)->where('guard_name',"admins")->first();
+
+            $admin = $this->crudRepository->create($request->except(["role_id"]));
+            if (!$role) {
+
+                throw new \Exception("الدور الوظيفي غير موجود");
+            }
+            $admin->assignRole($role);
             return new AdminResource($admin);
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -57,7 +69,13 @@ class AdminController extends BaseController
     public function update(AdminRequest $request, Admin $admin)
     {
         try {
-            $this->crudRepository->update($request->validated(), $admin->id);
+            $role = Role::where('id',$request->role_id)->where('guard_name',"admins")->first();
+            $this->crudRepository->update($request->except(["role_id"]), $admin->id);
+            if (!$role) {
+
+                throw new \Exception("الدور الوظيفي غير موجود");
+            }
+            $admin->syncRoles($role);
             activity()->performedOn($admin)->withProperties(['attributes' => $admin])->log('update');
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
         } catch (Exception $e) {
@@ -92,7 +110,12 @@ class AdminController extends BaseController
     public function forceDelete(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
+            $admins = Admin::whereIn('id', $request->items)->get();
+
             $this->crudRepository->deleteRecordsFinial(Admin::class, $request['items']);
+            foreach ($admins as $admin) {
+                $admin->roles()->detach();
+            }
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_FORCE_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
