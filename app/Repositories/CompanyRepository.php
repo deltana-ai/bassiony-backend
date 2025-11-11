@@ -48,7 +48,7 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             
             $employee ->assignRole("company_owner");
             
-            $employee->notify(new SendPassword($password ,$this->dashboard_type));
+            //$employee->notify(new SendPassword($password ,$this->dashboard_type));
 
             return ["employee"=>$employee,"password"=>$password] ;
         });
