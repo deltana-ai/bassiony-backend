@@ -49,6 +49,7 @@ class CompanySeeder extends Seeder
             'phone' => '01000000000',
             'address' => 'Cairo',
             'company_id' => $company->id,
+            'is_owner' => true,
             'active' => true,
         ]);
         $superManger = Role::firstOrCreate(['name' => 'company_owner','guard_name'=>'employees',"company_id"=>$company->id]);

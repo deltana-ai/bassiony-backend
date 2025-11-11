@@ -53,6 +53,7 @@ class PharmacySeeder extends Seeder
             'password' => Hash::make('passwordPharmacy123'),
             'phone' => '01000000001',
             'pharmacy_id' => Pharmacy::first()->id,
+            'is_owner' => 1,
             'branch_id' => Branch::first()->id,
         ]);
         $pharmacy_permissions = Permission::where('guard_name','pharmacists')->pluck('name')->toArray();

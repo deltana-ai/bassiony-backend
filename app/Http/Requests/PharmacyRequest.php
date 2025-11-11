@@ -29,13 +29,14 @@ class PharmacyRequest extends FormRequest
             'phone'          => ['nullable', 'string', 'max:20'],
             'license_number' => ['nullable', 'string', 'max:100'],
             'email' => ['required','string', 'email'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'password' => [ 'string', 'min:6', 'confirmed'],
 
         
         ];
         if ($this->isMethod('post')) {
           $rules['license_number'][] = 'unique:pharmacies,license_number';
           $rules['email'] []= 'unique:pharmacists,email';
+          $rules['password'] []= 'required';
 
         }
         else{
@@ -45,6 +46,7 @@ class PharmacyRequest extends FormRequest
 
             $rules['license_number'][] = Rule::unique('pharmacies','license_number')->ignore($pharmacy->id);
             $rules['email'] = Rule::unique('pharmacists','email')->ignore($pharmacist->id);
+            $rules['password'] []= 'nullable';
 
         }
         return $rules;

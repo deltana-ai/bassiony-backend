@@ -30,7 +30,7 @@ class PharmacyController extends BaseController
     public function index()
     {
         try {
-
+                
             $pharmacies = PharmacyResource::collection($this->crudRepository->all(
                 [],
                 [],

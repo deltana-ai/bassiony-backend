@@ -103,6 +103,7 @@ class PermissionSeeder extends Seeder
          foreach ($pharmacist_permissions as $permission) {
            Permission::create(['name' => $permission,'guard_name'=>'pharmacists']);
          }
+         
 
 
     }

@@ -29,13 +29,14 @@ class CompanyRequest extends FormRequest
             'address' => 'nullable|string|max:500',
             'phone'   => 'nullable|string|max:20|regex:/^[0-9+\-\s()]+$/',
             'email' => 'required|string|email',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'string|min:6|confirmed',
             
 
         ];
          if ($this->isMethod('post')) {
           $rules['name'] = $rules['name'].'|unique:companies,name';
           $rules['email'] = $rules['email'].'|unique:employees,email';
+          $rules['password'] = $rules['password'].'|required';
 
         }
         else{
@@ -47,7 +48,7 @@ class CompanyRequest extends FormRequest
             
             $rules['name'] = "$rules[name]|".Rule::unique('companies','name')->ignore($company->id);
             $rules['email'] = "$rules[email]|".Rule::unique('employees','email')->ignore($employee->id);
-
+            $rules['password'] = $rules['password'].'|nullable';
         }
         return $rules;
     }
