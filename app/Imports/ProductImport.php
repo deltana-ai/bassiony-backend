@@ -31,28 +31,30 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
             }
            
             $data = [
-                'name'     => trim($row['name']),
-                'bar_code' => trim($row['bar_code']),
-                'description' => $row['description'] ?? null,
-                'price'    => (float) ($row['price'] ?? 0),
-                'brand_name' => trim($row['brand_name']),
-                'category_name' => trim($row['category_name']),
-                'active' => filter_var($row['active'], FILTER_VALIDATE_BOOLEAN),
-                'show_home' => filter_var($row['show_home'], FILTER_VALIDATE_BOOLEAN),
-                'position' => $row['position'] 
+                'name_en'     => trim($row['Name_en']),
+                'name_ar'     => trim($row['Name_ar']),
+                'bar_code' => trim($row['BarCode']),
+                'gtin' => trim($row['GTIN']),
+                'dosage_form' => trim($row['DosageForm']),
+                'scientific_name' => trim($row['ScientificName']),
+                'active_ingredients' => trim($row['ActiveIngredients']),
+                'description' => trim($row['Description']),
+                'active' => (bool) ($row['Active'] ?? false),
+                'price'    => (float) ($row['Price'] ?? 0),
             ];
             
 
             $validator = Validator::make($data, [
-                'name'     => 'required|string|max:255',
-                'bar_code' => 'required|string|unique:products,bar_code',
-                'price'    => 'required|numeric|min:0',
+                'name_en'     => 'nullable|string|max:255',
+                'name_ar'     => 'nullable|string|max:255',
+                'gtin' => 'nullable|string|required_without:bar_code|unique:products,gtin',
+                'bar_code' => 'nullable|string|required_without:gtin|unique:products,bar_code',
+                'dosage_form' => 'nullable|string|max:225',
+                'scientific_name' => 'nullable|string|max:255',
+                'active_ingredients' => 'nullable|string|max:1000',
                 'description' => 'nullable|string|max:1000',
-                'brand_name' => 'required|string|max:255',
-                'category_name' => 'required|string|max:255',
-                'active' => 'required|boolean',
-                'show_home' => 'required|boolean',
-                'position' => 'required|integer|min:1',
+                'active' => 'nullable|boolean',
+                'price'    => 'nullable|numeric|min:0',
             ]);
             
             if ($validator->fails()) {
@@ -64,13 +66,9 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
                 continue;
             }
 
-            $brand = Brand::firstOrCreate(['name' => $data['brand_name']]);
-            $category = Category::firstOrCreate(['name' => $data['category_name']]);
+            $category = Category::firstOrCreate(['name' => "فئة مجهولة"]);
 
             $key = $data['bar_code'];
-            unset($data['category_name']);
-            unset($data['brand_name']);
-            $data['brand_id'] = $brand->id;
             $data['category_id'] = $category->id;
           // dd($data);
             if (isset($mergedRows[$key])) {

@@ -20,6 +20,11 @@ class BranchProduct2Resource extends JsonResource
          return [
             'id' => $this->id,
             'name' => $this->name,
+            'scientific_name' => $this->scientific_name,
+            'active_ingredients' => $this->active_ingredients,
+            'dosage_form' => $this->dosage_form,
+             'gtin' => $this->gtin,
+            'bar_code' => $this->bar_code,
             'description' => $this->description,
             'price' => (float) $this->price,
             'active' => (bool) $this->active,

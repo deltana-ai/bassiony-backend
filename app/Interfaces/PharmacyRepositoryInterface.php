@@ -14,5 +14,7 @@ interface PharmacyRepositoryInterface extends ICrudRepository
     public function deletePharmacywithUsers(array $ids );
     
     public function restorePharmacywithUsers(array $ids );
+    
     public function getPharmacyProducts(int $pharmacyId);
+
 }

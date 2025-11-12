@@ -11,6 +11,7 @@ use App\Interfaces\PharmacyRepositoryInterface;
 use App\Models\PharmacyProduct;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PharmacyProductController extends BaseController
 {
@@ -33,6 +34,7 @@ class PharmacyProductController extends BaseController
 
         try {
             $pharmacyId = auth()->guard("pharmacists")->user()->pharmacy_id;
+            
             $products = ProductPharmacyResource::collection($this->crudRepository->getPharmacyProducts($pharmacyId));
             
           

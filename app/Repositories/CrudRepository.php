@@ -23,6 +23,7 @@ class CrudRepository implements ICrudRepository
     {
         $order_by = request(Constants::ORDER_BY) ?? "id";
         $deleted = request(Constants::Deleted) ?? false;
+        
         $order_by_direction = request(Constants::ORDER_By_DIRECTION) ?? "asc";
         $filter_operator = request(Constants::FILTER_OPERATOR) ?? "=";
         $filters = request(Constants::FILTERS) ?? [];
@@ -40,6 +41,10 @@ class CrudRepository implements ICrudRepository
             } else {
                 $query = $query->where($key, 'LIKE', '%' . $value . '%');
             }
+        }
+        if($search_index = request('search_index')){
+            return  $query->whereRaw("MATCH(products.search_index) AGAINST(? IN BOOLEAN MODE)", [$search_index]);
+
         }
         if (isset($order_by) && !empty($with))
             $query = $query->with($with)->orderBy($order_by, $order_by_direction);

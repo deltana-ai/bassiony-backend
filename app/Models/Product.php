@@ -21,6 +21,38 @@ class Product extends BaseModel
         'show_home' => 'boolean'
     ];
 
+    protected $appends = ['name'];
+    public function getNameAttribute(){
+        $ar = $this->name_ar;
+        $en = $this->name_en;
+        if ($ar && $en) {
+            return "{$ar}  -  {$en}";
+        }
+        return $ar ?: $en ?: '';
+    }
+
+     public function scopeSearch($query, $term)
+    {
+        return $query->whereRaw(
+            "MATCH(search_index) AGAINST(? IN BOOLEAN MODE)",
+            [$term]
+        );
+    }
+    protected static function booted()
+    {
+        static::saving(function($product){
+            $product->search_index = implode('-',array_filter([
+                $product->name_ar,  
+                $product->name_en, 
+                $product->scientific_name, 
+                $product->active_ingredients, 
+                $product->dosage_form, 
+                $product->description, 
+               
+            ]));
+        });
+    }
+
     public function offers()
     {
         return $this->belongsToMany(Offer::class, 'offer_product');

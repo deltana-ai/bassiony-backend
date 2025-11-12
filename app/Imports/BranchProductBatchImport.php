@@ -31,7 +31,8 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
     {
         // استخراج الأكواد الفريدة في هذا الـ Chunk
         $barcodes = $rows->pluck('bar_code')->filter()->unique()->toArray();
-        $products = Product::whereIn('bar_code', $barcodes)->pluck('id', 'bar_code');
+        $gtins = $rows->pluck('GTIN')->filter()->unique()->toArray();
+        $products = Product::whereIn('bar_code', $barcodes)->orWhereIn('gtin', $gtins)->pluck('id', 'bar_code');
 
         $mergedRows = [];
 
@@ -40,6 +41,7 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
 
             $data = [
                 'bar_code'     => trim($row['bar_code']),
+                'gtin' => trim($row['GTIN']),
                 'batch_number' => trim($row['batch_number']),
                 'stock'        => (int) ($row['stock'] ?? 0),
                 'expiry_date'  => $row['expiry_date'] ?? null,
@@ -47,6 +49,8 @@ class BranchProductBatchImport implements ToCollection, WithHeadingRow, SkipsOnF
 
             $validator = Validator::make($data, [
                 'bar_code'     => 'required|string|exists:products,bar_code',
+                'gtin' => 'nullable|string|required_without:bar_code|unique:products,gtin',
+                'bar_code' => 'nullable|string|required_without:gtin|unique:products,bar_code',
                 'batch_number' => 'required|string',
                 'stock'        => 'required|integer|min:1',
                 'expiry_date'  => 'nullable|date',

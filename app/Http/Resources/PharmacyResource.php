@@ -22,7 +22,6 @@ class PharmacyResource extends JsonResource
             'address'        => $this->address ?? null,
             'phone'        => $this->phone ?? null,
             'license_number'  => $this->license_number ?? null,
-            'owner_email' => $owner->email ?? null,
             'imageUrl'    => $this->getFirstMediaUrl(),
             'image'       => new MediaResource($this->getFirstMedia()),
             'avg_rate'    => round($this->ratings_av_rate,1),

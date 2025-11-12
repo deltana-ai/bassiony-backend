@@ -14,4 +14,6 @@ class ProductRepository extends CrudRepository implements ProductRepositoryInter
     {
         $this->model = $model;
     }
+
+    
 }

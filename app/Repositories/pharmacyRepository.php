@@ -138,17 +138,23 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
         $query = Product::query()
             ->select([
                 'products.id',
-                'products.name',
+                'products.name_ar',
+                'products.name_en',
                 'products.description',
                 'products.price',
                 'products.active',
-                'products.show_home',
                 'products.rating',
                 'products.bar_code',
+                'products.qr_code',
+                'products.gtin',
+                'products.scientific_name',
+                'products.active_ingredients',
+                'products.dosage_form',
                 'products.category_id',
                 'products.brand_id',
                 'categories.name as category_name',
                 'brands.name as brand_name',
+                DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
                 DB::raw('COALESCE(SUM(branch_product.reserved_stock), 0) as total_reserved_stock'),
                 DB::raw('COALESCE(SUM(branch_product_batches.stock), 0) as total_stock'),
                 DB::raw('COUNT(DISTINCT branch_product_batches.id) as total_batches'),
@@ -168,13 +174,18 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
             ->groupBy([
                 'products.id',
-                'products.name',
+                'products.name_ar',
+                'products.name_en',
                 'products.description',
                 'products.price',
                 'products.active',
-                'products.show_home',
                 'products.rating',
                 'products.bar_code',
+                'products.qr_code',
+                'products.gtin',
+                'products.scientific_name',
+                'products.active_ingredients',
+                'products.dosage_form',
                 'products.category_id',
                 'products.brand_id',
                 'categories.name',
@@ -186,16 +197,8 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
 
         // Apply sorting
         $query->orderBy($sortBy, $sortOrder);
+        return $paginate ? $query->paginate($perPage) : $query->get();
 
-        if ($paginate) {
-            $products = $query->paginate($perPage);
-            
-            
-            
-            return $products;
-        } else {
-            return $query->get();
-        }
     
         
     }
@@ -217,17 +220,12 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
                 
                 // Search (name, description, barcode)
                 case 'search':
-                    $query->where(function ($q) use ($value) {
-                        $q->where('products.name', 'LIKE', '%' . $value . '%')
-                          ->orWhere('products.description', 'LIKE', '%' . $value . '%')
-                          ->orWhere('products.bar_code', 'LIKE', '%' . $value . '%');
-                    });
+                    $query->whereRaw("MATCH(products.search_index) AGAINST(? IN BOOLEAN MODE)", [$value]);
+
                     break;
 
                 // Product name only
-                case 'product_name':
-                    $query->where('products.name', 'LIKE', '%' . $value . '%');
-                    break;
+                
 
                 // Barcode exact or partial match
                 case 'bar_code':
@@ -237,15 +235,19 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
                 case 'bar_code_exact':
                     $query->where('products.bar_code', $value);
                     break;
+                case 'qr_code':
+                    $query->where('products.qr_code', $value);
+                    break;
 
+                case 'gtin':
+                    $query->where('products.gtin', $value);
+                    break;
                 // Product status
                 case 'active':
                     $query->where('products.active', (bool) $value);
                     break;
 
-                case 'show_home':
-                    $query->where('products.show_home', (bool) $value);
-                    break;
+              
 
                 // Price filters
                 case 'min_price':

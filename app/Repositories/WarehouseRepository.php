@@ -26,65 +26,60 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
      */
     public function getWarehouseProducts(int $warehouseId)
     {
-       
-    
         $filters = request(Constants::FILTERS) ?? [];
         $perPage = request(Constants::PER_PAGE) ?? 15;
         $paginate = request(Constants::PAGINATE) ?? true;
         $sortOrder = request(Constants::ORDER_By_DIRECTION) ?? "asc";
         $sortBy = request(Constants::ORDER_BY) ?? "products.id";
 
-         $query = Product::query()
+        $query = Product::query()
             ->select([
                 'products.id',
-                'products.name',
-                'products.description',
-                'products.price',
+                'products.name_ar',
+                'products.name_en',
                 'products.active',
-                'products.show_home',
+                'products.bar_code',
+                'products.qr_code',
+                'products.gtin',
+                'products.scientific_name',
+                'products.active_ingredients',
+                'products.description',
+                'products.dosage_form',
+                'products.price',
                 'warehouse_product.reserved_stock',
+                DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
                 DB::raw('COALESCE(SUM(warehouse_product_batches.stock), 0) as total_stock'),
                 DB::raw('COUNT(DISTINCT warehouse_product_batches.id) as total_batches')
             ])
-           // ->with(['media']) // Load images/media
             ->join('warehouse_product', function ($join) use ($warehouseId) {
                 $join->on('products.id', '=', 'warehouse_product.product_id')
-                     ->where('warehouse_product.warehouse_id', '=', $warehouseId);
+                    ->where('warehouse_product.warehouse_id', '=', $warehouseId);
             })
             ->leftJoin('warehouse_product_batches', function ($join) use ($warehouseId) {
                 $join->on('products.id', '=', 'warehouse_product_batches.product_id')
-                     ->where('warehouse_product_batches.warehouse_id', '=', $warehouseId);
+                    ->where('warehouse_product_batches.warehouse_id', '=', $warehouseId);
             })
             ->groupBy([
                 'products.id',
-                'products.name',
-                'products.description',
-                'products.price',
                 'products.active',
-                'products.show_home',
+                'products.name_ar',
+                'products.name_en',
+                'products.description',
+                'products.active_ingredients',
+                'products.dosage_form',
+                'products.price',
+                'products.bar_code',
+                'products.qr_code',
+                'products.gtin',
                 'warehouse_product.reserved_stock'
             ]);
 
-        // Apply filters
         $query = $this->applyFilters($query, $filters);
-
-        // Apply sorting
         $query->orderBy($sortBy, $sortOrder);
 
-        
-        if ($paginate) {
-            $products = $query->paginate($perPage);
-            
-            
-            
-            return $products;
-        } else {
-            $products = $query->get();
-            return $products;
-
-        }
-        
+        return $paginate ? $query->paginate($perPage) : $query->get();
     }
+
 
 
      /**
@@ -110,7 +105,7 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
 
         $query = WarehouseProductBatch::query()
             ->with([
-                'product:id,name,bar_code,price',
+                'product:id,name_ar,name_en,bar_code,price,qr_code,gtin,active',
                 'product.category:id,name',
                 'warehouse:id,name,location'
             ])
@@ -150,10 +145,8 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
             switch ($key) {
                 // Text search (product name or description)
                 case 'search':
-                    $query->where(function ($q) use ($value) {
-                        $q->where('products.name', 'LIKE', '%' . $value . '%')
-                          ->orWhere('products.description', 'LIKE', '%' . $value . '%');
-                    });
+                     $query->whereRaw("MATCH(products.search_index) AGAINST(? IN BOOLEAN MODE)", [$value]);
+
                     break;
 
                 
@@ -162,9 +155,7 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                     $query->where('products.active', (bool) $value);
                     break;
 
-                case 'show_home':
-                    $query->where('products.show_home', (bool) $value);
-                    break;
+                
 
                 // Price range filters
                 case 'min_price':

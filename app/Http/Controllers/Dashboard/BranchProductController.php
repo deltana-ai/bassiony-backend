@@ -41,7 +41,8 @@ class BranchProductController extends BaseController
     public function index($id)
     {
         try {
-        
+            $branch = Branch::find($id);
+            $this->authorize('manage', $branch);
             $branch_product_products = BranchProduct2Resource::collection($this->crudRepository->getBranchProducts( $id));
             return $branch_product_products->additional(JsonResponse::success());
         } catch (Exception $e) {
@@ -52,7 +53,7 @@ class BranchProductController extends BaseController
     
     public function addBatch(Branch $branch,BranchProductRequest $request){
         try {
-            $this->authorize('manage', $branch);
+            $this->authorize('canAddOrUpdateProduct', $branch);
             $data = $this->handleData( $request, $branch->id);
             $check_data = $data;
             unset($check_data["stock"]);
@@ -83,7 +84,7 @@ class BranchProductController extends BaseController
     public function addReservedStock(Branch $branch ,ReservedStockRequest $request)
     {
        try {
-            $this->authorize('manage', $branch);
+            $this->authorize('canAddOrUpdateProduct', $branch);
             if($branch->products()->where("product_id" ,$request->product_id)->exists())
             {
                 $branch->products()->updateExistingPivot($request->product_id, [
@@ -107,7 +108,7 @@ class BranchProductController extends BaseController
     public function show(Branch $branch, Request $request, int $productId)
     {
         try {
-            
+            $this->authorize('manage', $branch);
             $batches = $this->crudRepository->getProductBatches( $productId, $branch->id);
             return JsonResponse::respondSuccess('Item Fetched Successfully', BatchResource::collection($batches));
         } catch (Exception $e) {
@@ -120,7 +121,7 @@ class BranchProductController extends BaseController
     public function updateBatchStock(Branch $branch, UpdateBatchStockRequest $request)
     {
        try {
-            $this->authorize('manage', $branch);
+            $this->authorize('canAddOrUpdateProduct', $branch);
             
              BranchProductBatch::where("product_id" ,$request->product_id)->where("branch_id" ,$branch->id )->where('batch_number' ,$request->batch_number )
                ->update(["stock"=>$request->stock]);
@@ -139,7 +140,7 @@ class BranchProductController extends BaseController
     {
         try {
 
-            $this->authorize('manage', $branch);
+            $this->authorize('canAddOrUpdateProduct', $branch);
             $batch = BranchProductBatch::where("batch_number",$request->batch_number)
             ->where("product_id",$request->product_id)
             ->where("branch_id",$branch->id)
@@ -162,6 +163,7 @@ class BranchProductController extends BaseController
 	 public function import(FileImportRequest $request, Branch $branch)
     {
         try {
+            $this->authorize('canAddOrUpdateProduct', $branch);
             $import = new BranchProductBatchImport($branch);
             Excel::import($import, $request->file('file'));
             $errors = $import->getErrors();

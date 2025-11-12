@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Dashboard;
 
+use App\Http\Resources\MediaResource;
 use App\Models\Pharmacist;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -17,15 +18,20 @@ class PharmacyResource extends JsonResource
     {
         $owner = Pharmacist::where('pharmacy_id', $this->id)->where('is_owner',1)->first();
         return [
-         'id' => $this->id,
-         'name' => $this->name,
-         'address' => $this->address,
-         'phone' => $this->phone,
-         'owner_email' => $owner?->email ?? null,
-         'createdAt' => $this->created_at ? $this->created_at->format('Y-M-d H:i:s A') : null,
-         'updatedAt' => $this->updated_at ? $this->updated_at->format('Y-M-d H:i:s A') : null,
-         'deletedAt' => $this->deleted_at ? $this->deleted_at->format('Y-M-d H:i:s A') : null,
-         'deleted' => isset($this->deleted_at),
+         'id'          => $this->id,
+        'name'        => $this->name ?? null,
+        'address'        => $this->address ?? null,
+        'phone'        => $this->phone ?? null,
+        'license_number'  => $this->license_number ?? null,
+        'email' => $owner->email ?? null,
+        'imageUrl'    => $this->getFirstMediaUrl(),
+        'image'       => new MediaResource($this->getFirstMedia()),
+        'avg_rate'    => round($this->ratings_av_rate,1),
+        'total_rate'  => $this->ratings_count ?? null,
+        'createdAt' => $this->created_at ? $this->created_at->format('Y-M-d H:i:s A') : null,
+        'updatedAt' => $this->updated_at ? $this->updated_at->format('Y-M-d H:i:s A') : null,
+        'deletedAt' => $this->deleted_at ? $this->deleted_at->format('Y-M-d H:i:s A') : null,
+        'deleted' => isset($this->deleted_at),
        ];
     }
 }
