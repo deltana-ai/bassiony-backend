@@ -46,6 +46,8 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                 'products.description',
                 'products.dosage_form',
                 'products.price',
+                'products.search_index',
+                
                 'warehouse_product.reserved_stock',
                 DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
                 DB::raw('COALESCE(SUM(warehouse_product_batches.stock), 0) as total_stock'),
@@ -71,6 +73,8 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                 'products.bar_code',
                 'products.qr_code',
                 'products.gtin',
+                'products.search_index',
+                'products.scientific_name',
                 'warehouse_product.reserved_stock'
             ]);
 

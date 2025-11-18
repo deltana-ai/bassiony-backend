@@ -46,6 +46,8 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
                 'products.dosage_form',
                 'products.gtin',
                 'products.price',
+                'products.search_index',
+            
                 'branch_product.reserved_stock',
                 DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
 
@@ -74,6 +76,8 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
                 'products.bar_code',
                 'products.qr_code',
                 'products.gtin',
+                'products.search_index',
+              
                 'branch_product.reserved_stock'
             ]);
 
