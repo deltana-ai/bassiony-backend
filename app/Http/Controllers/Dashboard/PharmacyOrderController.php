@@ -46,7 +46,7 @@ class PharmacyOrderController extends BaseController
         }
 
         $items = CartItem::where('pharmacy_id', $id)
-            ->with('product:id,name,price')
+            ->with('product:id,name_en,price')
             ->get();
 
         return CartItemResource::collection($items)
