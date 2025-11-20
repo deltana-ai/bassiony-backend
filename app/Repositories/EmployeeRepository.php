@@ -21,7 +21,9 @@ class EmployeeRepository extends CrudRepository implements EmployeeRepositoryInt
     {
        return DB::transaction(function () use ($data) {
 
-            $role = Role::where('id',$data["role_id"])->where('guard_name',"employees")->first();
+            
+
+            $role = Role::find($data["role_id"]);
             if (!$role) {
 
                 throw new \Exception("الدور الوظيفي غير موجود");

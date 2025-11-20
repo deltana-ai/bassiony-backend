@@ -43,8 +43,8 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
 
 
             $employee = $this->employee_repo->create($employee_data);
-            
-            $employee ->assignRole("company_owner");
+            $superManger = Role::firstOrCreate(['name' => 'company_owner','guard_name'=>'employees',"company_id"=>$company->id]);
+            $employee ->assignRole($superManger);
             
 
             return $employee ;

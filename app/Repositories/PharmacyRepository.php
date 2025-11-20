@@ -43,8 +43,8 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
             $employee_data["pharmacy_id"] = $pharmacy->id;
 
             $employee = $this->employee_repo->create($employee_data);
-
-            $employee ->assignRole("pharmacy_owner");
+            $superpharmacist = Role::firstOrCreate(['name' => 'pharmacy_owner','guard_name'=>'pharmacists','pharmacy_id'=>$pharmacy->id]);
+            $employee ->assignRole($superpharmacist);
 
             return $employee ;
         });

@@ -56,7 +56,7 @@ class CompanySeeder extends Seeder
         $company_permissions = Permission::where('guard_name','employees')->pluck('name')->toArray();
         $superManger->givePermissionTo($company_permissions);
 
-        $manager->assignRole('company_owner');
+        $manager->assignRole($superManger);
 
         $this->command->info(" Company, warehouse, role, and manager created successfully!");
         $this->command->warn(" Manager Login: manager@company.com / password123");
