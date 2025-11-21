@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\{ CompanyController, CompanyOfferController, CompanyOrderController, CompanyProductController, EmployeeProfileController, EmployeeRoleController, PharmacyOrderController, ResponseOfferController, WarehouseController, WarehouseProductController,WarehouseProductSearchController};
 use App\Http\Controllers\Dashboard\EmployeeController;
 use App\Http\Controllers\ProductController;
-
+use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
+use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('company.')->group(function () {
 
 
@@ -39,6 +40,24 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::get('permissions', [EmployeeRoleController::class, 'getPermissions']);
     Route::apiResource('roles', EmployeeRoleController::class)->except(['index','destroy']);
     //////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    Route::post('brands/index', [AdminBrandController::class, 'index']);
+    Route::apiResource('brands', AdminBrandController::class)->only(['show']);
+    //////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+    
+    /////////////////////////////////////////////////////////////////////////////////
+    Route::post('categories/index', [AdminCategoryController::class, 'index']);
+    Route::apiResource('categories', AdminCategoryController::class)->only(['show']);
+    ////////////////////////////////////////////////////////////////////////////////////////
 
 
 

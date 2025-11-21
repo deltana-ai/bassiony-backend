@@ -19,10 +19,32 @@ use App\Http\Controllers\{
     ProductController,
     PharmacistController
 };
+use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
+use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 
 
 Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pharmacy.')->group(function () {
 
+
+
+
+      ///////////////////////////////////////////////////////////////////////////////////////
+    Route::post('brands/index', [AdminBrandController::class, 'index']);
+    Route::apiResource('brands', AdminBrandController::class)->only(['show']);
+    //////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+    
+    /////////////////////////////////////////////////////////////////////////////////
+    Route::post('categories/index', [AdminCategoryController::class, 'index']);
+    Route::apiResource('categories', AdminCategoryController::class)->only(['show']);
+    ////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    
 
     /////////////////////////////////////////////////////////////////////////////////
     Route::post('/pharmacist/index', [PharmacistController::class, 'index']);

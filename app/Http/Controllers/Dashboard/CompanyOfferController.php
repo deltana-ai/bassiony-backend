@@ -37,11 +37,7 @@ class CompanyOfferController extends Controller
             if (auth()->guard("employees")->check()) {
                 $options["company_id"] = auth()->guard("employees")->user()->company_id ;
             }
-            $offers = CompanyOfferResource::collection($this->crudRepository->all(
-                [],
-                $options,
-                ['*']
-            ));
+            $offers = CompanyOfferResource::collection($this->crudRepository->allOffers(["company",'product'],$options,['*']));
             return $offers->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

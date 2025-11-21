@@ -58,6 +58,7 @@ class RoleRepository extends CrudRepository implements RoleRepositoryInterface
         DB::transaction(function () use ($roleIds,$user_model) {
             $roles = Role::whereIn('id', $roleIds)->get();
             foreach ($roles as $role) {
+                
                 if ($role->guard_name !== auth()->user()->guard_name  ) {
                    continue;
                 }
@@ -68,7 +69,7 @@ class RoleRepository extends CrudRepository implements RoleRepositoryInterface
                     continue;
                 }
                 
-                if($role->name === 'company_owner' || $role->name === "pharmacy_owner"|| $role->name === "site_owner"){
+                if (in_array($role->name, ['company_owner', 'pharmacy_owner', 'site_owner'])) {
                     continue;
                 }
                 

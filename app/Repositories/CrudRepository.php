@@ -42,10 +42,9 @@ class CrudRepository implements ICrudRepository
                 $query = $query->where($key, 'LIKE', '%' . $value . '%');
             }
         }
-        if($search_index = request('search_index')){
-            return  $query->whereRaw("MATCH(products.search_index) AGAINST(? IN BOOLEAN MODE)", [$search_index]);
-
-        }
+        if (is_callable($customQuery)) 
+           $query = $customQuery($query);
+       
         if (isset($order_by) && !empty($with))
             $query = $query->with($with)->orderBy($order_by, $order_by_direction);
         if ($paginate && !empty($with))
@@ -54,8 +53,7 @@ class CrudRepository implements ICrudRepository
             $query = $query->orderBy($order_by, $order_by_direction);
         if ($paginate)
             return $query->paginate($per_page, $columns);
-        if (is_callable($customQuery)) 
-          return $customQuery($query);
+        
     
     
         if (!empty($with))
