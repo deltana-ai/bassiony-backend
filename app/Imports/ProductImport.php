@@ -41,6 +41,7 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
                 'description' => trim($row['Description']),
                 'active' => (bool) ($row['Active'] ?? false),
                 'price'    => (float) ($row['Price'] ?? 0),
+                //'price'    => (float) ($row['TaxRate'] ?? 0),
             ];
             
 

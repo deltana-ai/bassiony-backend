@@ -12,7 +12,7 @@ use App\Models\Employee;
 use App\Models\Product;
 use App\Notifications\SendPassword;
 use Illuminate\Support\Facades\DB;
-
+use Spatie\Permission\Models\Role;
 class CompanyRepository extends CrudRepository implements CompanyRepositoryInterface
 {
     protected Model $model;

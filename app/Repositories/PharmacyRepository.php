@@ -8,11 +8,12 @@ use App\Interfaces\PharmacyRepositoryInterface;
 use App\Models\Pharmacist;
 use App\Models\Pharmacy;
 use App\Models\Product;
+
 use App\Notifications\SendPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
+use Spatie\Permission\Models\Role;
 class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInterface
 {
     
