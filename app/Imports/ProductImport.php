@@ -104,19 +104,25 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
             }
         }
 
-        // Bulk Insert for each Chunk
+        // Insert each row individually to avoid rollback of valid rows
         if (!empty($mergedRows)) {
-            DB::transaction(function () use ($mergedRows) {
-                // Add timestamps for bulk insert
-                $timestamp = now();
-                $dataToInsert = array_map(function($row) use ($timestamp) {
-                    $row['created_at'] = $timestamp;
-                    $row['updated_at'] = $timestamp;
-                    return $row;
-                }, array_values($mergedRows));
-
-                Product::insert($dataToInsert);
-            });
+            $timestamp = now();
+            
+            foreach ($mergedRows as $key => $data) {
+                try {
+                    DB::transaction(function () use ($data, $timestamp) {
+                        $data['created_at'] = $timestamp;
+                        $data['updated_at'] = $timestamp;
+                        Product::insert([$data]);
+                    });
+                } catch (\Exception $e) {
+                    // Log error for this specific row
+                    $this->errors[] = [
+                        'row' => 'unknown', // Can track row number if needed
+                        'errors' => ['فشل الإدخال: ' . $e->getMessage()],
+                    ];
+                }
+            }
         }
     }
 
