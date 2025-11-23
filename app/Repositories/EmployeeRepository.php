@@ -64,14 +64,14 @@ class EmployeeRepository extends CrudRepository implements EmployeeRepositoryInt
     public function assignToWarehouse( array $ids, int $warehouse_id )
     {
         $warehouse = Warehouse::find($warehouse_id);
-        $warehouse->employees()->syncWithoutDeaching($ids);
+        $warehouse->employees()->syncWithoutDetaching($ids);
 
     }
     public function assignToRole(string $tableName, array $ids, int $role_id )
     {
         $role = Role::find($role_id);
 
-        $employees = DB::table($tableName)->whereIn('id', $ids)->get();
+        $employees = $this->model->whereIn('id', $ids)->get();
 
         foreach ($employees as $employee) {
 

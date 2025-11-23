@@ -23,73 +23,106 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
 
     public function collection(Collection $rows)
     {
+        // Get default category once
+        $category = Category::firstOrCreate(['name' => "فئة مجهولة"]);
+        
+        // Get existing products to check for duplicates
+        $barcodes = $rows->pluck('barcode')->filter()->map(fn($v) => trim($v))->unique()->toArray();
+        $gtins = $rows->pluck('gtin')->filter()->map(fn($v) => trim($v))->unique()->toArray();
+        
+        $existingBarcodes = Product::whereIn('bar_code', $barcodes)->pluck('bar_code')->toArray();
+        $existingGtins = Product::whereIn('gtin', $gtins)->pluck('gtin')->toArray();
+
         $mergedRows = [];
 
         foreach ($rows as $index => $row) {
-            if (empty($row['bar_code']) || empty($row['name']) || empty($row['price'])) {
+            // Check if at least one identifier exists
+            $barcode = isset($row['barcode']) ? trim($row['barcode']) : null;
+            $gtin = isset($row['gtin']) ? trim($row['gtin']) : null;
+            $nameEn = isset($row['name_en']) ? trim($row['name_en']) : null;
+            $nameAr = isset($row['name_ar']) ? trim($row['name_ar']) : null;
+            $price = isset($row['price']) ? $row['price'] : null;
+
+            // Skip if missing required fields
+            if ((empty($barcode) && empty($gtin)) || (empty($nameEn) && empty($nameAr)) || empty($price)) {
                 continue;
             }
-           
-            $data = [
-                'name_en'     => trim($row['Name_en']),
-                'name_ar'     => trim($row['Name_ar']),
-                'bar_code' => trim($row['BarCode']),
-                'gtin' => trim($row['GTIN']),
-                'dosage_form' => trim($row['DosageForm']),
-                'scientific_name' => trim($row['ScientificName']),
-                'active_ingredients' => trim($row['ActiveIngredients']),
-                'description' => trim($row['Description']),
-                'active' => (bool) ($row['Active'] ?? false),
-                'price'    => (float) ($row['Price'] ?? 0),
-                //'price'    => (float) ($row['TaxRate'] ?? 0),
-            ];
-            
 
+            // Check if product already exists in database
+            if (($barcode && in_array($barcode, $existingBarcodes)) || 
+                ($gtin && in_array($gtin, $existingGtins))) {
+                $this->errors[] = [
+                    'row' => $index + 2,
+                    'errors' => ['المنتج موجود بالفعل في قاعدة البيانات'],
+                ];
+                continue;
+            }
+
+            $data = [
+                'name_en'     => $nameEn,
+                'name_ar'     => $nameAr,
+                'bar_code'    => $barcode,
+                'gtin'        => $gtin,
+                'dosage_form' => isset($row['dosageform']) ? trim($row['dosageform']) : null,
+                'scientific_name' => isset($row['scientificname']) ? trim($row['scientificname']) : null,
+                'active_ingredients' => isset($row['activeingredients']) ? trim($row['activeingredients']) : null,
+                'description' => isset($row['description']) ? trim($row['description']) : null,
+                'active'      => isset($row['active']) ? (bool) $row['active'] : true,
+                'price'       => (float) $price,
+                'category_id' => $category->id,
+            ];
+
+            // Validate data
             $validator = Validator::make($data, [
                 'name_en'     => 'nullable|string|max:255',
                 'name_ar'     => 'nullable|string|max:255',
-                'gtin' => 'nullable|string|required_without:bar_code|unique:products,gtin',
-                'bar_code' => 'nullable|string|required_without:gtin|unique:products,bar_code',
+                'gtin'        => 'nullable|string|required_without:bar_code',
+                'bar_code'    => 'nullable|string|required_without:gtin',
                 'dosage_form' => 'nullable|string|max:225',
                 'scientific_name' => 'nullable|string|max:255',
                 'active_ingredients' => 'nullable|string|max:1000',
                 'description' => 'nullable|string|max:1000',
-                'active' => 'nullable|boolean',
-                'price'    => 'nullable|numeric|min:0',
+                'active'      => 'boolean',
+                'price'       => 'required|numeric|min:0',
+                'category_id' => 'required|exists:categories,id',
             ]);
-            
+
             if ($validator->fails()) {
                 $this->errors[] = [
-                    'row' => $index + 1,
+                    'row' => $index + 2,
                     'errors' => $validator->errors()->all(),
                 ];
-                 
                 continue;
             }
 
-            $category = Category::firstOrCreate(['name' => "فئة مجهولة"]);
+            // Create unique key using both barcode and gtin
+            $key = ($barcode ?: 'no_barcode') . '-' . ($gtin ?: 'no_gtin');
 
-            $key = $data['bar_code'];
-            $data['category_id'] = $category->id;
-          // dd($data);
-            if (isset($mergedRows[$key])) {
-              
-            } else {
+            // Prevent duplicates within the same chunk
+            if (!isset($mergedRows[$key])) {
                 $mergedRows[$key] = $data;
             }
         }
 
-        // Bulk Insert لكل Chunk
+        // Bulk Insert for each Chunk
         if (!empty($mergedRows)) {
             DB::transaction(function () use ($mergedRows) {
-                Product::insert(array_values($mergedRows));
+                // Add timestamps for bulk insert
+                $timestamp = now();
+                $dataToInsert = array_map(function($row) use ($timestamp) {
+                    $row['created_at'] = $timestamp;
+                    $row['updated_at'] = $timestamp;
+                    return $row;
+                }, array_values($mergedRows));
+
+                Product::insert($dataToInsert);
             });
         }
     }
 
     public function chunkSize(): int
     {
-        return 500; // حجم الـ Chunk
+        return 500;
     }
 
     public function getErrors()
