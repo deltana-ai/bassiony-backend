@@ -133,23 +133,25 @@ class ProductController extends BaseController
 
     public function import(FileImportRequest $request)
     {
+        $import = new ProductImport();
         try {
           
-            $import = new ProductImport();
-            Excel::import($import, $request->file('file'));
-            
-            $errors = $import->getErrors();
+             Excel::import($import, $request->file('file'));
 
-            if (!empty($errors)) {
-                return JsonResponse::respondError($errors);
-            }
-            if ($import->failures()->isNotEmpty()) {
-                return JsonResponse::respondError($import->failures());
+            
+            if ($import->hasErrors()) {
+                $data = [];
+                $data ["errors_count"] = $import->getErrorsCount();
+
+                $data ["errors"] = $import->getErrors();
+
+                return JsonResponse::respondSuccess('تم الاستيراد مع وجود بعض الأخطاء', $data);
+
             }
 
             return JsonResponse::respondSuccess( ' تم استيراد البيانات بنجاح');
         } catch (Exception $e) {
-            return JsonResponse::respondError($e->getMessage());
+            return JsonResponse::respondError('حدث خطأ أثناء الاستيراد: ' . $e->getMessage());
         }
         
     }

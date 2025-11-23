@@ -34,6 +34,7 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
         $existingGtins = Product::whereIn('gtin', $gtins)->pluck('gtin')->toArray();
 
         $mergedRows = [];
+        $rowMapping = []; // لتتبع رقم الصف الأصلي
 
         foreach ($rows as $index => $row) {
             // Check if at least one identifier exists
@@ -53,6 +54,9 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
                 ($gtin && in_array($gtin, $existingGtins))) {
                 $this->errors[] = [
                     'row' => $index + 2,
+                    'bar_code' => $barcode,
+                    'gtin' => $gtin,
+                    'name' => $nameEn ?: $nameAr,
                     'errors' => ['المنتج موجود بالفعل في قاعدة البيانات'],
                 ];
                 continue;
@@ -90,6 +94,9 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
             if ($validator->fails()) {
                 $this->errors[] = [
                     'row' => $index + 2,
+                    'bar_code' => $barcode,
+                    'gtin' => $gtin,
+                    'name' => $nameEn ?: $nameAr,
                     'errors' => $validator->errors()->all(),
                 ];
                 continue;
@@ -101,6 +108,7 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
             // Prevent duplicates within the same chunk
             if (!isset($mergedRows[$key])) {
                 $mergedRows[$key] = $data;
+                $rowMapping[$key] = $index + 2; // حفظ رقم الصف
             }
         }
 
@@ -113,13 +121,16 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
                     DB::transaction(function () use ($data, $timestamp) {
                         $data['created_at'] = $timestamp;
                         $data['updated_at'] = $timestamp;
-                        Product::insert([$data]);
+                        Product::create($data);
                     });
                 } catch (\Exception $e) {
                     // Log error for this specific row
                     $this->errors[] = [
-                        'row' => 'unknown', // Can track row number if needed
-                        'errors' => ['فشل الإدخال: ' . $e->getMessage()],
+                        'row' => $rowMapping[$key] ?? 'unknown',
+                        'bar_code' => $data['bar_code'] ?? null,
+                        'gtin' => $data['gtin'] ?? null,
+                        'name' => $data['name_en'] ?: $data['name_ar'],
+                        'errors' => ['فشل في قاعدة البيانات: ' . $e->getMessage()],
                     ];
                 }
             }
@@ -134,5 +145,23 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    public function hasErrors()
+    {
+        return !empty($this->errors);
+    }
+
+    public function getErrorsCount()
+    {
+        return count($this->errors);
+    }
+
+    public function getErrorsSummary()
+    {
+        return [
+            'total_errors' => count($this->errors),
+            'errors' => $this->errors
+        ];
     }
 }
