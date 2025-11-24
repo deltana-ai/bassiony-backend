@@ -27,7 +27,10 @@ class WarehouseProduct2Resource extends JsonResource
             'gtin' => $this->gtin,
             'bar_code' => $this->bar_code,
             
+            
             'price' => (float) $this->price,
+            'tax' => (float) $this->tax,
+            'price_without_tax' => (float) $this->price_without_tax,
             'active' => (bool) $this->active,
             'imageUrl'          => $this->getFirstMediaUrl(),
             'total_stock' => $totalStock,

@@ -23,6 +23,9 @@ class ProductCompanyResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'price' => (float) $this->price,
+            'tax' => (float) $this->tax,
+       
+            'price_without_tax' => (float) $this->price_without_tax,
             'gtin' => $this->gtin,
             'bar_code' => $this->bar_code,
             'qr_code' => $this->qr_code,

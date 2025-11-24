@@ -27,6 +27,8 @@ class BranchProduct2Resource extends JsonResource
             'bar_code' => $this->bar_code,
             'description' => $this->description,
             'price' => (float) $this->price,
+            'tax' => (float) $this->tax,
+            'price_without_tax' => (float) $this->price_without_tax,
             'active' => (bool) $this->active,
             'imageUrl'          => $this->getFirstMediaUrl(),
             'total_stock' => $totalStock,

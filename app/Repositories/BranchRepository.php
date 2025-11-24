@@ -45,7 +45,9 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
                 'products.description',
                 'products.dosage_form',
                 'products.gtin',
-                'products.price',
+                'products.price AS price_without_tax',
+                'products.tax',
+                DB::raw('(products.price + (products.price * products.tax / 100)) AS price'),
                 'products.search_index',
             
                 'branch_product.reserved_stock',
@@ -73,6 +75,7 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
                 'products.description',
                 'products.dosage_form',
                 'products.price',
+                'products.tax',
                 'products.bar_code',
                 'products.qr_code',
                 'products.gtin',
@@ -116,7 +119,7 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
 
         $query = BranchProductBatch::query()
             ->with([
-                'product:id,name_ar,name_en,bar_code,price,qr_code,gtin,active',
+                'product:id,name_ar,name_en,bar_code,price,tax,qr_code,gtin,active',
                 'branch:id,name,address'
             ])
             ->where('product_id', $productId)

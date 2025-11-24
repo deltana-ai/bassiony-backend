@@ -45,7 +45,9 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                 'products.active_ingredients',
                 'products.description',
                 'products.dosage_form',
-                'products.price',
+                'products.price AS price_without_tax',
+                'products.tax',
+                DB::raw('(products.price + (products.price * products.tax / 100)) AS price'),
                 'products.search_index',
                 
                 'warehouse_product.reserved_stock',
@@ -73,6 +75,7 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                 'products.bar_code',
                 'products.qr_code',
                 'products.gtin',
+                'products.tax',
                 'products.search_index',
                 'products.scientific_name',
                 'warehouse_product.reserved_stock'
@@ -109,7 +112,7 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
 
         $query = WarehouseProductBatch::query()
             ->with([
-                'product:id,name_ar,name_en,bar_code,price,qr_code,gtin,active',
+                'product:id,name_ar,name_en,bar_code,price,tax,qr_code,gtin,active',
                 'product.category:id,name',
                 'warehouse:id,name,location'
             ])
