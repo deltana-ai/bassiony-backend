@@ -43,6 +43,7 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
             $nameEn = isset($row['name_en']) ? trim($row['name_en']) : null;
             $nameAr = isset($row['name_ar']) ? trim($row['name_ar']) : null;
             $price = isset($row['price']) ? $row['price'] : null;
+            $tax = isset($row['taxrate']) ? $row['taxrate'] : 0;
 
             // Skip if missing required fields
             if ((empty($barcode) && empty($gtin)) || (empty($nameEn) && empty($nameAr)) || empty($price)) {
@@ -73,6 +74,7 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
                 'description' => isset($row['description']) ? trim($row['description']) : null,
                 'active'      => isset($row['active']) ? (bool) $row['active'] : true,
                 'price'       => (float) $price,
+                'tax'       => (float) $tax,
                 'category_id' => $category->id,
             ];
 
@@ -88,6 +90,7 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
                 'description' => 'nullable|string|max:1000',
                 'active'      => 'boolean',
                 'price'       => 'required|numeric|min:0',
+                'tax'         => 'nullable|numeric|min:0|max:100',
                 'category_id' => 'required|exists:categories,id',
             ]);
 
