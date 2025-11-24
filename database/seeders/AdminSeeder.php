@@ -74,7 +74,7 @@ class AdminSeeder extends Seeder
         $superAdmin->givePermissionTo($site_permissions);
 
         foreach ($super_admins as  $super_admin) {
-            $super_admin->assignRole('site_owner');
+            $super_admin->assignRole($superAdmin);
         }
     }
 }
