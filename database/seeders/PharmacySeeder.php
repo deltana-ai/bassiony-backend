@@ -60,7 +60,7 @@ class PharmacySeeder extends Seeder
         $superpharmacist = Role::firstOrCreate(['name' => 'pharmacy_owner_'.Pharmacy::first()->id,'guard_name'=>'pharmacists','pharmacy_id'=>Pharmacy::first()->id]);
         $superpharmacist->givePermissionTo($pharmacy_permissions);
 
-        $manager->assignRole('pharmacy_owner');
+        $manager->assignRole($superpharmacist);
     }
 }
 
