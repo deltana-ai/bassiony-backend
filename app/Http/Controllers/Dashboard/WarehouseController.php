@@ -23,7 +23,7 @@ class WarehouseController extends BaseController
     {
         $this->crudRepository = $pattern;
         $this->middleware('auth:employees');
-        $this->middleware('permission:warehouse-list|manage-company', ['only' => ['index']]);
+        $this->middleware('permission:warehouse-list|manage-company', ['only' => ['index','show']]);
         $this->middleware('permission:warehouse-create|manage-company', ['only' => [ 'store']]);
         $this->middleware('permission:warehouse-edit|manage-company', ['only' => [ 'update']]);
         $this->middleware('permission:warehouse-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
