@@ -23,6 +23,7 @@ class CrudRepository implements ICrudRepository
     {
         $order_by = request(Constants::ORDER_BY) ?? "id";
         $deleted = request(Constants::Deleted) ?? false;
+        
         $order_by_direction = request(Constants::ORDER_By_DIRECTION) ?? "asc";
         $filter_operator = request(Constants::FILTER_OPERATOR) ?? "=";
         $filters = request(Constants::FILTERS) ?? [];
@@ -41,6 +42,9 @@ class CrudRepository implements ICrudRepository
                 $query = $query->where($key, 'LIKE', '%' . $value . '%');
             }
         }
+        if (is_callable($customQuery)) 
+           $query = $customQuery($query);
+       
         if (isset($order_by) && !empty($with))
             $query = $query->with($with)->orderBy($order_by, $order_by_direction);
         if ($paginate && !empty($with))
@@ -49,8 +53,7 @@ class CrudRepository implements ICrudRepository
             $query = $query->orderBy($order_by, $order_by_direction);
         if ($paginate)
             return $query->paginate($per_page, $columns);
-        if (is_callable($customQuery)) 
-          return $customQuery($query);
+        
     
     
         if (!empty($with))

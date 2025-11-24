@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\DeleteBatchRequest;
-use App\Http\Requests\ReservedStockRequest;
+use App\Http\Requests\{ReservedStockRequest,UpdateBatchStockRequest };
 use App\Http\Requests\BranchProductRequest;
 use App\Http\Resources\BatchResource;
 use App\Http\Resources\BranchProduct2Resource;
@@ -13,12 +13,14 @@ use App\Interfaces\BranchRepositoryInterface;
 use App\Models\Branch;
 use App\Models\BranchProduct;
 use App\Models\BranchProductBatch;
+use App\Imports\BranchProductBatchImport;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
-
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Requests\FileImportRequest;
 class BranchProductController extends BaseController
 {
 
@@ -28,13 +30,19 @@ class BranchProductController extends BaseController
     public function __construct(BranchRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('permission:branch-product-list|manage-pharmacy', ['only' => ['index','show']]);
+        $this->middleware('permission:branch-product-create|manage-pharmacy', ['only' => [ 'addBatch','addReservedStock']]);
+        $this->middleware('permission:branch-product-edit|manage-pharmacy', ['only' => [ 'updateBatchStock']]);
+        $this->middleware('permission:branch-product-import|manage-pharmacy', ['only' => [ 'import']]);
+
     }
 
 
     public function index($id)
     {
         try {
-        
+            $branch = Branch::find($id);
+            $this->authorize('manage', $branch);
             $branch_product_products = BranchProduct2Resource::collection($this->crudRepository->getBranchProducts( $id));
             return $branch_product_products->additional(JsonResponse::success());
         } catch (Exception $e) {
@@ -45,22 +53,26 @@ class BranchProductController extends BaseController
     
     public function addBatch(Branch $branch,BranchProductRequest $request){
         try {
-            $this->authorize('manage', $branch);
+            $this->authorize('canAddOrUpdateProduct', $branch);
             $data = $this->handleData( $request, $branch->id);
             $check_data = $data;
             unset($check_data["stock"]);
-            $batch = BranchProductBatch::where($check_data)->first();
-             if ($batch) {
-                $batch->increment('stock', $data["stock"]);
-            } else {
-                if(!$branch->products()->where("product_id" ,$request->product_id)->exists())
-                {
-                    $branch->products()->attach($request->product_id, [
-                        'reserved_stock' => 0,
-                    ]);
+
+            DB::transaction(function () use ($check_data, $data, $branch, $request) {
+                $batch = BranchProductBatch::where($check_data)->first();
+
+                if ($batch) {
+                    $batch->increment('stock', $data['stock']);
+                } else {
+                    if (!$branch->products()->where('product_id', $request->product_id)->exists()) {
+                        $branch->products()->attach($request->product_id, [
+                            'reserved_stock' => 0,
+                        ]);
+                    }
+
+                    BranchProductBatch::create($data);
                 }
-               BranchProductBatch::create($data);
-            }
+            });
             
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
 
@@ -72,7 +84,7 @@ class BranchProductController extends BaseController
     public function addReservedStock(Branch $branch ,ReservedStockRequest $request)
     {
        try {
-            $this->authorize('manage', $branch);
+            $this->authorize('canAddOrUpdateProduct', $branch);
             if($branch->products()->where("product_id" ,$request->product_id)->exists())
             {
                 $branch->products()->updateExistingPivot($request->product_id, [
@@ -96,7 +108,7 @@ class BranchProductController extends BaseController
     public function show(Branch $branch, Request $request, int $productId)
     {
         try {
-            
+            $this->authorize('manage', $branch);
             $batches = $this->crudRepository->getProductBatches( $productId, $branch->id);
             return JsonResponse::respondSuccess('Item Fetched Successfully', BatchResource::collection($batches));
         } catch (Exception $e) {
@@ -104,13 +116,31 @@ class BranchProductController extends BaseController
         }
     }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public function updateBatchStock(Branch $branch, UpdateBatchStockRequest $request)
+    {
+       try {
+            $this->authorize('canAddOrUpdateProduct', $branch);
+            
+             BranchProductBatch::where("product_id" ,$request->product_id)->where("branch_id" ,$branch->id )->where('batch_number' ,$request->batch_number )
+               ->update(["stock"=>$request->stock]);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
     public function destroy(Branch $branch,DeleteBatchRequest $request): ?\Illuminate\Http\JsonResponse
     {
         try {
 
-            $this->authorize('manage', $branch);
+            $this->authorize('canAddOrUpdateProduct', $branch);
             $batch = BranchProductBatch::where("batch_number",$request->batch_number)
             ->where("product_id",$request->product_id)
             ->where("branch_id",$branch->id)
@@ -128,6 +158,30 @@ class BranchProductController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	 public function import(FileImportRequest $request, Branch $branch)
+    {
+        try {
+            $this->authorize('canAddOrUpdateProduct', $branch);
+            $import = new BranchProductBatchImport($branch);
+            Excel::import($import, $request->file('file'));
+            $errors = $import->getErrors();
+
+            if (!empty($errors)) {
+                return JsonResponse::respondError($errors);
+            }
+            if ($import->failures()->isNotEmpty()) {
+                return JsonResponse::respondError($import->failures());
+            }
+
+            return JsonResponse::respondSuccess( ' تم استيراد البيانات بنجاح');
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+        
+    }
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private function handleData(BranchProductRequest $request,int $branch_id)
     {

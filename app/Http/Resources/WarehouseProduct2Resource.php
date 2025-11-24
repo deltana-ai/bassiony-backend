@@ -21,6 +21,12 @@ class WarehouseProduct2Resource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
+            'scientific_name' => $this->scientific_name,
+            'active_ingredients' => $this->active_ingredients,
+            'dosage_form' => $this->dosage_form,
+            'gtin' => $this->gtin,
+            'bar_code' => $this->bar_code,
+            
             'price' => (float) $this->price,
             'active' => (bool) $this->active,
             'imageUrl'          => $this->getFirstMediaUrl(),

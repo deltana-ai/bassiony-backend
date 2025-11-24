@@ -22,12 +22,12 @@ class BranchProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //'branch_id' => 'required|exists:branches,id',
+            
             'product_id' => 'required|exists:products,id|unique:branch_product,product_id,NULL,id,branch_id,' . $this->branch_id,
-            'branch_price' => 'nullable|numeric',
+            
             'batch_number' => 'nullable|string',
             'stock' => 'integer|min:0',
-            'reserved_stock' => 'integer|min:0',
+           
             'expiry_date' => 'nullable|date|date_format:d-m-Y',
         ];
     }

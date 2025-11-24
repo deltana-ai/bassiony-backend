@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_offer_id')->constrained("company_offers")->onDelete('cascade');
             $table->foreignId('pharmacy_id')->constrained()->onDelete('cascade');
+            $table->foreignId('warehouse_id')->nullable()->constrained()->onDelete('set null');
+
             $table->decimal('total_price', 10, 2);
             $table->decimal('item_price',10,2)->default(1);
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\WarehouseBelongToCompany;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AssignWarehouseRequest extends FormRequest
@@ -22,7 +23,7 @@ class AssignWarehouseRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'warehouse_id' => ['required', 'exists:warehouses,id'],
+           'warehouse_id' => ['required', 'exists:warehouses,id',new WarehouseBelongToCompany()],
            'items' => ['required', 'array'],
            'items.*' => ['required', 'exists:employees,id'],
 

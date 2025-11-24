@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\{CompanyController};
+use App\Http\Controllers\Dashboard\{AdminRoleController, CompanyController};
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Dashboard\PharmacyController as AdminPharmacyController ;
@@ -121,6 +121,16 @@ Route::middleware(['auth:admins'])->prefix('dashboard')->group(function () {
 });
 ///////////////////////////////////////pharmacies ///////////////////////////////////////
 
+////////////////////////////////// roles //////////////////////////////////////////////////////
+Route::middleware(['auth:admins'])->group(function () {
+    Route::post('roles/index', [AdminRoleController::class, 'index'])->name('roles.index');
+    Route::delete('roles/delete', [AdminRoleController::class, 'destroy']);
+    Route::get('permissions', [AdminRoleController::class, 'getPermissions']);
+    
+    Route::apiResource('roles', AdminRoleController::class)->except(['index','destroy']);
+});
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 
@@ -132,7 +142,10 @@ Route::middleware(['auth:admins'])->group(function () {
     Route::delete('product/delete', [ProductController::class, 'destroy']);
     Route::put('/product/{id}/{column}', [ProductController::class, 'toggle']);
     Route::delete('product/force-delete', [ProductController::class, 'forceDelete']);
+    Route::post('product/import',[ProductController::class,"import"]);
+
     Route::apiResource('product', ProductController::class)->except(['destroy','index']);
+
 });
 //////////////////////////////////product///////////////////////////////////////////////
 

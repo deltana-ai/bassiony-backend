@@ -11,8 +11,8 @@ interface EmployeeRepositoryInterface extends ICrudRepository
     
     public function updateEmployee(Employee $employee, array $data);
 
-    public function assignToWarehouse(string $tableName, array $ids, int $warehouse_id );
-
+    public function assignToWarehouse( array $ids, int $warehouse_id );
+    
     public function assignToRole(string $tableName, array $ids, int $role_id );
 
 }

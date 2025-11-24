@@ -19,6 +19,12 @@ class EmployeeRoleController extends Controller
     public function __construct(RoleRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('auth:employees');
+        $this->middleware('permission:role-list|manage-company', ['only' => ['index']]);
+        $this->middleware('permission:role-create|manage-company', ['only' => [ 'store']]);
+        $this->middleware('permission:role-edit|manage-company', ['only' => [ 'update']]);
+        $this->middleware('permission:role-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+
     }
 
     public function index()
@@ -27,7 +33,7 @@ class EmployeeRoleController extends Controller
 
             $roles = RoleResource::collection($this->crudRepository->all(
                 [],
-                ["guard_name" => auth()->user()->guard_name,"company_id"=>auth()->user()->company_id],
+                ["guard_name" => auth()->guard("employees")->user()->guard_name,"company_id"=>auth()->guard("employees")->user()->company_id],
                 ['*']
             ));
             return $roles->additional(JsonResponse::success());
@@ -56,7 +62,7 @@ class EmployeeRoleController extends Controller
             if(!$role){
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_FOUND));
             }
-            if ($role->guard_name !== auth()->user()->guard_name || $role->comapany !== auth()->user()->company_id ) {
+            if ($role->guard_name !== auth()->guard("employees")->user()->guard_name || $role->company_id!== auth()->guard("employees")->user()->company_id ) {
                
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
 
@@ -79,7 +85,7 @@ class EmployeeRoleController extends Controller
             if($role->name === 'company_owner' ){
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
             }
-            if ($role->guard_name !== auth()->user()->guard_name || $role->comapany !== auth()->user()->company_id ) {
+            if ($role->guard_name !== auth()->guard("employees")->user()->guard_name || $role->company_id !== auth()->guard("employees")->user()->company_id ) {
                
                 return JsonResponse::respondError(trans(JsonResponse::MSG_NOT_AUTHORIZED));
 

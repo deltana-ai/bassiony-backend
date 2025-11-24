@@ -34,10 +34,10 @@ class CompanyOffer extends BaseModel
         return $this->hasOneThrough(
             Product::class,
             WarehouseProduct::class,
-            'id', // foreign key on warehouse_product
-            'id', // foreign key on products
-            'warehouse_product_id', // local key on company_offers
-            'product_id' // local key on warehouse_product
+            'id',                  // warehouse_product.id
+            'id',                  // product.id
+            'warehouse_product_id', // company_offers.warehouse_product_id
+            'product_id'           // warehouse_product.product_id
         );
     }
 

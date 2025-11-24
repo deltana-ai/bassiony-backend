@@ -17,6 +17,11 @@ class CategoryController extends BaseController
     public function __construct(CategoryRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('permission:category-list|manage-site|manage-pharmacy|manage-company', ['only' => ['index','show']]);
+        $this->middleware('permission:category-create|manage-site', ['only' => [ 'store']]);
+        $this->middleware('permission:category-edit|manage-site', ['only' => [ 'update']]);
+        $this->middleware('permission:category-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
+
     }
 
     public function index()

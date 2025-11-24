@@ -48,15 +48,15 @@ class CompanySeeder extends Seeder
             'password' => Hash::make('password123'),
             'phone' => '01000000000',
             'address' => 'Cairo',
-            'warehouse_id' => $warehouse->id,
             'company_id' => $company->id,
+            'is_owner' => true,
             'active' => true,
         ]);
         $superManger = Role::firstOrCreate(['name' => 'company_owner','guard_name'=>'employees',"company_id"=>$company->id]);
         $company_permissions = Permission::where('guard_name','employees')->pluck('name')->toArray();
         $superManger->givePermissionTo($company_permissions);
 
-        $manager->assignRole('company_owner');
+        $manager->assignRole($superManger);
 
         $this->command->info(" Company, warehouse, role, and manager created successfully!");
         $this->command->warn(" Manager Login: manager@company.com / password123");

@@ -30,22 +30,32 @@ class PharmacyOrderController extends BaseController
     //     return CartItemResource::collection($items);
     // }
 
-    public function index(Request $request): ?\Illuminate\Http\JsonResponse
-    {
-        try {
-            $pharmacyId = $request->pharmacy_id;
-
-            $items = CartItem::where('pharmacy_id', $pharmacyId)
-                ->with('product:id,name,price')
-                ->get();
-
-            return CartItemResource::collection($items)
-                ->additional(JsonResponse::success())
-                ->response();
-        } catch (Exception $e) {
-            return JsonResponse::respondError($e->getMessage());
+  public function index(Request $request, $id): ?\Illuminate\Http\JsonResponse
+{
+    try {
+        $user = auth()->guard("pharmacists")->user();
+        
+        // تحقق إذا كان المستخدم موجود ومسجل دخوله
+        if (!$user) {
+            return JsonResponse::respondError("يجب تسجيل الدخول أولاً", 401);
         }
+
+        // تحقق إذا كان المستخدم مصرح له للصيدلية
+        if ($id != $user->pharmacy_id) {
+            return JsonResponse::respondError("غير مصرح لك للوصول لهذه الصيدلية"); 
+        }
+
+        $items = CartItem::where('pharmacy_id', $id)
+            ->with('product:id,name_en,price')
+            ->get();
+
+        return CartItemResource::collection($items)
+            ->additional(JsonResponse::success())
+            ->response();
+    } catch (Exception $e) {
+        return JsonResponse::respondError($e->getMessage());
     }
+}
 
 
 
@@ -94,77 +104,75 @@ class PharmacyOrderController extends BaseController
         }
     }
 
-    public function storeOrder(Request $request): ?\Illuminate\Http\JsonResponse
-    {
-        try {
+public function storeOrder(Request $request): ?\Illuminate\Http\JsonResponse
+{
+    try {
 
-            $validated = $request->validate([
-                'pharmacy_id' => 'required|exists:pharmacies,id',
-                'warehouse_id' => 'required|exists:warehouses,id',
-            ]);
+        $validated = $request->validate([
+            'pharmacy_id' => 'required|exists:pharmacies,id',
+        ]);
 
-            $pharmacyId = $validated['pharmacy_id'];
+        $pharmacyId = $validated['pharmacy_id'];
 
-            $cartItems = CartItem::where('pharmacy_id', $pharmacyId)
-                ->with('product')
-                ->get();
+        $cartItems = CartItem::where('pharmacy_id', $pharmacyId)
+            ->with('product')
+            ->get();
 
-            if ($cartItems->isEmpty()) {
-                return JsonResponse::respondError('السلة فارغة', 400);
-            }
-
-            DB::beginTransaction();
-
-            $order = Order::create([
-                'pharmacy_id'   => $pharmacyId,
-                'pharmacist_id' => auth()->user()->id,
-                'warehouse_id'  => $validated['warehouse_id'], // ✅ أضفنا المخزن
-                'status'        => 'pending',
-                'payment_method'=> 'cash',
-                'total_price'   => 0,
-            ]);
-
-            $total = 0;
-
-            foreach ($cartItems as $item) {
-                $price = $item->product->price ?? 0;
-
-                OrderItem::create([
-                    'order_id'   => $order->id,
-                    'product_id' => $item->product_id,
-                    'quantity'   => $item->quantity,
-                    'price'      => $price,
-                ]);
-
-                $total += $price * $item->quantity;
-            }
-
-            $order->update(['total_price' => $total]);
-
-            CartItem::where('pharmacy_id', $pharmacyId)->delete();
-
-            DB::commit();
-
-            return JsonResponse::respondSuccess(
-                'تم إنشاء الأوردر بنجاح',
-                [
-                    'order_id'    => $order->id,
-                    'total_price' => $total,
-                    'warehouse_id'=> $validated['warehouse_id'],
-                    'status'      => 'pending',
-                ],
-                200
-            );
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-
-            return JsonResponse::respondError(
-                'حدث خطأ أثناء إنشاء الأوردر: ' . $e->getMessage(),
-                500
-            );
+        if ($cartItems->isEmpty()) {
+            return JsonResponse::respondError('السلة فارغة', 400);
         }
+
+        DB::beginTransaction();
+
+        $order = Order::create([
+            'pharmacy_id'   => $pharmacyId,
+            'pharmacist_id' => auth()->user()->id,
+            'status'        => 'pending',
+            'payment_method'=> 'cash',
+            'total_price'   => 0,
+        ]);
+
+        $total = 0;
+
+        foreach ($cartItems as $item) {
+            $price = $item->product->price ?? 0;
+
+            OrderItem::create([
+                'order_id'   => $order->id,
+                'product_id' => $item->product_id,
+                'quantity'   => $item->quantity,
+                'price'      => $price,
+            ]);
+
+            $total += $price * $item->quantity;
+        }
+
+        $order->update(['total_price' => $total]);
+
+        CartItem::where('pharmacy_id', $pharmacyId)->delete();
+
+        DB::commit();
+
+        return JsonResponse::respondSuccess(
+            'تم إنشاء الأوردر بنجاح',
+            [
+                'order_id'    => $order->id,
+                'total_price' => $total,
+                'status'      => 'pending',
+            ],
+            200
+        );
+
+    } catch (\Throwable $e) {
+        DB::rollBack();
+
+        return JsonResponse::respondError(
+            'حدث خطأ أثناء إنشاء الأوردر: ' . $e->getMessage(),
+            500
+        );
     }
+}
+
 
 
 }

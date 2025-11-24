@@ -21,6 +21,7 @@ class EmployeeResource extends JsonResource
             'phone' => $this->phone,
             'active' => (bool)$this->active,
             'role' => $this->getRoleNames()->first(),
+            'role_id'=> $this->roles->first()?->id,
             'warehouse_id' => $this->warehouse_id,
             'warehouse_name' => $this->warehouse?->name,
             'company' => $this->company,

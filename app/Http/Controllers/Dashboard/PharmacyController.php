@@ -20,12 +20,17 @@ class PharmacyController extends BaseController
     public function __construct(PharmacyRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('permission:pharmacy-list|manage-site|manage-pharmacy|manage-company', ['only' => ['index','show']]);
+        $this->middleware('permission:pharmacy-create|manage-site', ['only' => [ 'store']]);
+        $this->middleware('permission:pharmacy-edit|manage-site', ['only' => [ 'update']]);
+        $this->middleware('permission:pharmacy-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
+
     }
 
     public function index()
     {
         try {
-
+                
             $pharmacies = PharmacyResource::collection($this->crudRepository->all(
                 [],
                 [],
@@ -42,9 +47,9 @@ class PharmacyController extends BaseController
             try {
                 $employee = $this->crudRepository->createPharmacywithUser($request->validated());
                 
-                $employee["employee"]->load("roles");
+                $employee->load("roles");
                 
-                return JsonResponse::respondSuccess('Item created Successfully', ["pharmacy owner"=>new PharmacistResource($employee["employee"]),"password"=>$employee["password"]]);
+                return JsonResponse::respondSuccess('Item created Successfully', new PharmacistResource($employee));
             
                 
             } catch (Exception $e) {
@@ -67,9 +72,9 @@ class PharmacyController extends BaseController
 
         $employee = $this->crudRepository->updatePharmacywithUser($request->validated(), $pharmacy->id);
        
-        $employee["employee"]->load("roles");
+        $employee->load("roles");
                 
-        return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), ["pharmacy owner"=>new PharmacistResource($employee["employee"]),"password"=>$employee["password"]]);
+        return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), new PharmacistResource($employee));
            
 
     }

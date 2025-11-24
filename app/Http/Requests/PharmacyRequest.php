@@ -29,20 +29,24 @@ class PharmacyRequest extends FormRequest
             'phone'          => ['nullable', 'string', 'max:20'],
             'license_number' => ['nullable', 'string', 'max:100'],
             'email' => ['required','string', 'email'],
+            'password' => [ 'string', 'min:6', 'confirmed'],
 
         
         ];
         if ($this->isMethod('post')) {
           $rules['license_number'][] = 'unique:pharmacies,license_number';
           $rules['email'] []= 'unique:pharmacists,email';
+          $rules['password'] []= 'required';
 
         }
         else{
-            $pharmacist = Pharmacist::where('is_owner',1)->first();
-
+             
             $pharmacy = $this->route('pharmacy')?? $this->route('id');
+            $pharmacist = Pharmacist::where('pharmacy_id', $pharmacy->id)->where('is_owner',1)->first();
+
             $rules['license_number'][] = Rule::unique('pharmacies','license_number')->ignore($pharmacy->id);
             $rules['email'] = Rule::unique('pharmacists','email')->ignore($pharmacist->id);
+            $rules['password'] []= 'nullable';
 
         }
         return $rules;

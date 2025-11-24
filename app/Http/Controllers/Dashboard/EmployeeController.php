@@ -16,7 +16,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends BaseController
 {
@@ -27,6 +27,12 @@ class EmployeeController extends BaseController
     public function __construct(EmployeeRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('auth:employees');
+        $this->middleware('permission:employee-list|manage-company', ['only' => ['index']]);
+        $this->middleware('permission:employee-create|manage-company', ['only' => [ 'store']]);
+        $this->middleware('permission:employee-edit|manage-company', ['only' => [ 'update','assignWarehouse','assignRole']]);
+        $this->middleware('permission:employee-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+
     }
 
     public function index()
@@ -34,7 +40,7 @@ class EmployeeController extends BaseController
         try {
 
             $employee = EmployeeResource::collection($this->crudRepository->all(
-                ["warehouse"],
+                ["warehouses"],
                 ["company_id"=>auth()->guard("employees")->user()->company_id],
                 ['*']
             ));
@@ -48,8 +54,11 @@ class EmployeeController extends BaseController
     {
         try {
             $data = $this->prepareData($request);
+            
             $employee = $this->crudRepository->createEmployee($data);
-            return new EmployeeResource($employee);
+            
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
+
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
@@ -60,9 +69,9 @@ class EmployeeController extends BaseController
         try {
             $this->authorize('manage', $employee);
 
-            $employee->load(["warehouse"]);
+            $employee->load(["warehouses"]);
 
-            return JsonResponse::respondSuccess('Item Fetched Successfully', new EmployeeResource($employee));
+            return JsonResponse::respondSuccess("تم جلب بيانات الموظف بنجاح", new EmployeeResource($employee));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
@@ -86,10 +95,10 @@ class EmployeeController extends BaseController
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $employees = Employee::whereIn('id', $request->items)->get();
-
-            foreach ($employees as $employee) {
-                $this->authorize('manage', $employee); 
+            $company_id = auth()->guard("employees")->user()->company_id;
+            $employees = Employee::whereIn('id', $request->items)->where("company_id",$company_id)->get();
+            if(count($request['items']) != $employees->count()){
+                return JsonResponse::respondError("يوجد موظفين غير موجودة");
             }
             $this->crudRepository->deleteRecords('employees', $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_DELETED_SUCCESSFULLY));
@@ -101,11 +110,13 @@ class EmployeeController extends BaseController
     public function restore(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $employees = Employee::whereIn('id', $request->items)->get();
-
-            foreach ($employees as $employee) {
-                $this->authorize('manage', $employee); 
+            $company_id = auth()->guard("employees")->user()->company_id;
+            $employees = Employee::whereIn('id', $request->items)->where("company_id",$company_id)->get();
+            if(count($request['items']) != $employees->count()){
+                return JsonResponse::respondError("يوجد موظفين غير موجودة");
             }
+
+            
             $this->crudRepository->restoreItem(Employee::class, $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_RESTORED_SUCCESSFULLY));
         } catch (Exception $e) {
@@ -119,15 +130,21 @@ class EmployeeController extends BaseController
     public function forceDelete(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $employees = Employee::whereIn('id', $request->items)->get();
-
+            $company_id = auth()->guard("employees")->user()->company_id;
+            $employees = Employee::whereIn('id', $request->items)->where("company_id",$company_id)->get();
+            if(count($request['items']) != $employees->count()){
+                return JsonResponse::respondError("يوجد موظفين غير موجودة");
+            }
+            DB::beginTransaction();
             foreach ($employees as $employee) {
-                $this->authorize('manage', $employee); 
                 $employee->roles()->detach();
+                $employee->warehouses()->detach();
             }
             $this->crudRepository->deleteRecordsFinial(Employee::class, $request['items']);
+            DB::commit();
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_FORCE_DELETED_SUCCESSFULLY));
         } catch (Exception $e) {
+            DB::rollback();
             return JsonResponse::respondError($e->getMessage());
         }
     }
@@ -135,7 +152,7 @@ class EmployeeController extends BaseController
     public function assignWarehouse(AssignWarehouseRequest $request)
     {
         try {
-            $this->crudRepository->assignToWarehouse('employees', $request['items'] ,$request->warehouse_id);
+            $this->crudRepository->assignToWarehouse( $request['items'] ,$request->warehouse_id);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());

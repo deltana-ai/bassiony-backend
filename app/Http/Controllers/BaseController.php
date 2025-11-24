@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Helpers\JsonResponse;
 use Illuminate\Http\Request;
-
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 class BaseController extends Controller
 {
+    use AuthorizesRequests, ValidatesRequests;
     protected mixed $crudRepository;
 
     public function toggle($id, $column)

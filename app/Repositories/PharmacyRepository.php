@@ -8,11 +8,12 @@ use App\Interfaces\PharmacyRepositoryInterface;
 use App\Models\Pharmacist;
 use App\Models\Pharmacy;
 use App\Models\Product;
+
 use App\Notifications\SendPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
+use Spatie\Permission\Models\Role;
 class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInterface
 {
     
@@ -36,22 +37,17 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
             $employee_data = $this->handleData($data);
 
             unset($data["email"]);
+            unset($data["password"]);
 
             $pharmacy = $this->create($data);
 
             $employee_data["pharmacy_id"] = $pharmacy->id;
 
-            $password = $employee_data["un_hash"];
-
-            unset($employee_data["un_hash"]);
-
             $employee = $this->employee_repo->create($employee_data);
+            $superpharmacist = Role::firstOrCreate(['name' => 'pharmacy_owner','guard_name'=>'pharmacists','pharmacy_id'=>$pharmacy->id]);
+            $employee ->assignRole($superpharmacist);
 
-            $employee ->assignRole("pharmacy_owner");
-
-            $employee->notify(new SendPassword($password ,$this->dashboard_type));
-
-            return ["employee"=>$employee,"password"=>$password] ;
+            return $employee ;
         });
 
     }
@@ -63,22 +59,17 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
             $employee_data = $this->handleData($data);
 
             unset($data["email"]);
-
+            unset($data["password"]);
             $this->update($data , $pharmacy_id) ;
 
             $employee_data["pharmacy_id"] = $pharmacy_id;
 
-            $password = $employee_data["un_hash"];
-
-            unset($employee_data["un_hash"]);
-
-            $employee = Pharmacist::where('is_owner',1)->first();
+            $employee = Pharmacist::where('pharmacy_id', $pharmacy_id)->where('is_owner',1)->first();
 
             $employee ->update($employee_data);
 
-            $employee->notify(new SendPassword($password ,$this->dashboard_type));
 
-            return ["employee"=>$employee,"password"=>$password] ;
+            return $employee;
         });
 
     }
@@ -87,8 +78,9 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
 
     public function deletePharmacywithUsers(array $ids )
     {
+        
         return DB::transaction(function () use ($ids) {
-            $this->employee_repo->model::whereIn('pharmacy_id', $ids)->delete();
+            Pharmacist::whereIn('pharmacy_id', $ids)->delete();
             $this->model::whereIn('id', $ids)->delete();
 
         });
@@ -103,7 +95,7 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
             ->whereIn('id', $ids)
             ->restore();
 
-            $this->employee_repo->model::withTrashed()
+            Pharmacist::withTrashed()
                 ->whereIn('pharmacy_id', $ids)
                 ->restore();
         });
@@ -115,18 +107,19 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
     protected function handleData(array $data)
     {
 
-        $code = rand(1000,9999);
+        $password = $data["password"];
 
-        $password = rand(1000,9999)."Admin".rand(1000,9999);
+        $code = mt_rand(1000, 9999);
 
         $employee["name"] = $data["name"]."_admin".$code ;
 
         $employee["active"] = 1;
 
         $employee["email"] = $data["email"];
+        if (isset($data["password"])) {
+             $employee["password"] = Hash::make($data["password"]) ;
 
-        $employee["password"] = Hash::make($password) ;
-        $employee["un_hash"] = $password; 
+        }
      
         $employee["is_owner"] = 1;
         return $employee;
@@ -146,17 +139,23 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
         $query = Product::query()
             ->select([
                 'products.id',
-                'products.name',
+                'products.name_ar',
+                'products.name_en',
                 'products.description',
                 'products.price',
                 'products.active',
-                'products.show_home',
                 'products.rating',
                 'products.bar_code',
+                'products.qr_code',
+                'products.gtin',
+                'products.scientific_name',
+                'products.active_ingredients',
+                'products.dosage_form',
                 'products.category_id',
                 'products.brand_id',
                 'categories.name as category_name',
                 'brands.name as brand_name',
+                DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
                 DB::raw('COALESCE(SUM(branch_product.reserved_stock), 0) as total_reserved_stock'),
                 DB::raw('COALESCE(SUM(branch_product_batches.stock), 0) as total_stock'),
                 DB::raw('COUNT(DISTINCT branch_product_batches.id) as total_batches'),
@@ -176,13 +175,18 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
             ->groupBy([
                 'products.id',
-                'products.name',
+                'products.name_ar',
+                'products.name_en',
                 'products.description',
                 'products.price',
                 'products.active',
-                'products.show_home',
                 'products.rating',
                 'products.bar_code',
+                'products.qr_code',
+                'products.gtin',
+                'products.scientific_name',
+                'products.active_ingredients',
+                'products.dosage_form',
                 'products.category_id',
                 'products.brand_id',
                 'categories.name',
@@ -194,16 +198,8 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
 
         // Apply sorting
         $query->orderBy($sortBy, $sortOrder);
+        return $paginate ? $query->paginate($perPage) : $query->get();
 
-        if ($paginate) {
-            $products = $query->paginate($perPage);
-            
-            
-            
-            return $products;
-        } else {
-            return $query->get();
-        }
     
         
     }
@@ -225,17 +221,12 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
                 
                 // Search (name, description, barcode)
                 case 'search':
-                    $query->where(function ($q) use ($value) {
-                        $q->where('products.name', 'LIKE', '%' . $value . '%')
-                          ->orWhere('products.description', 'LIKE', '%' . $value . '%')
-                          ->orWhere('products.bar_code', 'LIKE', '%' . $value . '%');
-                    });
+                    $query->whereRaw("MATCH(products.search_index) AGAINST(? IN BOOLEAN MODE)", [$value]);
+
                     break;
 
                 // Product name only
-                case 'product_name':
-                    $query->where('products.name', 'LIKE', '%' . $value . '%');
-                    break;
+                
 
                 // Barcode exact or partial match
                 case 'bar_code':
@@ -245,15 +236,19 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
                 case 'bar_code_exact':
                     $query->where('products.bar_code', $value);
                     break;
+                case 'qr_code':
+                    $query->where('products.qr_code', $value);
+                    break;
 
+                case 'gtin':
+                    $query->where('products.gtin', $value);
+                    break;
                 // Product status
                 case 'active':
                     $query->where('products.active', (bool) $value);
                     break;
 
-                case 'show_home':
-                    $query->where('products.show_home', (bool) $value);
-                    break;
+              
 
                 // Price filters
                 case 'min_price':

@@ -21,6 +21,11 @@ class CompanyController extends BaseController
     public function __construct(CompanyRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('permission:company-list|manage-site|manage-pharmacy|manage-company', ['only' => ['index','show']]);
+        $this->middleware('permission:company-create|manage-site', ['only' => [ 'store']]);
+        $this->middleware('permission:company-edit|manage-site', ['only' => [ 'update']]);
+        $this->middleware('permission:company-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
+
     }
 
     public function index()
@@ -46,9 +51,9 @@ class CompanyController extends BaseController
 
                 $employee = $this->crudRepository->createCompanywithUser($request->validated());
 
-                $employee["employee"]->load("roles");
+                $employee->load("roles");
 
-                return JsonResponse::respondSuccess('Item created Successfully', ["company owner"=>new EmployeeResource($employee["employee"]),"password"=>$employee["password"]]);
+                return JsonResponse::respondSuccess('Item created Successfully', new EmployeeResource($employee));
 
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());
@@ -71,14 +76,13 @@ class CompanyController extends BaseController
     public function update(CompanyRequest $request, Company $company)
     {
         try {
-
             $this->authorize('update', $company);
 
             $employee = $this->crudRepository->updateCompanywithUser($request->validated(), $company->id);
 
-            $employee["employee"]->load("roles");
+            $employee->load("roles");
 
-            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), ["company owner"=>new EmployeeResource($employee["employee"]),"password"=>$employee["password"]]);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY), new EmployeeResource($employee));
 
 
         } catch (\Throwable $th) {
@@ -147,10 +151,14 @@ class CompanyController extends BaseController
             }])
             ->get();
 
-        return response()->json([
-            'company' => $company->name,
-            'products' => ProductResource::collection($products),
-        ]);        }
+           $data = [
+                'company' => $company->name,
+                'products' => ProductResource::collection($products),
+            ];
+          return JsonResponse::respondSuccess('products Fetched Successfully', $data);
+
+    }
+
 
 
 }

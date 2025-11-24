@@ -1,0 +1,157 @@
+Add Category
+This endpoint allows you to add a new category to the dashboard. The request requires specific parameters that define the category's attributes.
+Request Parameters
+The request is sent using the POST method and requires the following form-data parameters:
+name (text): The name of the category.
+active (text): Indicates whether the category is active (true or false).
+show_home (text): Specifies if the category should be displayed on the home page (true or false).
+position (text): The position of the category in the display order.
+image (text): A URL or identifier for the category's image.
+
+Expected Response
+Upon a successful request, the server will respond with a 201 Created status and return a JSON object containing the following fields:
+data: An object that includes:
+id: The unique identifier of the newly created category.
+name: The name of the category.
+showHome: A boolean indicating if the category is displayed on the home page.
+position: The position of the category.
+active: A boolean indicating if the category is active.
+imageUrl: The URL of the category's image.
+image: An object containing details about the image, including:
+id: The unique identifier of the image.
+name: The name of the image file.
+mimeType: The MIME type of the image.
+size: The size of the image file in bytes.
+authorId: The identifier of the author who uploaded the image (if applicable).
+previewUrl: A URL for a preview of the image.
+fullUrl: The full URL of the image.
+createdAt: Timestamp of when the image was created.
+
+createdAt: Timestamp of when the category was created.
+updatedAt: Timestamp of the last update to the category.
+deletedAt: Timestamp of when the category was deleted (if applicable).
+deleted: A boolean indicating if the category has been marked as deleted.
+
+
+Notes
+Ensure that all required parameters are included in the request to avoid errors.
+The image parameter should point to a valid image resource for proper processing.
+
+
+
+This endpoint allows you to add a new category to the dashboard. The request requires specific parameters that define the category's attributes.
+Request Parameters
+The request is sent using the POST method and requires the following form-data parameters:
+name (text): The name of the category.
+active (text): Indicates whether the category is active (true or false).
+show_home (text): Specifies if the category should be displayed on the home page (true or false).
+position (text): The position of the category in the display order.
+image (text): A URL or identifier for the category's image.
+
+Expected Response
+Upon a successful request, the server will respond with a 201 Created status and return a JSON object containing the following fields:
+data: An object that includes:
+id: The unique identifier of the newly created category.
+name: The name of the category.
+showHome: A boolean indicating if the category is displayed on the home page.
+position: The position of the category.
+active: A boolean indicating if the category is active.
+imageUrl: The URL of the category's image.
+image: An object containing details about the image, including:
+id: The unique identifier of the image.
+name: The name of the image file.
+mimeType: The MIME type of the image.
+size: The size of the image file in bytes.
+authorId: The identifier of the author who uploaded the image (if applicable).
+previewUrl: A URL for a preview of the image.
+fullUrl: The full URL of the image.
+createdAt: Timestamp of when the image was created.
+
+createdAt: Timestamp of when the category was created.
+updatedAt: Timestamp of the last update to the category.
+deletedAt: Timestamp of when the category was deleted (if applicable).
+deleted: A boolean indicating if the category has been marked as deleted.
+
+
+Notes
+Ensure that all required parameters are included in the request to avoid errors.
+The image parameter should point to a valid image resource for proper processing.
+
+
+
+This endpoint allows you to add a new category to the dashboard. The request requires specific parameters that define the category's attributes.
+Request Parameters
+The request is sent using the POST method and requires the following form-data parameters:
+name (text): The name of the category.
+active (text): Indicates whether the category is active (true or false).
+show_home (text): Specifies if the category should be displayed on the home page (true or false).
+position (text): The position of the category in the display order.
+image (text): A URL or identifier for the category's image.
+
+Expected Response
+Upon a successful request, the server will respond with a 201 Created status and return a JSON object containing the following fields:
+data: An object that includes:
+id: The unique identifier of the newly created category.
+name: The name of the category.
+showHome: A boolean indicating if the category is displayed on the home page.
+position: The position of the category.
+active: A boolean indicating if the category is active.
+imageUrl: The URL of the category's image.
+image: An object containing details about the image, including:
+id: The unique identifier of the image.
+name: The name of the image file.
+mimeType: The MIME type of the image.
+size: The size of the image file in bytes.
+authorId: The identifier of the author who uploaded the image (if applicable).
+previewUrl: A URL for a preview of the image.
+fullUrl: The full URL of the image.
+createdAt: Timestamp of when the image was created.
+
+createdAt: Timestamp of when the category was created.
+updatedAt: Timestamp of the last update to the category.
+deletedAt: Timestamp of when the category was deleted (if applicable).
+deleted: A boolean indicating if the category has been marked as deleted.
+
+
+Notes
+Ensure that all required parameters are included in the request to avoid errors.
+The image parameter should point to a valid image resource for proper processing.
+
+This endpoint allows you to add a new Category to the dashboard. It is essential for managing Category-related data within the application. When you send a request to this endpoint, you will define the attributes of the Category you wish to create.
+Request Parameters
+The request is sent using the POST method and requires the following form-data parameters:
+name (text): The name of the Category. This is a mandatory field that should represent the Category's identity.
+active (text): Indicates whether the Category is active. Acceptable values are "true" or "false". This parameter helps in filtering active Categorys in the dashboard.
+show_home (text): Specifies if the Category should be displayed on the home page. Acceptable values are "true" or "false". This controls the visibility of the Category on the homepage.
+position (text): The position of the Category in the display order. This is used to arrange Categorys in a specific sequence on the dashboard.
+image (text): A URL or identifier for the Category's image. This should point to a valid image resource to ensure proper display.
+
+Expected Response
+Upon a successful request, the server will respond with a 201 Created status and return a JSON object containing the following structure:
+data: An object that includes:
+id: The unique identifier of the newly created Category.
+name: The name of the Category as provided in the request.
+showHome: A boolean indicating if the Category is displayed on the home page, reflecting the value of the show_home parameter.
+position: The position of the Category as specified in the request.
+active: A boolean indicating if the Category is active, reflecting the value of the active parameter.
+imageUrl: The URL of the Category's image, which is generated based on the provided image parameter.
+image: An object containing details about the image, including:
+id: The unique identifier of the image.
+name: The name of the image file.
+mimeType: The MIME type of the image.
+size: The size of the image file in bytes.
+authorId: The identifier of the author who uploaded the image (if applicable).
+previewUrl: A URL for a preview of the image.
+fullUrl: The full URL of the image.
+createdAt: Timestamp of when the image was created.
+
+createdAt: Timestamp of when the Category was created.
+updatedAt: Timestamp of the last update to the Category.
+deletedAt: Timestamp of when the Category was deleted (if applicable).
+deleted: A boolean indicating if the Category has been marked as deleted.
+
+
+Notes
+Ensure that all required parameters are included in the request to avoid errors.
+The image parameter should point to a valid image resource for proper processing.
+This endpoint is crucial for maintaining the Category catalog and ensuring that the dashboard reflects the correct Category information.

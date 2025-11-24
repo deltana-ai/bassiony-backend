@@ -12,7 +12,7 @@ use App\Models\Employee;
 use App\Models\Product;
 use App\Notifications\SendPassword;
 use Illuminate\Support\Facades\DB;
-
+use Spatie\Permission\Models\Role;
 class CompanyRepository extends CrudRepository implements CompanyRepositoryInterface
 {
     protected Model $model;
@@ -35,22 +35,19 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             $employee_data = $this->handleData($data);
 
             unset($data["email"]);
+            unset($data["password"]);
             
             $company = $this->create($data);
 
             $employee_data["company_id"] = $company->id;
 
-            $password = $employee_data["un_hash"];
-
-            unset($employee_data["un_hash"]);
 
             $employee = $this->employee_repo->create($employee_data);
+            $superManger = Role::firstOrCreate(['name' => 'company_owner','guard_name'=>'employees',"company_id"=>$company->id]);
+            $employee ->assignRole($superManger);
             
-            $employee ->assignRole("company_owner");
-            
-            $employee->notify(new SendPassword($password ,$this->dashboard_type));
 
-            return ["employee"=>$employee,"password"=>$password] ;
+            return $employee ;
         });
 
     }
@@ -62,6 +59,7 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             $employee_data = $this->handleData($data);
 
             unset($data["email"]);
+            unset($data["password"]);
 
             $company = $this->find($company_id);
 
@@ -69,17 +67,11 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
              
             $employee_data["company_id"] = $company->id;
 
-            $password = $employee_data["un_hash"];
-
-            unset($employee_data["un_hash"]);
-
-            $employee = Employee::where('is_owner',1)->first();
+            $employee = Employee::where('company_id', $company_id)->where('is_owner',1)->first();
       
             $employee ->update($employee_data);
             
-            $employee->notify(new SendPassword($password ,$this->dashboard_type));
-
-            return ["employee"=>$employee,"password"=>$password] ;
+            return $employee ;
         });
 
     }
@@ -104,7 +96,7 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             ->whereIn('id', $ids)
             ->restore();
 
-            $this->employee_repo->model::withTrashed()
+            Employee::withTrashed()
                 ->whereIn('company_id', $ids)
                 ->restore();
         });
@@ -118,16 +110,15 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
 
         $code = rand(1000,9999);
 
-        $password = rand(1000,9999)."Admin".rand(1000,9999);
-
         $employee["name"] = $data["name"]."_admin".$code ;
 
         $employee["active"] = 1;
 
         $employee["email"] = $data["email"];
+        if (isset($data["password"])) {
+             $employee["password"] = Hash::make($data["password"]) ;
 
-        $employee["password"] = Hash::make($password) ;
-        $employee["un_hash"] = $password; 
+        }
        
         $employee["is_owner"] = 1;
         return $employee;
@@ -146,17 +137,23 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
         $query = Product::query()
             ->select([
                 'products.id',
-                'products.name',
+                'products.name_ar',
+                'products.name_en',
                 'products.description',
                 'products.price',
                 'products.active',
-                'products.show_home',
                 'products.rating',
                 'products.bar_code',
+                'products.qr_code',
+                'products.gtin',
+                'products.scientific_name',
+                'products.active_ingredients',
+                'products.dosage_form',
                 'products.category_id',
                 'products.brand_id',
                 'categories.name as category_name',
                 'brands.name as brand_name',
+                DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
                 DB::raw('COALESCE(SUM(warehouse_product.reserved_stock), 0) as total_reserved_stock'),
                 DB::raw('COALESCE(SUM(warehouse_product_batches.stock), 0) as total_stock'),
                 DB::raw('COUNT(DISTINCT warehouse_product_batches.id) as total_batches'),
@@ -176,13 +173,18 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
             ->groupBy([
                 'products.id',
-                'products.name',
+                'products.name_ar',
+                'products.name_en',
                 'products.description',
                 'products.price',
                 'products.active',
-                'products.show_home',
                 'products.rating',
                 'products.bar_code',
+                'products.qr_code',
+                'products.gtin',
+                'products.scientific_name',
+                'products.active_ingredients',
+                'products.dosage_form',
                 'products.category_id',
                 'products.brand_id',
                 'categories.name',
@@ -195,15 +197,8 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
         // Apply sorting
         $query->orderBy($sortBy, $sortOrder);
 
-        if ($paginate) {
-            $products = $query->paginate($perPage);
-            
-            
-            
-            return $products;
-        } else {
-            return $query->get();
-        }
+        return $paginate ? $query->paginate($perPage) : $query->get();
+
     
         
     }
@@ -225,16 +220,8 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
                 
                 // Search (name, description, barcode)
                 case 'search':
-                    $query->where(function ($q) use ($value) {
-                        $q->where('products.name', 'LIKE', '%' . $value . '%')
-                          ->orWhere('products.description', 'LIKE', '%' . $value . '%')
-                          ->orWhere('products.bar_code', 'LIKE', '%' . $value . '%');
-                    });
-                    break;
+                      $query->whereRaw("MATCH(products.search_index) AGAINST(? IN BOOLEAN MODE)", [$value]);
 
-                // Product name only
-                case 'product_name':
-                    $query->where('products.name', 'LIKE', '%' . $value . '%');
                     break;
 
                 // Barcode exact or partial match
@@ -246,14 +233,21 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
                     $query->where('products.bar_code', $value);
                     break;
 
+                
+
+                case 'qr_code':
+                    $query->where('products.qr_code', $value);
+                    break;
+
+                case 'gtin':
+                    $query->where('products.gtin', $value);
+                    break;
                 // Product status
                 case 'active':
                     $query->where('products.active', (bool) $value);
                     break;
 
-                case 'show_home':
-                    $query->where('products.show_home', (bool) $value);
-                    break;
+               
 
                 // Price filters
                 case 'min_price':

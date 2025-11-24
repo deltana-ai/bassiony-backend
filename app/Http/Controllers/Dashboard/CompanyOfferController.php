@@ -23,10 +23,13 @@ class CompanyOfferController extends Controller
     public function __construct(CompanyOfferRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('permission:company-offer-create|manage-company', ['only' => [ 'store']]);
+        $this->middleware('permission:company-offer-edit|manage-company', ['only' => [ 'update']]);
+        $this->middleware('permission:company-offer-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
     }
 
 
-      public function index()
+    public function index()
     {
         try {
             $this->authorize('viewAny', CompanyOffer::class);
@@ -34,11 +37,7 @@ class CompanyOfferController extends Controller
             if (auth()->guard("employees")->check()) {
                 $options["company_id"] = auth()->guard("employees")->user()->company_id ;
             }
-            $offers = CompanyOfferResource::collection($this->crudRepository->all(
-                [],
-                $options,
-                ['*']
-            ));
+            $offers = CompanyOfferResource::collection($this->crudRepository->allOffers(["company",'product'],$options,['*']));
             return $offers->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -52,8 +51,8 @@ class CompanyOfferController extends Controller
                 $data = $this->handleData( $request);
                 $offer = $this->crudRepository->create($data);
 
-                return new CompanyOfferResource($offer);
-                //return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
+               // return new CompanyOfferResource($offer);
+                return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
 
             } catch (Exception $e) {
                 return JsonResponse::respondError($e->getMessage());

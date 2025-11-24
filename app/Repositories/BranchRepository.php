@@ -35,13 +35,22 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
          $query = Product::query()
             ->select([
                 'products.id',
-                'products.name',
-                'products.description',
-                'products.price',
-                'products.bar_code',
+                'products.name_ar',
+                'products.name_en',
                 'products.active',
-                'products.show_home',
+                'products.bar_code',
+                'products.qr_code',
+                'products.scientific_name',
+                'products.active_ingredients',
+                'products.description',
+                'products.dosage_form',
+                'products.gtin',
+                'products.price',
+                'products.search_index',
+            
                 'branch_product.reserved_stock',
+                DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
+
                 DB::raw('COALESCE(SUM(branch_product_batches.stock), 0) as total_stock'),
                 DB::raw('COUNT(DISTINCT branch_product_batches.id) as total_batches')
             ])
@@ -56,11 +65,19 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
             })
             ->groupBy([
                 'products.id',
-                'products.name',
-                'products.description',
-                'products.price',
                 'products.active',
-                'products.show_home',
+                'products.name_ar',
+                'products.name_en',
+                'products.scientific_name',
+                'products.active_ingredients',
+                'products.description',
+                'products.dosage_form',
+                'products.price',
+                'products.bar_code',
+                'products.qr_code',
+                'products.gtin',
+                'products.search_index',
+              
                 'branch_product.reserved_stock'
             ]);
 
@@ -71,17 +88,7 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
         $query->orderBy($sortBy, $sortOrder);
 
         
-        if ($paginate) {
-            $products = $query->paginate($perPage);
-            
-            
-            
-            return $products;
-        } else {
-            $products = $query->get();
-            return $products;
-
-        }
+        return $paginate ? $query->paginate($perPage) : $query->get();
         
     }
 
@@ -109,8 +116,8 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
 
         $query = BranchProductBatch::query()
             ->with([
-                'product:id,name,bar_code,price',
-                'branch:id,name,location'
+                'product:id,name_ar,name_en,bar_code,price,qr_code,gtin,active',
+                'branch:id,name,address'
             ])
             ->where('product_id', $productId)
             ->where('branch_id', $branchId);
@@ -145,10 +152,8 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
             switch ($key) {
                 // Text search (product name or description)
                 case 'search':
-                    $query->where(function ($q) use ($value) {
-                        $q->where('products.name', 'LIKE', '%' . $value . '%')
-                          ->orWhere('products.description', 'LIKE', '%' . $value . '%');
-                    });
+                     $query->whereRaw("MATCH(products.search_index) AGAINST(? IN BOOLEAN MODE)", [$value]);
+
                     break;
 
                 
@@ -157,9 +162,7 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
                     $query->where('products.active', (bool) $value);
                     break;
 
-                case 'show_home':
-                    $query->where('products.show_home', (bool) $value);
-                    break;
+              
 
                 // Price range filters
                 case 'min_price':

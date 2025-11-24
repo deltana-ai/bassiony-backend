@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\BaseController;
+
 use App\Helpers\JsonResponse;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\WarehouseRequest;
 use App\Http\Resources\WarehouseResource ;
 use App\Interfaces\WarehouseRepositoryInterface;
@@ -20,6 +22,12 @@ class WarehouseController extends BaseController
     public function __construct(WarehouseRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('auth:employees');
+        $this->middleware('permission:warehouse-list|manage-company', ['only' => ['index']]);
+        $this->middleware('permission:warehouse-create|manage-company', ['only' => [ 'store']]);
+        $this->middleware('permission:warehouse-edit|manage-company', ['only' => [ 'update']]);
+        $this->middleware('permission:warehouse-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+    
     }
 
     public function index()
@@ -28,7 +36,7 @@ class WarehouseController extends BaseController
 
             $warehouses = WarehouseResource::collection($this->crudRepository->all(
                 ["company"],
-                ["company_id"=>auth()->user()->company_id],
+                ["company_id"=>auth()->guard("employees")->user()->company_id],
                 ['*']
             ));
             return $warehouses->additional(JsonResponse::success());

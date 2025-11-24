@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\JsonResponse;
+use App\Http\Requests\FileImportRequest;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Imports\ProductImport;
+use App\Imports\ProductsImport;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+
 class ProductController extends BaseController
 
 {
@@ -121,6 +126,34 @@ class ProductController extends BaseController
     } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
+    }
+
+    	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+    public function import(FileImportRequest $request)
+    {
+        $import = new ProductImport();
+        try {
+          
+             Excel::import($import, $request->file('file'));
+
+            
+            if ($import->hasErrors()) {
+                $data = [];
+                $data ["errors_count"] = $import->getErrorsCount();
+
+                $data ["errors"] = $import->getErrors();
+
+                return JsonResponse::respondSuccess('تم الاستيراد مع وجود بعض الأخطاء', $data);
+
+            }
+
+            return JsonResponse::respondSuccess( ' تم استيراد البيانات بنجاح');
+        } catch (Exception $e) {
+            return JsonResponse::respondError('حدث خطأ أثناء الاستيراد: ' . $e->getMessage());
+        }
+        
     }
  
 
