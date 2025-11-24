@@ -29,10 +29,11 @@ return new class extends Migration
             $table->string('dosage_form')->nullable();
             $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('rating', 2, 1)->default(0);
-            $table->decimal('price', 5, 2)->default(0);
+            $table->decimal('price', 8, 2)->default(0);
             $table->unsignedInteger('rating_count')->default(0);
             $table->text('search_index')->nullable();
-         
+            $table->decimal('tax', 8, 2)->default(0);
+
             $table->fullText(['search_index']);
             $table->softDeletes();
             $table->timestamps();
