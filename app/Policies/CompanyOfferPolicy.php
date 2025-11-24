@@ -52,8 +52,8 @@ class CompanyOfferPolicy
      */
     public function update($user, CompanyOffer $companyOffer): bool
     {
-        return $this->getGuard() === 'employees'
-            && $user->company_id === $companyOffer->company_id;
+        return $this->getGuard() === 'employees';
+           // && $user->company_id === $companyOffer->company_id;
     }
 
     /**
@@ -61,7 +61,7 @@ class CompanyOfferPolicy
      */
     public function delete($user, CompanyOffer $companyOffer): bool
     {
-        return $this->getGuard() === 'employees'
-            && $user->company_id === $companyOffer->company_id;
+        return $this->getGuard() === 'employees';
+           // && $user->company_id === $companyOffer->company_id;
     }
 }
