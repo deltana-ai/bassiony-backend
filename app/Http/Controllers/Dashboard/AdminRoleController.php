@@ -20,7 +20,7 @@ class AdminRoleController extends Controller
     {
         $this->crudRepository = $pattern;
         $this->middleware('auth:admins');
-        $this->middleware('permission:role-list|manage-site', ['only' => ['index']]);
+        $this->middleware('permission:role-list|manage-site', ['only' => ['index','show']]);
         $this->middleware('permission:role-create|manage-site', ['only' => [ 'store']]);
         $this->middleware('permission:role-edit|manage-site', ['only' => [ 'update']]);
         $this->middleware('permission:role-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
