@@ -14,6 +14,8 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $taxValue = ($this->price * ($this->tax / 100));
+        $priceWithTax = $this->price + $taxValue;
          return [
             'id'          => $this->id,
             'name'        => $this->name,
@@ -32,7 +34,12 @@ class ProductResource extends JsonResource
             'show_home'   => (bool) $this->show_home,
             'rating'      => (float) $this->rating,
             'rating_count'=> $this->rating_count,
-            'price'         => (float) $this->price,
+
+            'tax' => (float) $this->tax,
+            'price' => round($priceWithTax, 2),
+            'price_without_tax' => (float) $this->price,
+
+            'total_stock'  => $this->total_stock ?? 0,
 
             'imageUrl'    => $this->getFirstMediaUrl(),
             'image'       => new MediaResource($this->getFirstMedia()),

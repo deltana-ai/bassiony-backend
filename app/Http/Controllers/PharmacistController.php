@@ -7,7 +7,9 @@ use App\Http\Requests\Auth\RegisterPharmacistRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\PharmacistRequest;
 use App\Http\Resources\PharmacistResource;
+use App\Http\Resources\ProductResource;
 use App\Interfaces\PharmacistRepositoryInterface;
+use App\Models\Company;
 use App\Models\Pharmacist;
 use Exception;
 use Illuminate\Http\Request;
@@ -245,6 +247,41 @@ class PharmacistController extends BaseController
 
         return JsonResponse::respondSuccess('Successfully logged out');
     }
+
+
+    public function indexAllProductInCompany()
+    {
+        $companies = Company::with(['warehouses.batches.product'])
+            ->get()
+            ->map(function ($company) {
+
+                // نجمع كل الباتشات اللي في مخازن الشركة
+                $products = $company->warehouses
+                    ->flatMap(fn($warehouse) => $warehouse->batches)
+                    ->groupBy('product_id')
+                    ->map(function ($group) {
+
+                        // ناخد المنتج
+                        $product = $group->first()->product;
+
+                        // نضيف total_stock كخاصية على المنتج
+                        $product->total_stock = $group->sum('stock');
+
+                        // نرجع المنتج عشان يروح للريسورس
+                        return $product;
+                    })
+                    ->values();
+
+                return [
+                    'company_id'   => $company->id,
+                    'company_name' => $company->name,
+                    'products'     => ProductResource::collection($products),
+                ];
+            });
+
+        return response()->json($companies);
+    }
+
 
 
 }

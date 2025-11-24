@@ -22,7 +22,7 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
 
-    
+
 
     ///////////////////////////////////update company data/////////////////////////////////////////
     Route::patch('/our-company', [CompanyController::class, 'update']);
@@ -53,7 +53,7 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
 
-    
+
     /////////////////////////////////////////////////////////////////////////////////
     Route::post('categories/index', [AdminCategoryController::class, 'index']);
     Route::apiResource('categories', AdminCategoryController::class)->only(['show']);
@@ -106,10 +106,10 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     /////////////////////////////////////////////////////////////////////////////////////////
     Route::post('company-products/index', [CompanyProductController::class,"index"]);
     ////////////////////////////////////////////////////////////////////////////////////////
-    
 
 
-   
+
+
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +135,7 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    
+
 
 
     ////////////////////////profile employee///////////////////////////////////////////////////////////////
@@ -157,8 +157,19 @@ Route::prefix('company')->middleware('throttle:20')->group(function () {
 });
 
 Route::get('/warehouse-products/search', [WarehouseProductSearchController::class, 'search']);
+Route::get('companies/{companyId}/available-products', [CompanyController::class, 'availableProducts']);
 
 
+// pharmacy Order & Cart Routes
+Route::get('/pharmacy/cart', [PharmacyOrderController::class, 'index']);
+Route::post('/pharmacy/cart', [PharmacyOrderController::class, 'store']);
+Route::delete('/pharmacy/cart', [PharmacyOrderController::class, 'destroy']);
 
+// 🧾 pharmacy Order
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/pharmacy/orders', [PharmacyOrderController::class, 'storeOrder']);
+});
 
-
+Route::put('company/orders/{id}/status', [CompanyOrderController::class, 'updateStatus']);
+Route::post('company/orders/{id}/assign', [CompanyOrderController::class, 'assignWarehouse']);
+Route::get('company/all-pharmacy-orders', [CompanyOrderController::class, 'getAllPharmacyOrders']);

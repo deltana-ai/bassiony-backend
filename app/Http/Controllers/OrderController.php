@@ -15,6 +15,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Interfaces\OrderRepositoryInterface;
+use App\Models\Company;
 
 class OrderController extends BaseController
 {
@@ -142,6 +143,10 @@ public function updateStatus(UpdateOrderStatusRequest $request, $orderId)
             OrderPharmacistResource::collection($orders)
         );
     }
+
+
+
+
 
 
 

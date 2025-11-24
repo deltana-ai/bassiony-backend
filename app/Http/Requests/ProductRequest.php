@@ -15,7 +15,7 @@ class ProductRequest extends FormRequest
         return true; // لو فيه صلاحيات تقدر تتحكم هنا
     }
 
-          
+
     public function rules(): array
     {
         $rules = [
@@ -35,6 +35,7 @@ class ProductRequest extends FormRequest
             'brand_id'           => [ 'nullable','exists:brands,id'],
             'rating'             => [ 'nullable','numeric','min:0','max:9.9'],
             'price'              => [ 'nullable','numeric'],
+            'tax'              => [ 'nullable','numeric'],
         ];
         if ($this->isMethod('post')) {
           $rules['gtin'][]     = 'unique:products,gtin';
