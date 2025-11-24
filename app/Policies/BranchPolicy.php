@@ -15,8 +15,8 @@ class BranchPolicy
 
     public function manage( Pharmacist $user, Branch $branch)
     {
-
-        return  $user->pharmacy_id === $branch->pharmacy_id ;
+return true;
+       // return  $user->pharmacy_id === $branch->pharmacy_id ;
 
 
     }
