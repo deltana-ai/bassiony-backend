@@ -52,7 +52,7 @@ class CompanySeeder extends Seeder
             'is_owner' => true,
             'active' => true,
         ]);
-        $superManger = Role::firstOrCreate(['name' => 'company_owner','guard_name'=>'employees',"company_id"=>$company->id]);
+        $superManger = Role::firstOrCreate(['name' => 'company_owner_'.$company->id,'guard_name'=>'employees',"company_id"=>$company->id]);
         $company_permissions = Permission::where('guard_name','employees')->pluck('name')->toArray();
         $superManger->givePermissionTo($company_permissions);
 

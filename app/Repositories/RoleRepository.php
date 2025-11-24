@@ -20,12 +20,19 @@ class RoleRepository extends CrudRepository implements RoleRepositoryInterface
     public function createRole(array $data)
     {
         $permissions = $data["permissions"];
-        $data_create = ['name' => $data["name"],'guard_name'=> auth()->user()->guard_name];
+        $userEntrprice = null;
+        
+        $data_create = ['name' => $data["name"]  ,'guard_name'=> auth()->user()->guard_name];
         if (auth()->guard("employees")->check()) {
-           $data_create["company_id"]  =  auth()->guard("employees")->user()->company_id;
+            $userEntrprice = auth()->guard("employees")->user()->company_id;
+            $data_create["company_id"]  =  $userEntrprice;
+            $data_create["name"]  = $data["name"]."_".$userEntrprice;
         }
         if (auth()->guard("pharmacists")->check()) {
-           $data_create["pharmacy_id"]  =  auth()->guard("pharmacists")->user()->pharmacy_id;
+           $userEntrprice =  auth()->guard("pharmacists")->user()->pharmacy_id;
+           $data_create["pharmacy_id"]  =  $userEntrprice;
+
+           $data_create["name"]  = $data["name"] ."_". $userEntrprice;
         }
         $role = Role::create($data_create);
        
@@ -40,8 +47,8 @@ class RoleRepository extends CrudRepository implements RoleRepositoryInterface
         $permissions = $data["permissions"];
         
         $permissions = Permission::whereIn('id', $permissions)->get(['name'])->toArray();
-
-        $role->update(['name' => $data["name"]]);
+        $roleEntrprise = $role->pharmacy_id ?? $role->company_id ?? null;
+        $role->update(['name' => $data["name"]."_".$roleEntrprise]);
 
         $role->syncPermissions($permissions);
 

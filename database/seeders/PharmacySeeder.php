@@ -57,7 +57,7 @@ class PharmacySeeder extends Seeder
             'branch_id' => Branch::first()->id,
         ]);
         $pharmacy_permissions = Permission::where('guard_name','pharmacists')->pluck('name')->toArray();
-        $superpharmacist = Role::firstOrCreate(['name' => 'pharmacy_owner','guard_name'=>'pharmacists','pharmacy_id'=>Pharmacy::first()->id]);
+        $superpharmacist = Role::firstOrCreate(['name' => 'pharmacy_owner_'.Pharmacy::first()->id,'guard_name'=>'pharmacists','pharmacy_id'=>Pharmacy::first()->id]);
         $superpharmacist->givePermissionTo($pharmacy_permissions);
 
         $manager->assignRole('pharmacy_owner');
