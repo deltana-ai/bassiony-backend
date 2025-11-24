@@ -21,10 +21,10 @@ class CompanyController extends BaseController
     public function __construct(CompanyRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
-        $this->middleware('permission:company-list|manage-site|manage-pharmacy|manage-company', ['only' => ['index','show']]);
-        $this->middleware('permission:company-create|manage-site', ['only' => [ 'store']]);
-        $this->middleware('permission:company-edit|manage-site', ['only' => [ 'update']]);
-        $this->middleware('permission:company-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
+        // $this->middleware('permission:company-list|manage-site|manage-pharmacy|manage-company', ['only' => ['index','show']]);
+        // $this->middleware('permission:company-create|manage-site', ['only' => [ 'store']]);
+        // $this->middleware('permission:company-edit|manage-site', ['only' => [ 'update']]);
+        // $this->middleware('permission:company-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
 
     }
 

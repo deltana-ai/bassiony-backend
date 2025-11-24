@@ -23,9 +23,10 @@ class CompanyOfferController extends Controller
     public function __construct(CompanyOfferRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
-        $this->middleware('permission:company-offer-create|manage-company', ['only' => [ 'store']]);
-        $this->middleware('permission:company-offer-edit|manage-company', ['only' => [ 'update']]);
-        $this->middleware('permission:company-offer-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+        // $this->middleware('permission:company-offer-create|manage-company', ['only' => [ 'store']]);
+        // $this->middleware('permission:company-offer-edit|manage-company', ['only' => [ 'update']]);
+        // $this->middleware('permission:company-offer-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+    
     }
 
 

@@ -30,10 +30,10 @@ class BranchProductController extends BaseController
     public function __construct(BranchRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
-        $this->middleware('permission:branch-product-list|manage-pharmacy', ['only' => ['index','show']]);
-        $this->middleware('permission:branch-product-create|manage-pharmacy', ['only' => [ 'addBatch','addReservedStock']]);
-        $this->middleware('permission:branch-product-edit|manage-pharmacy', ['only' => [ 'updateBatchStock']]);
-        $this->middleware('permission:branch-product-import|manage-pharmacy', ['only' => [ 'import']]);
+        // $this->middleware('permission:branch-product-list|manage-pharmacy', ['only' => ['index','show']]);
+        // $this->middleware('permission:branch-product-create|manage-pharmacy', ['only' => [ 'addBatch','addReservedStock']]);
+        // $this->middleware('permission:branch-product-edit|manage-pharmacy', ['only' => [ 'updateBatchStock']]);
+        // $this->middleware('permission:branch-product-import|manage-pharmacy', ['only' => [ 'import']]);
 
     }
 

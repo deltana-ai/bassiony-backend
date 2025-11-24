@@ -19,10 +19,11 @@ class AdminController extends BaseController
     public function __construct(AdminRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
-        $this->middleware('permission:admin-list|manage-site', ['only' => ['index']]);
-        $this->middleware('permission:admin-create|manage-site', ['only' => [ 'store']]);
-        $this->middleware('permission:admin-edit|manage-site', ['only' => [ 'update']]);
-        $this->middleware('permission:admin-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
+        // $this->middleware('permission:admin-list|manage-site', ['only' => ['index']]);
+        // $this->middleware('permission:admin-create|manage-site', ['only' => [ 'store']]);
+        // $this->middleware('permission:admin-edit|manage-site', ['only' => [ 'update']]);
+        // $this->middleware('permission:admin-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
+    
     }
 
     public function index()
