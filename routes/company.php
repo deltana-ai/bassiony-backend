@@ -23,7 +23,7 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
 
-    
+
 
     ///////////////////////////////////update company data/////////////////////////////////////////
     Route::patch('/our-company', [CompanyController::class, 'update']);
@@ -64,7 +64,7 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::post('warehouses/{warehouse}/products/store',[WarehouseProductController::class,"addReservedStock"]);
 
     Route::apiResource('warehouses/{warehouse}/products', WarehouseProductController::class)->only(['show']);
-   
+
     //////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -131,9 +131,6 @@ Route::prefix('company')->middleware('throttle:20')->group(function () {
 });
 
 Route::get('/warehouse-products/search', [WarehouseProductSearchController::class, 'search']);
-
-
-
 Route::get('companies/{companyId}/available-products', [CompanyController::class, 'availableProducts']);
 
 
@@ -146,7 +143,7 @@ Route::delete('/pharmacy/cart', [PharmacyOrderController::class, 'destroy']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/pharmacy/orders', [PharmacyOrderController::class, 'storeOrder']);
 });
+
 Route::put('company/orders/{id}/status', [CompanyOrderController::class, 'updateStatus']);
-
-
 Route::post('company/orders/{id}/assign', [CompanyOrderController::class, 'assignWarehouse']);
+Route::get('company/all-pharmacy-orders', [CompanyOrderController::class, 'getAllPharmacyOrders']);

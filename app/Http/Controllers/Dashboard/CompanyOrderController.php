@@ -5,6 +5,7 @@ use App\Http\Controllers\BaseController;
 use App\Helpers\JsonResponse;
 use App\Http\Requests\CompanyRequest;
 use App\Http\Resources\CompanyResource;
+use App\Http\Resources\OrderPharmacistResource;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\ProductResource;
 use App\Interfaces\CompanyRepositoryInterface;
@@ -103,5 +104,17 @@ class CompanyOrderController extends BaseController
             'message' => 'Order assigned to warehouse successfully',
             'status' => '200',
         ]);
+    }
+
+
+
+    public function getAllPharmacyOrders()
+    {
+        $orders = Order::whereNotNull('pharmacy_id')
+            ->with(['user', 'pharmacist', 'promoCode', 'address'])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return JsonResponse::respondSuccess('Orders Fetched Successfully', OrderPharmacistResource::collection($orders));
     }
 }

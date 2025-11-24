@@ -26,6 +26,7 @@ class ProductResource extends JsonResource
             'rating'      => (float) $this->rating,
             'rating_count'=> $this->rating_count,
             'price'         => (float) $this->price,
+            'total_stock'  => $this->total_stock ?? 0,
 
             'imageUrl'    => $this->getFirstMediaUrl(),
             'image'       => new MediaResource($this->getFirstMedia()),

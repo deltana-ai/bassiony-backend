@@ -105,6 +105,8 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
 Route::get('pharmacies/{id}/orders', [OrderController::class, 'getPharmacyOrders']);
 Route::get('company/{companyId}/orders', [OrderController::class, 'companyOrders']);
 Route::get('warehouses/{warehouse}/orders', [OrderController::class, 'ordersByWarehouse']);
+Route::get('/company-all-products', [PharmacistController::class, 'indexAllProductInCompany'])
+    ->name('company.products');
 
 Route::prefix('pharmacist')->group(function () {
     Route::post('logout', [PharmacistController::class, 'logout'])
