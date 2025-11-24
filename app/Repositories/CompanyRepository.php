@@ -12,6 +12,7 @@ use App\Models\Employee;
 use App\Models\Product;
 use App\Notifications\SendPassword;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 class CompanyRepository extends CrudRepository implements CompanyRepositoryInterface
 {
@@ -40,11 +41,13 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             $company = $this->create($data);
 
             $employee_data["company_id"] = $company->id;
-
+            $company_permissions = Permission::where('guard_name','employees')->pluck('name')->toArray();
 
             $employee = $this->employee_repo->create($employee_data);
             $roleName = 'company_owner_' . $company->id;
             $superManger = Role::firstOrCreate(['name' => $roleName,'guard_name'=>'employees',"company_id"=>$company->id]);
+            $superManger->givePermissionTo($company_permissions);
+
             $employee ->assignRole($superManger);
             
 

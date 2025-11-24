@@ -13,6 +13,7 @@ use App\Notifications\SendPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInterface
 {
@@ -42,10 +43,13 @@ class PharmacyRepository extends CrudRepository implements PharmacyRepositoryInt
             $pharmacy = $this->create($data);
 
             $employee_data["pharmacy_id"] = $pharmacy->id;
+            $company_permissions = Permission::where('guard_name','pharmacists')->pluck('name')->toArray();
 
             $employee = $this->employee_repo->create($employee_data);
             $roleName = 'pharmacy_owner_' . $pharmacy->id;
             $superpharmacist = Role::firstOrCreate(['name' => $roleName,'guard_name'=>'pharmacists','pharmacy_id'=>$pharmacy->id]);
+            $superpharmacist->givePermissionTo($company_permissions);
+
             $employee ->assignRole($superpharmacist);
 
             return $employee ;

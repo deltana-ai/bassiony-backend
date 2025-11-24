@@ -13,7 +13,7 @@ class WarehousePolicy
 
     public function manage( Employee $user, Warehouse $warehouse)
     {
-        return true ;
+       // return true ;
         return  (($warehouse->company_id === $user->company_id   && $user->warehouses->contains($warehouse->id)) || $user->hasRole($this->manger_role));
     }
     /**
