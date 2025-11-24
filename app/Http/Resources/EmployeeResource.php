@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,10 +23,9 @@ class EmployeeResource extends JsonResource
             'active' => (bool)$this->active,
             'role' => $this->getRoleNames()?->first(),
             'role_id'=> $this->roles->first()?->id,
-            
+            'company' => new CompanyResource($this->company),
             'warehouses' => $this->warehouses? WarehouseResource::collection($this->warehouses):null,
-            'company' => $this->company?->id,
-            'company' => $this->company?->name,
+          
             'address' => $this->address,
             'createdAt' => $this->created_at ? $this->created_at->format('d-M-Y H:i A') : null,
             'updatedAt' => $this->updated_at ? $this->updated_at->format('d-M-Y H:i A') : null
