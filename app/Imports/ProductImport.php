@@ -80,12 +80,12 @@ class ProductImport implements ToCollection, WithHeadingRow, SkipsOnFailure, Wit
 
             // Validate data
             $validator = Validator::make($data, [
-                'name_en'     => 'nullable|string|max:255',
-                'name_ar'     => 'nullable|string|max:255',
+                'name_en'     => 'nullable|string|max:190',
+                'name_ar'     => 'nullable|string|max:190',
                 'gtin'        => 'nullable|string|required_without:bar_code',
                 'bar_code'    => 'nullable|string|required_without:gtin',
-                'dosage_form' => 'nullable|string|max:225',
-                'scientific_name' => 'nullable|string|max:255',
+                'dosage_form' => 'nullable|string|max:190',
+                'scientific_name' => 'nullable|string|max:190',
                 'active_ingredients' => 'nullable|string|max:1000',
                 'description' => 'nullable|string|max:1000',
                 'active'      => 'boolean',
