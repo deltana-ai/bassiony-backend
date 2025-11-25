@@ -21,10 +21,11 @@ class BranchController extends BaseController
     public function __construct(BranchRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
-        // $this->middleware('permission:branch-list|manage-pharmacy', ['only' => ['index']]);
-        // $this->middleware('permission:branch-create|manage-pharmacy', ['only' => [ 'store']]);
-        // $this->middleware('permission:branch-edit|manage-pharmacy', ['only' => [ 'update']]);
-        //$this->middleware('permission:branch-delete|manage-pharmacy', ['only' => ['destroy','restore','forceDelete']]);
+        $this->middleware('permission:branch-list|manage-pharmacy', ['only' => ['index','show']]);
+        $this->middleware('permission:branch-create|manage-pharmacy', ['only' => [ 'store']]);
+        $this->middleware('permission:branch-edit|manage-pharmacy', ['only' => [ 'update']]);
+        $this->middleware('permission:branch-delete|manage-pharmacy', ['only' => ['destroy','restore','forceDelete']]);
+   
     }
 
     public function index()

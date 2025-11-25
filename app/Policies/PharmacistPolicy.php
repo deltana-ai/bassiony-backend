@@ -12,6 +12,6 @@ class PharmacistPolicy
      */
     public function manage( Pharmacist $pharmacist)
     {
-        return true; //$pharmacist->pharmacy_id === auth()->guard("pharmacists")->user()->pharmacy_id;
+        return $pharmacist->pharmacy_id === auth()->guard("pharmacists")->user()->pharmacy_id;
     }
 }

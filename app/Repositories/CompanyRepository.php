@@ -41,7 +41,7 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
             $company = $this->create($data);
 
             $employee_data["company_id"] = $company->id;
-            $company_permissions = Permission::where('guard_name','employees')->pluck('name')->toArray();
+            $company_permissions= Permission::where('guard_name','employees')->where('name','manage-company')->first();
 
             $employee = $this->employee_repo->create($employee_data);
             $roleName = 'company_owner_' . $company->id;

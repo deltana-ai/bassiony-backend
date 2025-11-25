@@ -11,12 +11,12 @@ class BranchPolicy
     /**
      * Create a new policy instance.
      */
-    protected $manger_role = "pharmacy_owner";
+    protected $manger_perm = "manage-pharmacy";
 
     public function manage( Pharmacist $user, Branch $branch)
     {
-return true;
-       // return  $user->pharmacy_id === $branch->pharmacy_id ;
+
+        return   $user->pharmacy_id === $branch->pharmacy_id ;
 
 
     }
@@ -24,8 +24,7 @@ return true;
     public function canAddOrUpdateProduct( Pharmacist $user, Branch $branch)
     {
 
-        return true;
-          $user->pharmacy_id === $branch->pharmacy_id &&  ($user->branch_id === $branch->id || $user->hasRole($this->manger_role)); ;
+         return $user->pharmacy_id === $branch->pharmacy_id &&  ($user->branch_id === $branch->id || $user->hasPermissionTo($this->manger_perm,"pharmacists")); ;
     }
     
 

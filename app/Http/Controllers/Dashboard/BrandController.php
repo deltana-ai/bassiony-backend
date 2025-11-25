@@ -18,10 +18,10 @@ class BrandController extends BaseController
     {
 
         $this->crudRepository = $pattern;
-        // $this->middleware('permission:brand-list|manage-site|manage-pharmacy|manage-company', ['only' => ['index','show']]);
-        // $this->middleware('permission:brand-create|manage-site', ['only' => [ 'store']]);
-        // $this->middleware('permission:brand-edit|manage-site', ['only' => [ 'update']]);
-        // $this->middleware('permission:brand-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
+        $this->middleware('permission:brand-list|manage-site|manage-pharmacy|manage-company', ['only' => ['index','show']]);
+        $this->middleware('permission:brand-create|manage-site', ['only' => [ 'store']]);
+        $this->middleware('permission:brand-edit|manage-site', ['only' => [ 'update']]);
+        $this->middleware('permission:brand-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
 
      
     }

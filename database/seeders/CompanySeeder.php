@@ -53,7 +53,7 @@ class CompanySeeder extends Seeder
             'active' => true,
         ]);
         $superManger = Role::firstOrCreate(['name' => 'company_owner_'.$company->id,'guard_name'=>'employees',"company_id"=>$company->id]);
-        $company_permissions = Permission::where('guard_name','employees')->pluck('name')->toArray();
+        $company_permissions= Permission::where('guard_name','employees')->where('name','manage-company')->first();
         $superManger->givePermissionTo($company_permissions);
 
         $manager->assignRole($superManger);

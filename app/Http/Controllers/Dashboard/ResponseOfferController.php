@@ -23,12 +23,12 @@ class ResponseOfferController extends Controller
     {
         $this->crudRepository = $pattern;
          
-        // $this->middleware('permission:response-offer-create|manage-pharmacy', ['only' => [ 'store']]);
-        // $this->middleware('permission:response-offer-edit|manage-company', ['only' => [ 'updateStatus']]);
-        // $this->middleware('permission:response-offer-order|manage-company', ['only' => [ 'getOfferOrders']]);
-        // $this->middleware('permission:response-offer-cancel|manage-pharmacy', ['only' => [ 'cancel']]);
-        // $this->middleware('permission:response-offer-list|manage-company|manage-pharmacy|mange-site', ['only' => [ 'show','index']]);
-        // $this->middleware('permission:response-offe-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+        $this->middleware('permission:response-offer-create|manage-pharmacy', ['only' => [ 'store']]);
+        $this->middleware('permission:response-offer-edit|manage-company', ['only' => [ 'updateStatus']]);
+        $this->middleware('permission:response-offer-order|manage-company', ['only' => [ 'getOfferOrders']]);
+        $this->middleware('permission:response-offer-cancel|manage-pharmacy', ['only' => [ 'cancel']]);
+        $this->middleware('permission:response-offer-list|manage-company|manage-pharmacy|mange-site', ['only' => [ 'show','index']]);
+        $this->middleware('permission:response-offe-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
 
     }
 

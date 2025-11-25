@@ -20,6 +20,8 @@ class PharmacyProductController extends BaseController
     public function __construct(PharmacyRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('permission:pharmacy-product-list|manage-pharmacy', ['only' => [ 'index']]);
+
     }
     public function index(Request $request)
     {

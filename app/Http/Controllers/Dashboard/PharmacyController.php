@@ -20,10 +20,10 @@ class PharmacyController extends BaseController
     public function __construct(PharmacyRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
-        // $this->middleware('permission:pharmacy-list|manage-site|manage-pharmacy|manage-company', ['only' => ['index','show']]);
-        // $this->middleware('permission:pharmacy-create|manage-site', ['only' => [ 'store']]);
-        // $this->middleware('permission:pharmacy-edit|manage-site', ['only' => [ 'update']]);
-        // $this->middleware('permission:pharmacy-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
+        $this->middleware('permission:pharmacy-list|manage-site|manage-pharmacy|manage-company', ['only' => ['index','show']]);
+        $this->middleware('permission:pharmacy-create|manage-site', ['only' => [ 'store']]);
+        $this->middleware('permission:pharmacy-edit|manage-site', ['only' => [ 'update']]);
+        $this->middleware('permission:pharmacy-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
 
     }
 

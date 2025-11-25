@@ -60,7 +60,7 @@ class PermissionSeeder extends Seeder
             //////////////////////////////////////////////////////////////////
             'response_offer-list' , 'response_offer-edit' , 'response_offer-delete','response_offer-order',
             //////////////////////////////////////////////////////////////////
-            'product-list' ,
+            'product-list' ,'company-product-list',
             /////////////////////////////////////////////////////////////
             'order-list' , 'order-create' , 'order-edit' , 'order-delete',
          
@@ -85,7 +85,7 @@ class PermissionSeeder extends Seeder
             //////////////////////////////////////////////////////////////////
             'company-offer-list' ,
             //////////////////////////////////////////////////////////////////
-            'product-list' ,
+            'product-list' ,'pharmacy-product-list',
             /////////////////////////////////////////////////////////////
             'order-list' , 'order-edit' , 'order-delete',
            /////////////////////////////////////////////////////////////

@@ -28,10 +28,10 @@ class EmployeeController extends BaseController
     {
         $this->crudRepository = $pattern;
         $this->middleware('auth:employees');
-        // $this->middleware('permission:employee-list|manage-company', ['only' => ['index']]);
-        // $this->middleware('permission:employee-create|manage-company', ['only' => [ 'store']]);
-        // $this->middleware('permission:employee-edit|manage-company', ['only' => [ 'update','assignWarehouse','assignRole']]);
-        // $this->middleware('permission:employee-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
+        $this->middleware('permission:employee-list|manage-company', ['only' => ['index','show']]);
+        $this->middleware('permission:employee-create|manage-company', ['only' => [ 'store']]);
+        $this->middleware('permission:employee-edit|manage-company', ['only' => [ 'update','assignWarehouse','assignRole']]);
+        $this->middleware('permission:employee-delete|manage-company', ['only' => ['destroy','restore','forceDelete']]);
 
     }
 

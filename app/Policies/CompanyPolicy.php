@@ -66,8 +66,8 @@ class CompanyPolicy
         if ($guard === 'admins') {
             return true;
         }
-//&& $user->company_id === $company->id
-        if ($guard === 'employees'  ) { 
+//
+        if ($guard === 'employees' && $user->company_id === $company->id ) { 
             return true;
         }
 

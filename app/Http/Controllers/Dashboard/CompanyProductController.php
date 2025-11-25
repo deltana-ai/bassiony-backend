@@ -18,6 +18,8 @@ class CompanyProductController extends BaseController
     public function __construct(CompanyRepositoryInterface $pattern)
     {
         $this->crudRepository = $pattern;
+        $this->middleware('permission:company-product-list|manage-company', ['only' => [ 'index']]);
+
        
     }
     /**

@@ -11,7 +11,6 @@ class EmployeePolicy
      */
     public function manage( Employee $employee)
     {
-        return  true;
-         $employee->company_id === auth()->guard("employees")->user()->company_id;
+        return  $employee->company_id === auth()->guard("employees")->user()->company_id;
     }
 }

@@ -26,7 +26,7 @@ class PharmacistController extends BaseController
     {
         $this->crudRepository = $pattern;
         $this->crudRepository = $pattern;
-        $this->middleware('permission:pharmacist-list|manage-site', ['only' => ['index']]);
+        $this->middleware('permission:pharmacist-list|manage-site', ['only' => ['index','show']]);
         $this->middleware('permission:pharmacist-create|manage-site', ['only' => [ 'store']]);
         $this->middleware('permission:pharmacist-edit|manage-site', ['only' => [ 'update']]);
         $this->middleware('permission:pharmacist-delete|manage-site', ['only' => ['destroy','restore','forceDelete']]);
