@@ -24,6 +24,19 @@ class Company extends BaseModel
         return CompanyPolicy::class;
     }
 
+
+    public function productPrices()
+    {
+        return $this->hasMany(CompanyPrice::class);
+    }
+
+    // المنتجات التي تبيعها الشركة
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'company_prices')
+                    ->withPivot(['discount_percent']);
+    }
+
    
 
     public function warehouses()

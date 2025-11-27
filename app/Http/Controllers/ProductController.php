@@ -38,6 +38,8 @@ class ProductController extends BaseController
         }
     }
 
+    
+
     public function show(Product $product)
     {
         try {

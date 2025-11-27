@@ -94,8 +94,13 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
     /////////////////////////////////show product details//////////////////////////////////////////////////
-    Route::post('master-products/index', [ProductController::class, 'index']);
+    Route::post('master-products/index', [CompanyProductController::class, 'productsAll']);
+    Route::post('products-prices/store/{product}', [CompanyProductController::class, 'storePrice']);
+    Route::patch('products-prices/update/{companyPrice}', [CompanyProductController::class, 'updatePrice']);
+    Route::get('products-prices/{product}', [CompanyProductController::class,"showProductPrice"]);
+
     Route::get('master-products/{product}', [ProductController::class,"show"]);
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

@@ -31,7 +31,12 @@ class Product extends BaseModel
         return $ar ?: $en ?: '';
     }
 
-     public function scopeSearch($query, $term)
+    public function companyPrice($companyId)
+    {
+        return $this->hasOne(CompanyPrice::class)
+                    ->where('company_id', $companyId);
+    }
+    public function scopeSearch($query, $term)
     {
         return $query->whereRaw(
             "MATCH(search_index) AGAINST(? IN BOOLEAN MODE)",
@@ -90,6 +95,12 @@ class Product extends BaseModel
     public function warehouseProducts()
     {
         return $this->hasMany(WarehouseProduct::class);
+    }
+
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class, 'company_prices')
+                    ->withPivot(['discount_percent']);
     }
 
 

@@ -8,16 +8,26 @@ use App\Interfaces\CompanyRepositoryInterface;
 use Illuminate\Http\Request;
 use Exception;
 use App\Helpers\JsonResponse;
-
+use App\Http\Requests\CompanyPriceRequest;
+use App\Http\Resources\CompanyPriceResource;
+use App\Http\Resources\CompanyProductResource;
+use App\Http\Resources\ProductResource;
+use App\Interfaces\ProductRepositoryInterface;
+use App\Models\CompanyPrice;
+use App\Models\Product;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
+
 class CompanyProductController extends BaseController
 {
     use AuthorizesRequests;
     protected mixed $crudRepository;
-
-    public function __construct(CompanyRepositoryInterface $pattern)
+    protected mixed $crudProductRepository;
+    public function __construct(CompanyRepositoryInterface $pattern ,ProductRepositoryInterface $repo)
     {
         $this->crudRepository = $pattern;
+        $this->crudProductRepository = $repo;
+
         $this->middleware('permission:company-product-list|manage-company', ['only' => [ 'index']]);
 
        
@@ -47,6 +57,99 @@ class CompanyProductController extends BaseController
             return JsonResponse::respondError($e->getMessage());
         }
     }
+
+
+    public function productsAll()
+    {
+        try {
+            $companyId = auth()->guard("employees")->user()->company_id;
+
+            $products = CompanyProductResource::collection($this->crudProductRepository->all(
+                [['companyPrice' => function($q) use ($companyId) {
+                    $q->where('company_id', $companyId);
+                }]],
+                [],
+                ['*']
+            ));
+            return $products->additional(JsonResponse::success());
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+    /**
+     * store new company price.
+     */
+    public function storePrice(CompanyPriceRequest $request, Product $product)
+    {
+       
+        try {
+            $data = $request->validated();
+            $data["company_id"] =  auth("employees")->user()->company_id;
+            $company_price = CompanyPrice::create($data);
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
+
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+
+    }
+
+
+    
+    /**
+     * Update the specified company price.
+     */
+    public function updatePrice(CompanyPriceRequest $request, CompanyPrice $companyPrice)
+    {
+        try {
+
+            $companyId = Auth::guard('employees')->user()->company_id;
+
+            if ($companyPrice->company_id != $companyId) {
+
+                return JsonResponse::respondError("Unauthorized",403);
+
+            }
+
+            $companyPrice->update([
+                'product_id' => $request->product_id,
+                'discount_percent' => $request->discount_percent,
+            ]);
+
+            return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+
+    }
+
+    /**
+     * Show the product with the company's price.
+     */
+    public function showProductPrice(Product $product)
+    {
+        try {
+            $companyId = Auth::guard('employees')->user()->company_id;
+
+            $companyPrice = CompanyPrice::where('company_id', $companyId)
+                ->where('product_id', $product->id)
+                ->first();
+
+            if (!$companyPrice) {
+                return JsonResponse::respondError("Price not found",404);
+            }
+
+            return JsonResponse::respondSuccess('Item Fetched Successfully', new CompanyPriceResource($companyPrice));
+
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+
+
+
 
  
 }
