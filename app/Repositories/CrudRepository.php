@@ -54,8 +54,6 @@ class CrudRepository implements ICrudRepository
         if ($paginate)
             return $query->paginate($per_page, $columns);
         
-    
-    
         if (!empty($with))
             return $query->with($with)->get($columns);
         else

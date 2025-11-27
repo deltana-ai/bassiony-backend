@@ -31,10 +31,10 @@ class Product extends BaseModel
         return $ar ?: $en ?: '';
     }
 
-    public function companyPrice($companyId)
+    public function companyPrice()
     {
         return $this->hasOne(CompanyPrice::class)
-                    ->where('company_id', $companyId);
+                    ;
     }
     public function scopeSearch($query, $term)
     {

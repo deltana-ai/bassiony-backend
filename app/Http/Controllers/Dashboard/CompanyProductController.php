@@ -63,14 +63,28 @@ class CompanyProductController extends BaseController
     {
         try {
             $companyId = auth()->guard("employees")->user()->company_id;
-
-            $products = CompanyProductResource::collection($this->crudProductRepository->all(
-                [['companyPrice' => function($q) use ($companyId) {
+            $discount_percent = request("discount_percent") ?? null;
+            $products = CompanyProductResource::collection($this->crudProductRepository->anotherAll(
+                ['companyPrice' => function($q) use ($companyId) {
                     $q->where('company_id', $companyId);
-                }]],
+					
+                }],
                 [],
-                ['*']
+                ['*'],  function ($query) use ($companyId, $discount_percent) {
+       
+        if ($discount_percent != null) {
+            $query->whereHas('companyPrice', function($q) use ($companyId, $discount_percent) {
+                $q->where('company_id', $companyId)
+                  ->where('discount_percent', $discount_percent);
+				 
+            });
+			 
+        }
+        return $query;
+    }
             ));
+			
+			
             return $products->additional(JsonResponse::success());
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
@@ -80,7 +94,7 @@ class CompanyProductController extends BaseController
     /**
      * store new company price.
      */
-    public function storePrice(CompanyPriceRequest $request, Product $product)
+    public function storePrice(CompanyPriceRequest $request)
     {
        
         try {
