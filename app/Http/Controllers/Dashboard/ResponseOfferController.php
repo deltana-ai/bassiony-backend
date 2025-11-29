@@ -11,17 +11,19 @@ use App\Http\Requests\UpdateOfferStatusRequest;
 use App\Http\Resources\ResponseOfferResource;
 use Exception;
 use App\Models\ResponseOffer;
+use App\Services\ResponseOfferService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ResponseOfferController extends Controller
 {
     use AuthorizesRequests;
-    protected mixed $crudRepository;
+    protected mixed $crudRepository, $service;
 
-    public function __construct(ResponseOfferRepositoryInterface $pattern)
+    public function __construct(ResponseOfferRepositoryInterface $pattern ,ResponseOfferService $service) 
     {
         $this->crudRepository = $pattern;
+        $this->service = $service;
          
         $this->middleware('permission:response-offer-create|manage-pharmacy', ['only' => [ 'store']]);
         $this->middleware('permission:response-offer-edit|manage-company', ['only' => [ 'updateStatus']]);
@@ -83,13 +85,9 @@ class ResponseOfferController extends Controller
 
             $offer = $this->crudRepository->getBaseOffer($request->company_offer_id); 
             
-            if ($request->quantity < $offer->min_quantity || $request->quantity > $offer->total_quantity) {
-                return JsonResponse::respondError("هذه الكمية لا تناسب العرض في الوقت الحالي");
+            
+            $response_offer = $this->service->applyOffer( $offer,  $request);
 
-            }
-            $data = $this->handleData($request,$offer);
-           
-            $response_offer =  $this->crudRepository->create($data);
            
             return new ResponseOfferResource($response_offer);
         } catch (Exception $e) {
@@ -109,6 +107,23 @@ class ResponseOfferController extends Controller
         } catch (Exception $e) {
             return JsonResponse::respondError($e->getMessage());
         }
+    }
+
+    public function update(ResponseOfferRequest $request, $id)
+    {
+        $this->authorize('create', ResponseOffer::class);
+           // dd(auth()->guard("pharmacists")->check());
+
+        $offer = $this->crudRepository->getBaseOffer($request->company_offer_id); 
+        try {
+             
+            $this->service->updateOffer( $offer,  $request,$id);
+             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
+
+        } catch (\Throwable $th) {
+            return JsonResponse::respondError($th->getMessage());
+        }
+        
     }
 
 

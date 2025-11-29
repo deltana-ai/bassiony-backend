@@ -20,7 +20,10 @@ return new class extends Migration
             $table->decimal('total_price', 10, 2);
             $table->decimal('item_price',10,2)->default(1);
 
-            $table->integer('quantity');
+            $table->unsignedInteger('quantity');
+            $table->unsignedInteger('total_free_quantity')->default(0);
+            $table->unsignedInteger('all_quantity')->default(0);
+
             $table->enum('status',["pending","approved","rejected","delivered","canceled","returned","completed"])->default("pending");
             $table->softDeletes();
             $table->timestamps();

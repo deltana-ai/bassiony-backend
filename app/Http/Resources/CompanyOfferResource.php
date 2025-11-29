@@ -16,7 +16,11 @@ class CompanyOfferResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            'offer_type' => $this->offer_type,
             "discount" => $this->discount,
+            'get_free_quantity' => $this->get_free_quantity,
+            'max_redemption_per_invoice' => $this->max_redemption_per_invoice,
+            
             "min_quantity" => $this->min_quantity,
             "total_quantity" => $this->total_quantity,
             "description" => $this->description,

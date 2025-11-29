@@ -12,6 +12,7 @@ use App\Http\Resources\CompanyOfferResource;
 use Exception;
 use App\Models\Company;
 use App\Models\CompanyOffer;
+use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -49,7 +50,22 @@ class CompanyOfferController extends Controller
     {
             try {
                 $this->authorize('create', CompanyOffer::class);
+                $product = Product::findOrFail($request->product_id);
+
+                if (! $product->warehouses()->exists()) {
+                    return JsonResponse::respondError( 'لا يوجد مخازن لهذا المنتج.',404);
+                }
                 $data = $this->handleData( $request);
+                
+                $exists = CompanyOffer::where('product_id', $data['product_id'])
+                    ->where(function ($q) use ($data) {
+                        $q->where('start_date', '<=', $data['end_date'])
+                        ->where('end_date', '>=', $data['start_date']);
+                    })
+                    ->exists();
+                if ($exists) {
+                   return JsonResponse::respondError('تم اضافة عرض لهذا المنتج بالفعل',400);
+                }
                 $offer = $this->crudRepository->create($data);
 
                // return new CompanyOfferResource($offer);
@@ -77,7 +93,23 @@ class CompanyOfferController extends Controller
         try {
             $companyOffer = $this->crudRepository->find($id);
             $this->authorize('update',$companyOffer);
+            $product = Product::findOrFail($request->product_id);
+
+            if (! $product->warehouses()->exists()) {
+                return JsonResponse::respondError( 'لا يوجد مخازن لهذا المنتج.',404);
+            }
             $data = $this->handleData( $request);
+            $exists = CompanyOffer::where('product_id', $data['product_id'])
+                ->where('id', '!=', $companyOffer->id) // exclude current
+                ->where(function ($q) use ($data) {
+                    $q->where('start_date', '<=', $data['end_date'])
+                    ->where('end_date', '>=', $data['start_date']);
+                })
+                ->exists();
+
+            if ($exists) {
+                return JsonResponse::respondError( 'تم اضافة عرض لهذا المنتج بالفعل',400);
+            }
             $this->crudRepository->update($data, $companyOffer->id);
 
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_UPDATED_SUCCESSFULLY));
@@ -92,10 +124,14 @@ class CompanyOfferController extends Controller
     public function destroy(Request $request): ?\Illuminate\Http\JsonResponse
     {
         try {
-            $responses = CompanyOffer::whereIn('id', $request->items)->get();
+            $offers = CompanyOffer::whereIn('id', $request->items)->get();
 
-            foreach ($responses as $response) {
-                $this->authorize('delete', $response); 
+            foreach ($offers as $offer) {
+                $this->authorize('delete', $offer); 
+                if($offer->responses()->exists()){
+                   return JsonResponse::respondError("لا يمكن حذف عرض يوجد ردود عليه");
+
+                }
             }
 
             $this->crudRepository->delete( $request['items']);
@@ -109,10 +145,14 @@ class CompanyOfferController extends Controller
     public function restore(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $responses = CompanyOffer::whereIn('id', $request->items)->get();
+            $offers = CompanyOffer::whereIn('id', $request->items)->get();
 
-            foreach ($responses as $response) {
-                $this->authorize('delete', $response); 
+            foreach ($offers as $offer) {
+                $this->authorize('delete', $offer); 
+                if($offer->responses()->exists()){
+                   return JsonResponse::respondError("لا يمكن حذف عرض يوجد ردود عليه");
+
+                }
             }
             $this->crudRepository->restoreItem(CompanyOffer::class, $request['items']);
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_RESTORED_SUCCESSFULLY));

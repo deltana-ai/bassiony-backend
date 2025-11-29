@@ -23,22 +23,11 @@ class CompanyOffer extends BaseModel
         return $this->belongsTo(Company::class);
     }
 
-    public function warehouseProduct()
-    {
-        return $this->belongsTo(WarehouseProduct::class);
-    }
 
     // من خلال warehouseProduct نقدر نوصل للمنتج مباشرة
     public function product()
     {
-        return $this->hasOneThrough(
-            Product::class,
-            WarehouseProduct::class,
-            'id',                  // warehouse_product.id
-            'id',                  // product.id
-            'warehouse_product_id', // company_offers.warehouse_product_id
-            'product_id'           // warehouse_product.product_id
-        );
+        return $this->belongsTo(Product::class);
     }
 
     public function responses()

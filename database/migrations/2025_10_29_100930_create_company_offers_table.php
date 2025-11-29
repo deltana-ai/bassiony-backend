@@ -14,15 +14,26 @@ return new class extends Migration
         Schema::create('company_offers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->foreignId('warehouse_product_id')->constrained("warehouse_product")->onDelete('cascade');
-            $table->decimal('discount', 8, 2);//percentage total_quantity
-            $table->integer('min_quantity')->default(1);
-            $table->integer('total_quantity')->default(1);
+            $table->foreignId('product_id')->constrained("products")->onDelete('cascade');
+          // Offer Type
+            $table->enum('offer_type', ['DISCOUNT', 'BUY_X_GET_Y'])->default('DISCOUNT');
+
+            // Discount Fields
+            $table->decimal('discount', 8, 2)->nullable();
+
+            // Buy X Get Y Fields
+            $table->unsignedInteger('get_free_quantity')->nullable();
+            $table->unsignedInteger('max_redemption_per_invoice')->nullable();
+
+            // Shared
+            $table->unsignedInteger('min_quantity')->nullable(); // هذا هو Buy X
+            $table->unsignedInteger('total_quantity')->default(1);
 
             $table->text('description')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->boolean('active')->default(true);
+
             $table->softDeletes();
             $table->timestamps();
         });

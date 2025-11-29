@@ -11,9 +11,13 @@ class UniqueOfferResponse implements ValidationRule
 {
     protected int $companyOfferId;
 
-    public function __construct(int $companyOfferId)
+    protected ?int $responseOfferId;
+
+
+    public function __construct(int $companyOfferId , ?int $responseOfferId = null)
     {
-        $this->companyOfferId = $companyOfferId;
+        $this->companyOfferId  = $companyOfferId;
+        $this->responseOfferId = $responseOfferId;
     }
 
     /**
@@ -33,13 +37,17 @@ class UniqueOfferResponse implements ValidationRule
             return;
         }
 
-        $exists = ResponseOffer::where('company_offer_id', $this->companyOfferId)
+        $existsQuery = ResponseOffer::where('company_offer_id', $this->companyOfferId)
             ->where('pharmacy_id', $value)
-            ->whereIn('status', [ 'pending'])
-            ->exists();
+            ->whereIn('status', ['pending']);
 
-            // ->whereIn('status', ['pending', 'approved', 'delivered','canceled'])
+        // Ignore the current response offer if updating
+        if ($this->responseOfferId != null) {
+            $existsQuery->where('id', '!=', $this->responseOfferId);
+        }
 
+        $exists = $existsQuery->exists();
+        
         if ($exists) {
             $fail('تم استخدام هذا العرض بالفعل.');
         }

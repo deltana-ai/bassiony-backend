@@ -22,34 +22,25 @@ class CompanyOfferRequest extends FormRequest
     public function rules(): array
     {
         
-        if ($this->isMethod('post')) {
-            return [
-                'warehouse_product_id' => ['required', 'exists:warehouse_product,id'],
-                'discount' => ['required', 'numeric', 'min:0'],
-                'active' => ['boolean'],
-                'min_quantity' => ['required', 'integer', 'min:1'],
-                'total_quantity' => ['required', 'integer', 'min:1'],
+        return [
+            'product_id' => 'required|exists:products,id',
+            'offer_type' => 'required|in:DISCOUNT,BUY_X_GET_Y',
 
-                'description' => ['nullable', 'string'],
-                'start_date' => ['required', 'date','date_format:d-m-Y'],
-                'end_date' => ['required', 'date','date_format:d-m-Y', 'after_or_equal:start_date']
-            ];
-        }
-        else{
-            
-            return [
-                'warehouse_product_id' => ['nullable', 'exists:warehouse_product,id'],
-                'discount' => ['nullable', 'numeric', 'min:0'],
-                'active' => ['nullable','boolean'],
-                'min_quantity' => ['nullable', 'integer', 'min:1'],
-                'total_quantity' => ['nullable', 'integer', 'min:1'],
+            // Discount
+            'discount' => 'required_if:offer_type,DISCOUNT|numeric|min:1|max:100',
 
-                'description' => ['nullable', 'string'],
-                'start_date' => ['nullable', 'date','date_format:d-m-Y'],
-                'end_date' => ['nullable', 'date','date_format:d-m-Y', 'after_or_equal:start_date']
-            ];
-        
-        }
+            // Buy X Get Y
+            'get_free_quantity' => 'required_if:offer_type,BUY_X_GET_Y|integer|min:1',
+            'max_redemption_per_invoice' => 'nullable|integer|min:1',
+
+            // Shared field
+            'min_quantity' => 'required|integer|min:1', // BUY X OR MINIMUM FOR DISCOUNT
+
+            'total_quantity' => 'required|integer|min:1',
+            'description' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ];
 
        
     }

@@ -134,7 +134,7 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     Route::put('/response-company-offers/cancel/{id}', [ResponseOfferController::class, 'cancel']);
     Route::post('/response-company-offers/index', [ResponseOfferController::class, 'index']);
-    Route::apiResource('response-company-offers', ResponseOfferController::class)->only(['show','store']);
+    Route::apiResource('response-company-offers', ResponseOfferController::class)->only(['show','store','update']);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
