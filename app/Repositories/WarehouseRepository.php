@@ -26,12 +26,30 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
      */
     public function getWarehouseProducts(int $warehouseId)
     {
-        $filters = request(Constants::FILTERS) ?? [];
-        $perPage = request(Constants::PER_PAGE) ?? 15;
-        $paginate = request(Constants::PAGINATE) ?? true;
-        $sortOrder = request(Constants::ORDER_By_DIRECTION) ?? "asc";
-        $sortBy = request(Constants::ORDER_BY) ?? "products.id";
+         $warehouse = Warehouse::select('id', 'company_id')
+        ->findOrFail($warehouseId);
+    
 
+        // 2. Validate and sanitize inputs
+        $filters = $this->validateFilters(request(Constants::FILTERS, []));
+        $perPage = min(max((int)request(Constants::PER_PAGE, 15), 1), 100);
+        $paginate = filter_var(request(Constants::PAGINATE, true), FILTER_VALIDATE_BOOLEAN);
+        
+        // 3. Secure ORDER BY with mapping
+        $sortColumns = [
+            'id' => 'products.id',
+            'name_ar' => 'products.name_ar',
+            'name_en' => 'products.name_en',
+            'stock' => 'total_stock',
+            'price' => 'price_after_discount_without_tax'
+        ];
+        $sortKey = request(Constants::ORDER_BY, 'id');
+        $sortBy = $sortColumns[$sortKey] ?? 'products.id';
+        
+        $sortOrder = strtoupper(request(Constants::ORDER_By_DIRECTION, 'ASC'));
+        $sortOrder = in_array($sortOrder, ['ASC', 'DESC']) ? $sortOrder : 'ASC';
+
+        // 4. Build optimized query
         $query = Product::query()
             ->select([
                 'products.id',
@@ -47,13 +65,23 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                 'products.dosage_form',
                 'products.price AS price_without_tax',
                 'products.tax',
-                DB::raw('(products.price + (products.price * products.tax / 100)) AS price'),
-                'products.search_index',
-                
                 'warehouse_product.reserved_stock',
                 DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
                 DB::raw('COALESCE(SUM(warehouse_product_batches.stock), 0) as total_stock'),
-                DB::raw('COUNT(DISTINCT warehouse_product_batches.id) as total_batches')
+                DB::raw('COUNT(DISTINCT warehouse_product_batches.id) as total_batches'),
+                
+                // Price calculations
+                DB::raw('
+                    products.price * (1 - COALESCE(company_prices.discount_percent, 0) / 100)
+                    AS price_after_discount_without_tax
+                '),
+                
+                DB::raw('
+                    products.price * (1 - COALESCE(company_prices.discount_percent, 0) / 100) * (1 + products.tax / 100)
+                    AS price_after_discount_with_tax
+                '),
+                
+                'company_prices.discount_percent',
             ])
             ->join('warehouse_product', function ($join) use ($warehouseId) {
                 $join->on('products.id', '=', 'warehouse_product.product_id')
@@ -63,27 +91,19 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                 $join->on('products.id', '=', 'warehouse_product_batches.product_id')
                     ->where('warehouse_product_batches.warehouse_id', '=', $warehouseId);
             })
-            ->groupBy([
-                'products.id',
-                'products.active',
-                'products.name_ar',
-                'products.name_en',
-                'products.description',
-                'products.active_ingredients',
-                'products.dosage_form',
-                'products.price',
-                'products.bar_code',
-                'products.qr_code',
-                'products.gtin',
-                'products.tax',
-                'products.search_index',
-                'products.scientific_name',
-                'warehouse_product.reserved_stock'
-            ]);
+            ->leftJoin('company_prices', function ($join) use ($warehouse) {
+                $join->on('products.id', '=', 'company_prices.product_id')
+                    ->where('company_prices.company_id', '=', $warehouse->company_id);
+            })
+            ->groupBy('products.id', 'warehouse_product.reserved_stock', 'company_prices.discount_percent'); // Minimal grouping
 
+        // 5. Apply filters
         $query = $this->applyFilters($query, $filters);
-        $query->orderBy($sortBy, $sortOrder);
+        
+        // 6. Apply sorting
+        $query->orderByRaw("{$sortBy} {$sortOrder}");
 
+        // 7. Return results
         return $paginate ? $query->paginate($perPage) : $query->get();
     }
 
@@ -92,48 +112,49 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
      /**
      * Get batch details for specific product in warehouse
      */
-    public function getProductBatches(int $productId, int $warehouseId)
+     public function getProductBatches(int $productId, int $warehouseId)
     {
 
-        $filters = request(Constants::FILTERS) ?? [];
-        $sortOrder = request(Constants::ORDER_By_DIRECTION) ?? "asc";
-        $sortBy = request(Constants::ORDER_BY) ?? "id";
-        // Verify product exists in warehouse
-        $exists = DB::table('warehouse_product')
-            ->where('product_id', $productId)
-            ->where('warehouse_id', $warehouseId)
-            ->exists();
+        // 2. SECURITY: Validate inputs
+        $filters = $this->validateBatchFilters(request(Constants::FILTERS, []));
+        $perPage = min(max((int)request(Constants::PER_PAGE, 50), 1), 100);
+        $paginate = filter_var(request(Constants::PAGINATE, true), FILTER_VALIDATE_BOOLEAN);
+        
+        // 3. SECURITY: Whitelist sort columns
+        $sortColumns = [
+            'id' => 'id',
+            'batch_number' => 'batch_number',
+            'stock' => 'stock',
+            'expiry_date' => 'expiry_date',
+            'created_at' => 'created_at'
+        ];
+        $sortKey = request(Constants::ORDER_BY, 'created_at');
+        $sortBy = $sortColumns[$sortKey] ?? 'created_at';
+        
+        $sortOrder = strtoupper(request(Constants::ORDER_By_DIRECTION, 'DESC'));
+        $sortOrder = in_array($sortOrder, ['ASC', 'DESC']) ? $sortOrder : 'DESC';
 
-        if (!$exists) {
-            throw new \Exception('Product not found in this warehouse');
-        }
-
-      
-
+        // 4. Build query
         $query = WarehouseProductBatch::query()
             ->with([
                 'product:id,name_ar,name_en,bar_code,price,tax,qr_code,gtin,active',
-                'product.category:id,name',
-                'warehouse:id,name,location'
+                'warehouse:id,name,address'
             ])
             ->where('product_id', $productId)
             ->where('warehouse_id', $warehouseId);
 
-        // Apply filters
+        // 5. Apply filters
         $query = $this->applyBatchFilters($query, $filters);
 
-        // Apply sorting
-        $query->orderBy($sortBy, $sortOrder);
-
+        // 6. Apply sorting
+        $query->orderByRaw("{$sortBy} {$sortOrder}");
+        
         if ($sortBy !== 'created_at') {
             $query->orderBy('created_at', 'desc');
         }
 
-        $batches = $query->get();
-
-        return $batches;
-
-       
+        // 7. PERFORMANCE: Always paginate
+        return $paginate ? $query->paginate($perPage) : $query->limit(1000)->get();
     }
 
     
@@ -145,95 +166,84 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
     protected function applyFilters($query, array $filters)
     {
         foreach ($filters as $key => $value) {
-            if (empty($value) && $value !== '0' && $value !== 0) {
+            if (is_null($value) || $value === '') {
                 continue;
             }
 
             switch ($key) {
-                // Text search (product name or description)
                 case 'search':
-                     $query->whereRaw("MATCH(products.search_index) AGAINST(? IN BOOLEAN MODE)", [$value]);
-
+                    // Sanitize search input
+                    $searchTerm = trim($value);
+                    if (strlen($searchTerm) > 0) {
+                        $query->whereRaw(
+                            "MATCH(products.search_index) AGAINST(? IN BOOLEAN MODE)", 
+                            [$searchTerm]
+                        );
+                    }
                     break;
-
-                
 
                 case 'active':
-                    $query->where('products.active', (bool) $value);
+                    $query->where('products.active', (bool)$value);
                     break;
 
-                
-
-                // Price range filters
                 case 'min_price':
-                    $query->where('products.price', '>=', $value);
+                    $query->havingRaw('price_after_discount_without_tax >= ?', [(float)$value]);
                     break;
 
                 case 'max_price':
-                    $query->where('products.price', '<=', $value);
+                    $query->havingRaw('price_after_discount_without_tax <= ?', [(float)$value]);
                     break;
 
-                // Stock filters (using HAVING because of aggregation)
+                case 'min_price_with_tax':
+                    $query->havingRaw('price_after_discount_with_tax >= ?', [(float)$value]);
+                    break;
+
+                case 'max_price_with_tax':
+                    $query->havingRaw('price_after_discount_with_tax <= ?', [(float)$value]);
+                    break;
+
                 case 'min_stock':
-                    $query->havingRaw('SUM(warehouse_product_batches.stock) >= ?', [$value]);
+                    $query->havingRaw('COALESCE(SUM(warehouse_product_batches.stock), 0) >= ?', [(int)$value]);
                     break;
 
                 case 'max_stock':
-                    $query->havingRaw('SUM(warehouse_product_batches.stock) <= ?', [$value]);
+                    $query->havingRaw('COALESCE(SUM(warehouse_product_batches.stock), 0) <= ?', [(int)$value]);
                     break;
 
                 case 'out_of_stock':
-                    if ($value) {
+                    if ((bool)$value) {
                         $query->havingRaw('COALESCE(SUM(warehouse_product_batches.stock), 0) = 0');
                     }
                     break;
 
                 case 'low_stock':
-                    if ($value) {
-                        $threshold = request('low_stock_threshold') ?? 10;
-                        $query->havingRaw('COALESCE(SUM(warehouse_product_batches.stock), 0) > 0')
-                              ->havingRaw('COALESCE(SUM(warehouse_product_batches.stock), 0) <= ?', [$threshold]);
+                    if ((bool)$value) {
+                        $threshold = min((int)($filters['low_stock_threshold'] ?? 10), 1000);
+                        $query->havingRaw('COALESCE(SUM(warehouse_product_batches.stock), 0) BETWEEN 1 AND ?', [$threshold]);
                     }
                     break;
 
-                // Reserved stock filter
                 case 'min_reserved_stock':
-                    $query->where('warehouse_product.reserved_stock', '>=', $value);
+                    $query->where('warehouse_product.reserved_stock', '>=', (int)$value);
                     break;
 
                 case 'max_reserved_stock':
-                    $query->where('warehouse_product.reserved_stock', '<=', $value);
+                    $query->where('warehouse_product.reserved_stock', '<=', (int)$value);
                     break;
 
                 case 'has_reserved_stock':
-                    if ($value) {
+                    if ((bool)$value) {
                         $query->where('warehouse_product.reserved_stock', '>', 0);
                     }
                     break;
 
-                
-
-                // Batch count filter
                 case 'min_batches':
-                    $query->havingRaw('COUNT(DISTINCT warehouse_product_batches.id) >= ?', [$value]);
+                    $query->havingRaw('COUNT(DISTINCT warehouse_product_batches.id) >= ?', [(int)$value]);
                     break;
 
                 case 'has_batches':
-                    if ($value) {
-                        $query->havingRaw('COUNT(DISTINCT warehouse_product_batches.id) > 0');
-                    } else {
-                        $query->havingRaw('COUNT(DISTINCT warehouse_product_batches.id) = 0');
-                    }
-                    break;
-
-
-                // Default: Try to match on products table
-                default:
-                    if (is_numeric($value)) {
-                        $query->where("products.{$key}", '=', $value);
-                    } else {
-                        $query->where("products.{$key}", 'LIKE', '%' . $value . '%');
-                    }
+                    $operator = (bool)$value ? '>' : '=';
+                    $query->havingRaw("COUNT(DISTINCT warehouse_product_batches.id) {$operator} 0");
                     break;
             }
         }
@@ -247,25 +257,26 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
     protected function applyBatchFilters($query, array $filters)
     {
         foreach ($filters as $key => $value) {
-            if (empty($value) && $value !== '0' && $value !== 0) {
+            if (is_null($value) || $value === '') {
                 continue;
             }
 
             switch ($key) {
                 case 'batch_number':
-                    $query->where('batch_number', 'LIKE', '%' . $value . '%');
+                    // SECURITY: Parameterized LIKE
+                    $query->where('batch_number', 'LIKE', '%' . addslashes($value) . '%');
                     break;
 
                 case 'min_stock':
-                    $query->where('stock', '>=', $value);
+                    $query->where('stock', '>=', (int)$value);
                     break;
 
                 case 'max_stock':
-                    $query->where('stock', '<=', $value);
+                    $query->where('stock', '<=', (int)$value);
                     break;
 
                 case 'has_expiry':
-                    if ($value) {
+                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
                         $query->whereNotNull('expiry_date');
                     } else {
                         $query->whereNull('expiry_date');
@@ -273,13 +284,13 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                     break;
 
                 case 'expired':
-                    if ($value) {
+                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
                         $query->where('expiry_date', '<', now());
                     }
                     break;
 
                 case 'not_expired':
-                    if ($value) {
+                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
                         $query->where(function ($q) {
                             $q->whereNull('expiry_date')
                               ->orWhere('expiry_date', '>=', now());
@@ -288,8 +299,8 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                     break;
 
                 case 'expiring_soon':
-                    if ($value) {
-                        $days = request('expiring_days') ?? 90;
+                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+                        $days = min((int)($filters['expiring_days'] ?? 90), 365);
                         $query->whereBetween('expiry_date', [
                             now(),
                             now()->addDays($days)
@@ -314,18 +325,20 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                     break;
 
                 case 'status':
-                    // Filter by status (expired, expiring_soon, good)
                     $now = now();
                     switch ($value) {
                         case 'expired':
                             $query->where('expiry_date', '<', $now);
                             break;
                         case 'expiring_soon':
-                            $days = request('expiring_days') ?? 90;
-                            $query->whereBetween('expiry_date', [$now, $now->copy()->addDays($days)]);
+                            $days = min((int)($filters['expiring_days'] ?? 90), 365);
+                            $query->whereBetween('expiry_date', [
+                                $now,
+                                $now->copy()->addDays($days)
+                            ]);
                             break;
                         case 'good':
-                            $days = request('expiring_days') ?? 90;
+                            $days = min((int)($filters['expiring_days'] ?? 90), 365);
                             $query->where(function ($q) use ($now, $days) {
                                 $q->whereNull('expiry_date')
                                   ->orWhere('expiry_date', '>', $now->copy()->addDays($days));
@@ -333,20 +346,11 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                             break;
                     }
                     break;
-
-                default:
-                    if (is_numeric($value)) {
-                        $query->where($key, '=', $value);
-                    } else {
-                        $query->where($key, 'LIKE', '%' . $value . '%');
-                    }
-                    break;
             }
         }
 
         return $query;
     }
-
 
 
 
@@ -371,6 +375,56 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
         return 'No expiry';
     }
 
+
+    protected function validateFilters(array $filters): array
+    {
+        $allowedFilters = [
+            'search' => 'string|max:255',
+            'active' => 'boolean',
+            'min_price' => 'numeric|min:0',
+            'max_price' => 'numeric|min:0',
+            'min_price_with_tax' => 'numeric|min:0',
+            'max_price_with_tax' => 'numeric|min:0',
+            'min_stock' => 'integer|min:0',
+            'max_stock' => 'integer|min:0',
+            'out_of_stock' => 'boolean',
+            'low_stock' => 'boolean',
+            'low_stock_threshold' => 'integer|min:1|max:1000',
+            'min_reserved_stock' => 'integer|min:0',
+            'max_reserved_stock' => 'integer|min:0',
+            'has_reserved_stock' => 'boolean',
+            'min_batches' => 'integer|min:0',
+            'has_batches' => 'boolean'
+        ];
+
+        $validated = [];
+        foreach ($filters as $key => $value) {
+            if (isset($allowedFilters[$key])) {
+                // Basic validation
+                $validated[$key] = $value;
+            }
+        }
+
+        return $validated;
+    }
+
+
+     /**
+     * SECURITY: Validate batch filters
+     */
+    protected function validateBatchFilters(array $filters): array
+    {
+        $allowed = [
+            'batch_number', 'min_stock', 'max_stock', 'has_expiry',
+            'expired', 'not_expired', 'expiring_soon', 'expiring_days',
+            'expiry_from', 'expiry_to', 'created_from', 'created_to', 'status'
+        ];
+
+        return array_intersect_key(
+            $filters,
+            array_flip($allowed)
+        );
+    }
 
     /**
      * Get stock status label

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->decimal('discount_percent', 6, 2)->default(0);
             $table->timestamps();
+            $table->index(['company_id', 'product_id']);
         });
     }
 

@@ -79,7 +79,7 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
     ////////////////////////////////// warehouse product crud //////////////////////////////////////////////////////
-    Route::post('warehouses/{warehouse}/products/index', [WarehouseProductController::class, 'index'])->name('warehouse.products.index');
+    Route::post('warehouses/{warehouse}/products/index', [WarehouseProductController::class, 'index'])->name('warehouse.products.index')->middleware('throttle:60,1');
    // Route::delete('warehouses/{warehouse}/products/delete', [WarehouseProductController::class, 'destroy']);
     Route::post('warehouses/{warehouse}/products/store/batch',[WarehouseProductController::class,"addBatch"]);
     Route::put('warehouses/{warehouse}/products/update/batch',[WarehouseProductController::class,"updateBatchStock"]);

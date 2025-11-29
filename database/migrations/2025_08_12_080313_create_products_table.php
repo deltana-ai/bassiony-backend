@@ -35,6 +35,8 @@ return new class extends Migration
             $table->decimal('tax', 8, 2)->default(0);
 
             $table->fullText(['search_index']);
+            $table->index('active');
+
             $table->softDeletes();
             $table->timestamps();
         });

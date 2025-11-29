@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('reserved_stock')->default(0);
 
             $table->timestamps();
+            $table->index(['branch_id', 'product_id']);
+
         });
     }
 

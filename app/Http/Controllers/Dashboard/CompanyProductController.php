@@ -70,18 +70,19 @@ class CompanyProductController extends BaseController
 					
                 }],
                 [],
-                ['*'],  function ($query) use ($companyId, $discount_percent) {
+                ['*'],
+                function ($query) use ($companyId, $discount_percent) {
        
-        if ($discount_percent != null) {
-            $query->whereHas('companyPrice', function($q) use ($companyId, $discount_percent) {
-                $q->where('company_id', $companyId)
-                  ->where('discount_percent', $discount_percent);
-				 
-            });
-			 
-        }
-        return $query;
-    }
+                    if ($discount_percent != null) {
+                        $query->whereHas('companyPrice', function($q) use ($companyId, $discount_percent) {
+                            $q->where('company_id', $companyId)
+                            ->where('discount_percent', $discount_percent);
+                            
+                        });
+                        
+                    }
+                    return $query;
+                }
             ));
 			
 			
