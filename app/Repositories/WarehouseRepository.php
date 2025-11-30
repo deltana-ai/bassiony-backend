@@ -26,85 +26,86 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
      */
     public function getWarehouseProducts(int $warehouseId)
     {
-         $warehouse = Warehouse::select('id', 'company_id')
-        ->findOrFail($warehouseId);
-    
+         $warehouse = Warehouse::select('id', 'company_id') 
+        ->findOrFail($warehouseId); 
+ 
+    $filters = $this->validateFilters(request(Constants::FILTERS, [])); 
+    $perPage = min(max((int)request(Constants::PER_PAGE, 15), 1), 100); 
+    $paginate = filter_var(request(Constants::PAGINATE, true), FILTER_VALIDATE_BOOLEAN); 
+     
+    $sortColumns = [ 
+        'id' => 'products.id', 
+        'name_ar' => 'products.name_ar', 
+        'name_en' => 'products.name_en', 
+        'stock' => 'batch_summary.total_stock', 
+        'price' => 'price_after_discount_without_tax' 
+    ]; 
+    $sortKey = request(Constants::ORDER_BY, 'id'); 
+    $sortBy = $sortColumns[$sortKey] ?? 'products.id'; 
+     
+    $sortOrder = strtoupper(request(Constants::ORDER_By_DIRECTION, 'ASC')); 
+    $sortOrder = in_array($sortOrder, ['ASC', 'DESC']) ? $sortOrder : 'ASC'; 
 
-        // 2. Validate and sanitize inputs
-        $filters = $this->validateFilters(request(Constants::FILTERS, []));
-        $perPage = min(max((int)request(Constants::PER_PAGE, 15), 1), 100);
-        $paginate = filter_var(request(Constants::PAGINATE, true), FILTER_VALIDATE_BOOLEAN);
-        
-        // 3. Secure ORDER BY with mapping
-        $sortColumns = [
-            'id' => 'products.id',
-            'name_ar' => 'products.name_ar',
-            'name_en' => 'products.name_en',
-            'stock' => 'total_stock',
-            'price' => 'price_after_discount_without_tax'
-        ];
-        $sortKey = request(Constants::ORDER_BY, 'id');
-        $sortBy = $sortColumns[$sortKey] ?? 'products.id';
-        
-        $sortOrder = strtoupper(request(Constants::ORDER_By_DIRECTION, 'ASC'));
-        $sortOrder = in_array($sortOrder, ['ASC', 'DESC']) ? $sortOrder : 'ASC';
+    // Subquery for batch aggregations (only groups by product_id)
+    $batchSubquery = DB::table('warehouse_product_batches')
+        ->select([
+            'product_id',
+            DB::raw('COALESCE(SUM(stock), 0) as total_stock'),
+            DB::raw('COUNT(DISTINCT id) as total_batches')
+        ])
+        ->where('warehouse_id', $warehouseId)
+        ->groupBy('product_id');
 
-        // 4. Build optimized query
-        $query = Product::query()
-            ->select([
-                'products.id',
-                'products.name_ar',
-                'products.name_en',
-                'products.active',
-                'products.bar_code',
-                'products.qr_code',
-                'products.gtin',
-                'products.scientific_name',
-                'products.active_ingredients',
-                'products.description',
-                'products.dosage_form',
-                'products.price AS price_without_tax',
-                'products.tax',
-                'warehouse_product.reserved_stock',
-                'company_prices.discount_percent As company_discount_percent',
-                DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
-                DB::raw('COALESCE(SUM(warehouse_product_batches.stock), 0) as total_stock'),
-                DB::raw('COUNT(DISTINCT warehouse_product_batches.id) as total_batches'),
-                
-                // Price calculations
-                DB::raw(' products.price * (1 - COALESCE(company_prices.discount_percent, 0) / 100)
-                    AS price_after_discount_without_tax'),
-                
-                DB::raw('
-                    products.price * (1 - COALESCE(company_prices.discount_percent, 0) / 100) * (1 + products.tax / 100)
-                    AS price_after_discount_with_tax
-                '),
-                
-                
-            ])
-            ->join('warehouse_product', function ($join) use ($warehouseId) {
-                $join->on('products.id', '=', 'warehouse_product.product_id')
-                    ->where('warehouse_product.warehouse_id', '=', $warehouseId);
-            })
-            ->leftJoin('warehouse_product_batches', function ($join) use ($warehouseId) {
-                $join->on('products.id', '=', 'warehouse_product_batches.product_id')
-                    ->where('warehouse_product_batches.warehouse_id', '=', $warehouseId);
-            })
-            ->leftJoin('company_prices', function ($join) use ($warehouse) {
-                $join->on('products.id', '=', 'company_prices.product_id')
-                    ->where('company_prices.company_id', '=', $warehouse->company_id);
-            })
-            ->groupBy('products.id', 'warehouse_product.reserved_stock', 'company_prices.discount_percent'); // Minimal grouping
+    // Main query without complex GROUP BY
+    $query = Product::query() 
+        ->select([ 
+            'products.id', 
+            'products.name_ar', 
+            'products.name_en', 
+            'products.active', 
+            'products.bar_code', 
+            'products.qr_code', 
+            'products.gtin', 
+            'products.scientific_name', 
+            'products.active_ingredients', 
+            'products.description', 
+            'products.dosage_form', 
+            'products.price AS price_without_tax', 
+            'products.tax', 
+            'warehouse_product.reserved_stock', 
+            'company_prices.discount_percent As company_discount_percent', 
+            DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"), 
+            'batch_summary.total_stock',
+            'batch_summary.total_batches',
+             
+            // Price calculations 
+            DB::raw('products.price * (1 - COALESCE(company_prices.discount_percent, 0) / 100) 
+                AS price_after_discount_without_tax'), 
+             
+            DB::raw('products.price * (1 - COALESCE(company_prices.discount_percent, 0) / 100) * (1 + products.tax / 100) 
+                AS price_after_discount_with_tax'), 
+        ]) 
+        ->join('warehouse_product', function ($join) use ($warehouseId) { 
+            $join->on('products.id', '=', 'warehouse_product.product_id') 
+                ->where('warehouse_product.warehouse_id', '=', $warehouseId); 
+        }) 
+        ->leftJoinSub($batchSubquery, 'batch_summary', function ($join) {
+            $join->on('products.id', '=', 'batch_summary.product_id');
+        })
+        ->leftJoin('company_prices', function ($join) use ($warehouse) { 
+            $join->on('products.id', '=', 'company_prices.product_id') 
+                ->where('company_prices.company_id', '=', $warehouse->company_id); 
+        });
 
-        // 5. Apply filters
-        $query = $this->applyFilters($query, $filters);
-        
-        // 6. Apply sorting
-        $query->orderByRaw("{$sortBy} {$sortOrder}");
+    // Apply filters 
+    $query = $this->applyFilters($query, $filters); 
+     
+    // Apply sorting 
+    $query->orderByRaw("{$sortBy} {$sortOrder}"); 
 
-        // 7. Return results
-        return $paginate ? $query->paginate($perPage) : $query->get();
-    }
+    // Return results 
+    return $paginate ? $query->paginate($perPage) : $query->get(); 
+}
 
 
 

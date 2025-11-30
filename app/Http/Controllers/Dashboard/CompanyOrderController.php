@@ -19,6 +19,17 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CompanyOrderController extends BaseController
 {
+
+
+
+
+    // public function __construct()
+    // {
+    //     $this->middleware('permission:pharmacy-order-update-status|manage-company', ['only' => [ 'updateStatus']]);
+    //     $this->middleware('permission:pharmacy-order-wharehouse|manage-company', ['only' => [ 'assignWarehouse']]);
+    //     $this->middleware('permission:all-pharmacy-order|manage-company', ['only' => ['getAllPharmacyOrders']]);
+    
+    // }
     public function updateStatus(Request $request, $id): ?\Illuminate\Http\JsonResponse
     {
         try {

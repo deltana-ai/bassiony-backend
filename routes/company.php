@@ -150,6 +150,20 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
     Route::put('update-password', [EmployeeProfileController::class, 'updatePassword']);
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+
+
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+Route::middleware(['auth:employees'])->prefix('company')->name('company.')->group(function () {
+
+    Route::put('orders/{id}/status', [CompanyOrderController::class, 'updateStatus']);
+    Route::post('orders/{id}/assign', [CompanyOrderController::class, 'assignWarehouse']);
+    Route::get('all-pharmacy-orders', [CompanyOrderController::class, 'getAllPharmacyOrders']);
 });
 
 
@@ -175,6 +189,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/pharmacy/orders', [PharmacyOrderController::class, 'storeOrder']);
 });
 
-Route::put('company/orders/{id}/status', [CompanyOrderController::class, 'updateStatus']);
-Route::post('company/orders/{id}/assign', [CompanyOrderController::class, 'assignWarehouse']);
-Route::get('company/all-pharmacy-orders', [CompanyOrderController::class, 'getAllPharmacyOrders']);
+

@@ -25,77 +25,82 @@ class BranchRepository extends CrudRepository implements BranchRepositoryInterfa
     public function getBranchProducts(int $branchId)
     {
         
+         // 2. SECURITY: Validate and sanitize inputs
+$filters = $this->validateFilters(request(Constants::FILTERS, []));
+$perPage = min(max((int)request(Constants::PER_PAGE, 15), 1), 100);
+$paginate = filter_var(request(Constants::PAGINATE, true), FILTER_VALIDATE_BOOLEAN);
 
-        // 2. SECURITY: Validate and sanitize inputs
-        $filters = $this->validateFilters(request(Constants::FILTERS, []));
-        $perPage = min(max((int)request(Constants::PER_PAGE, 15), 1), 100);
-        $paginate = filter_var(request(Constants::PAGINATE, true), FILTER_VALIDATE_BOOLEAN);
-        
-        // 3. SECURITY: Whitelist sort columns
-        $sortColumns = [
-            'id' => 'products.id',
-            'name_ar' => 'products.name_ar',
-            'name_en' => 'products.name_en',
-            'price' => 'products.price',
-            'stock' => 'total_stock',
-            'active' => 'products.active'
-        ];
-        $sortKey = request(Constants::ORDER_BY, 'id');
-        $sortBy = $sortColumns[$sortKey] ?? 'products.id';
-        
-        $sortOrder = strtoupper(request(Constants::ORDER_By_DIRECTION, 'ASC'));
-        $sortOrder = in_array($sortOrder, ['ASC', 'DESC']) ? $sortOrder : 'ASC';
+// 3. SECURITY: Whitelist sort columns
+$sortColumns = [
+    'id' => 'products.id',
+    'name_ar' => 'products.name_ar',
+    'name_en' => 'products.name_en',
+    'price' => 'products.price',
+    'stock' => 'batch_summary.total_stock',
+    'active' => 'products.active'
+];
+$sortKey = request(Constants::ORDER_BY, 'id');
+$sortBy = $sortColumns[$sortKey] ?? 'products.id';
 
-        // 4. PERFORMANCE: Optimized query
-        $query = Product::query()
-            ->select([
-                'products.id',
-                'products.name_ar',
-                'products.name_en',
-                'products.active',
-                'products.bar_code',
-                'products.qr_code',
-                'products.scientific_name',
-                'products.active_ingredients',
-                'products.description',
-                'products.dosage_form',
-                'products.gtin',
-                'products.price AS price_without_tax',
-                'products.tax',
-                DB::raw('(products.price * (1 + products.tax / 100)) AS price'),
-                'branch_product.reserved_stock',
-                DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
-                DB::raw('COALESCE(SUM(branch_product_batches.stock), 0) as total_stock'),
-                DB::raw('COUNT(DISTINCT branch_product_batches.id) as total_batches')
-            ])
-            ->join('branch_product', function ($join) use ($branchId) {
-                $join->on('products.id', '=', 'branch_product.product_id')
-                     ->where('branch_product.branch_id', '=', $branchId);
-            })
-            ->leftJoin('branch_product_batches', function ($join) use ($branchId) {
-                $join->on('products.id', '=', 'branch_product_batches.product_id')
-                     ->where('branch_product_batches.branch_id', '=', $branchId);
-            })
-            // PERFORMANCE: Only group by primary key
-            ->groupBy('products.id', 'branch_product.reserved_stock');
+$sortOrder = strtoupper(request(Constants::ORDER_By_DIRECTION, 'ASC'));
+$sortOrder = in_array($sortOrder, ['ASC', 'DESC']) ? $sortOrder : 'ASC';
 
-        // 5. Apply filters
-        $query = $this->applyFilters($query, $filters);
+// 4. PERFORMANCE: Subquery for batch aggregations (avoids large GROUP BY)
+$batchSubquery = DB::table('branch_product_batches')
+    ->select([
+        'product_id',
+        DB::raw('COALESCE(SUM(stock), 0) as total_stock'),
+        DB::raw('COUNT(DISTINCT id) as total_batches')
+    ])
+    ->where('branch_id', $branchId)
+    ->groupBy('product_id');
 
-        // 6. SECURITY: Safe sorting
-        $query->orderByRaw("{$sortBy} {$sortOrder}");
+// 5. PERFORMANCE: Optimized main query (no GROUP BY needed)
+$query = Product::query()
+    ->select([
+        'products.id',
+        'products.name_ar',
+        'products.name_en',
+        'products.active',
+        'products.bar_code',
+        'products.qr_code',
+        'products.gtin',
+        'products.scientific_name',
+        'products.active_ingredients',
+        'products.description',
+        'products.dosage_form',
+        'products.price AS price_without_tax',
+        'products.tax',
+        DB::raw('(products.price * (1 + products.tax / 100)) AS price'),
+        'branch_product.reserved_stock',
+        DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
+        'batch_summary.total_stock',
+        'batch_summary.total_batches'
+    ])
+    ->join('branch_product', function ($join) use ($branchId) {
+        $join->on('products.id', '=', 'branch_product.product_id')
+             ->where('branch_product.branch_id', '=', $branchId);
+    })
+    ->leftJoinSub($batchSubquery, 'batch_summary', function ($join) {
+        $join->on('products.id', '=', 'batch_summary.product_id');
+    });
 
-        // 7. PERFORMANCE: Paginate and eager load media
-        if ($paginate) {
-            $products = $query->paginate($perPage);
-            // Load media only for current page (not all products)
-            $products->load('media');
-            return $products;
-        }
+// 6. Apply filters
+$query = $this->applyFilters($query, $filters);
 
-        $products = $query->get();
-        $products->load('media');
-        return $products;
+// 7. SECURITY: Safe sorting (using parameterized orderBy instead of raw)
+$query->orderBy(DB::raw($sortBy), $sortOrder);
+
+// 8. PERFORMANCE: Paginate and eager load media
+if ($paginate) {
+    $products = $query->paginate($perPage);
+    $products->load('media');
+    return $products;
+}
+
+$products = $query->get();
+$products->load('media');
+return $products;
     }
 
     /**
