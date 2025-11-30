@@ -27,6 +27,7 @@ class ResponseOfferResource extends JsonResource
             "total_price"=> $this->total_price ,
             "item_price"=>$this->item_price,
             "quantity"=>$this->quantity,
+			"all_quantity"=>$this->all_quantity,
             "status"=> $this->status,
             "offer"=> $this->offer? new CompanyOfferResource($this->offer):null,
             'createdAt' => $this->created_at ? $this->created_at->format('Y-M-d H:i:s A') : null,

@@ -85,8 +85,8 @@ class ResponseOfferRepository extends CrudRepository implements ResponseOfferRep
 
             switch ($data["status"]) {
                 case 'approved':
-                    $this->deductStockByBatch($product->id, $data["warehouse_id"], $responseOffer->quantity);
-                    $offer->decrement('total_quantity', $responseOffer->quantity);
+                    $this->deductStockByBatch($product->id, $data["warehouse_id"], $responseOffer->all_quantity);
+                    $offer->decrement('total_quantity', $responseOffer->all_quantity);
                     $offer->update(["warehouse_id"=>$data["warehouse_id"]]);
                     break;
 
