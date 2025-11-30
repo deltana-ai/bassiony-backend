@@ -24,7 +24,7 @@ class RoleRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name' => ['required', 'string', 'max:90'],
+            'name' => ['required', 'string', 'max:100'],
             'permissions' => ['required', 'array', new PermissionBelongToGuard],
             'permissions.*' => ['exists:permissions,id'],
         ];
