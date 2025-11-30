@@ -28,8 +28,11 @@ class WarehouseProduct2Resource extends JsonResource
             'bar_code' => $this->bar_code,
             
             
-            'price' => (float) $this->price,
+           // 'price' => (float) $this->price,
+            'company_discount_percent' => (float) $this->company_discount_percent,
             'tax' => (float) $this->tax,
+            'price_after_discount_without_tax' => (float) $this->price_after_discount_without_tax,
+            'price_after_discount_with_tax' => (float) $this->price_after_discount_with_tax,
             'price_without_tax' => (float) $this->price_without_tax,
             'active' => (bool) $this->active,
             'imageUrl'          => $this->getFirstMediaUrl(),

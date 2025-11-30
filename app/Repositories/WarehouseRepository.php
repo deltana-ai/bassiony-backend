@@ -66,22 +66,21 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
                 'products.price AS price_without_tax',
                 'products.tax',
                 'warehouse_product.reserved_stock',
+                'company_prices.discount_percent As company_discount_percent',
                 DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
                 DB::raw('COALESCE(SUM(warehouse_product_batches.stock), 0) as total_stock'),
                 DB::raw('COUNT(DISTINCT warehouse_product_batches.id) as total_batches'),
                 
                 // Price calculations
-                DB::raw('
-                    products.price * (1 - COALESCE(company_prices.discount_percent, 0) / 100)
-                    AS price_after_discount_without_tax
-                '),
+                DB::raw(' products.price * (1 - COALESCE(company_prices.discount_percent, 0) / 100)
+                    AS price_after_discount_without_tax'),
                 
                 DB::raw('
                     products.price * (1 - COALESCE(company_prices.discount_percent, 0) / 100) * (1 + products.tax / 100)
                     AS price_after_discount_with_tax
                 '),
                 
-                'company_prices.discount_percent',
+                
             ])
             ->join('warehouse_product', function ($join) use ($warehouseId) {
                 $join->on('products.id', '=', 'warehouse_product.product_id')
