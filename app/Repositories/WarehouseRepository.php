@@ -138,7 +138,7 @@ class WarehouseRepository extends CrudRepository implements WarehouseRepositoryI
         $query = WarehouseProductBatch::query()
             ->with([
                 'product:id,name_ar,name_en,bar_code,price,tax,qr_code,gtin,active',
-                'warehouse:id,name,address'
+                'warehouse:id,name,location'
             ])
             ->where('product_id', $productId)
             ->where('warehouse_id', $warehouseId);
