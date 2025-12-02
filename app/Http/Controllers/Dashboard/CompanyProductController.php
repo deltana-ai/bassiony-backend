@@ -103,9 +103,24 @@ class CompanyProductController extends BaseController
             $data["company_id"] =  auth("employees")->user()->company_id;
             $exist = CompanyPrice::where("company_id", $data["company_id"])->where("product_id", $data["product_id"])->first();
             if ($exist) {
-                return JsonResponse::respondError("Price already exist",409);
+
+                if ($exist->company_id != $data["company_id"] ) {
+
+                    return JsonResponse::respondError("Unauthorized",403);
+
+                }
+
+
+                $exist->update([
+
+                    'discount_percent' => $data['discount_percent'],
+                ]);
+           
             }
-            $company_price = CompanyPrice::create($data);
+            else{
+               $company_price = CompanyPrice::create($data);
+
+            }
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
 
         } catch (Exception $e) {
