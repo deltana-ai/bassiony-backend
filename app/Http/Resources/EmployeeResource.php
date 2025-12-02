@@ -26,7 +26,8 @@ class EmployeeResource extends JsonResource
             'company' => new CompanyResource($this->company),
             // 'warehouses' => $this->warehouses? WarehouseResource::collection($this->warehouses):null,
             'warehouses' => $this->warehouses ? WarehouseResource::collection($this->warehouses) : null,
-
+            'warehouse_id' => $this->warehouses->first()?->id,
+            'warehouse_name' => $this->warehouses->first()?->name,
             'address' => $this->address,
             'createdAt' => $this->created_at ? $this->created_at->format('d-M-Y H:i A') : null,
             'updatedAt' => $this->updated_at ? $this->updated_at->format('d-M-Y H:i A') : null
