@@ -21,7 +21,7 @@ class EmployeeResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'active' => (bool)$this->active,
-            'role' => $this->getRoleNames()->first(),
+            'role' => preg_replace('/_\d+$/', '', $this->getRoleNames()->first()),
             'role_id'=> $this->roles->first()?->id,
             'company' => new CompanyResource($this->company),
             // 'warehouses' => $this->warehouses? WarehouseResource::collection($this->warehouses):null,

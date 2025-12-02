@@ -18,6 +18,8 @@ class AdminResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'role' =>  $this->getRoleNames()->first(),
+
             'role_id'=> $this->roles->first()?->id,
             'superAdmin' => $this->super_admin
         ];

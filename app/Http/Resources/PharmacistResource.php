@@ -19,6 +19,8 @@ class PharmacistResource extends JsonResource
             'name' => $this->name,
             'phone' => $this->phone,
             'email' => $this->email,
+            'role' => preg_replace('/_\d+$/', '', $this->getRoleNames()->first()),
+
             'role_id'=> $this->roles->first()?->id,
             'pharmacy' => new PharmacyResource($this->pharmacy),
             'imageUrl' => $this->getFirstMediaUrl(),
