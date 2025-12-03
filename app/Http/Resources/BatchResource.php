@@ -26,7 +26,7 @@ class BatchResource extends JsonResource
             $status = 'expiring_soon';
         }
 
-        return [
+       $data = [
 
             'id' => $this->id,
             'batch_number' => $this->batch_number,
@@ -43,12 +43,22 @@ class BatchResource extends JsonResource
                 'name' => $this->product?->name,
                 'bar_code' => $this->product?->bar_code,
             ],
-            'warehouse'=>
-            [
+            
+        ];
+        if($this->warehouse){
+            $data['warehouse'] = [
                 'id' => $this->warehouse_id,
                 'name' => $this->warehouse?->name,
-            ]
-        ];
+            ];
+        }
+        if($this->branch)
+        $data['branch'] =
+            [
+                'id' => $this->branch_id,
+                'name' => $this->branch?->name,
+            ];
+
+        return $data;
 
     }
 

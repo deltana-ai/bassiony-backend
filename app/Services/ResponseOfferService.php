@@ -6,6 +6,7 @@ use App\Http\Requests\ResponseOfferRequest;
 use App\Interfaces\ResponseOfferRepositoryInterface;
 use App\Models\CompanyOffer;
 use App\Models\ResponseOffer;
+use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 
 class ResponseOfferService
@@ -80,7 +81,8 @@ class ResponseOfferService
         $data['total_price'] = 0;
 
         // Ensure offer is active
-        if (! $offer->active || ($offer->start_date && now()->toDateString() < $offer->start_date) || ($offer->end_date && now()->toDateString() > $offer->end_date)) {
+        if (!$offer->active ||now()->lt(Carbon::parse($offer->start_date)) || now()->gt(Carbon::parse($offer->end_date))) {
+
             throw new \Exception("هذا العرض غير متاح حالياً.");
         }
 

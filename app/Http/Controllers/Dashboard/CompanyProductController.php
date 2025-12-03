@@ -101,7 +101,26 @@ class CompanyProductController extends BaseController
         try {
             $data = $request->validated();
             $data["company_id"] =  auth("employees")->user()->company_id;
-            $company_price = CompanyPrice::create($data);
+            $exist = CompanyPrice::where("company_id", $data["company_id"])->where("product_id", $data["product_id"])->first();
+            if ($exist) {
+
+                if ($exist->company_id != $data["company_id"] ) {
+
+                    return JsonResponse::respondError("Unauthorized",403);
+
+                }
+
+
+                $exist->update([
+
+                    'discount_percent' => $data['discount_percent'],
+                ]);
+           
+            }
+            else{
+               $company_price = CompanyPrice::create($data);
+
+            }
             return JsonResponse::respondSuccess(trans(JsonResponse::MSG_ADDED_SUCCESSFULLY));
 
         } catch (Exception $e) {
@@ -115,20 +134,27 @@ class CompanyProductController extends BaseController
     /**
      * Update the specified company price.
      */
-    public function updatePrice(CompanyPriceRequest $request, CompanyPrice $companyPrice)
+    public function updatePrice(CompanyPriceRequest $request, Product $product)
     {
         try {
 
             $companyId = Auth::guard('employees')->user()->company_id;
 
-            if ($companyPrice->company_id != $companyId) {
+            $companyPrice = CompanyPrice::where('company_id', $companyId)
+                ->where('product_id', $product->id)
+                ->first();
+
+            if (!$companyPrice) {
+                return JsonResponse::respondError("Price not found",404);
+            }
+             if ($companyPrice->company_id != $companyId) {
 
                 return JsonResponse::respondError("Unauthorized",403);
 
             }
 
+           
             $companyPrice->update([
-                'product_id' => $request->product_id,
                 'discount_percent' => $request->discount_percent,
             ]);
 
