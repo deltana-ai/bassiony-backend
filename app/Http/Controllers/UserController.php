@@ -187,22 +187,202 @@ class UserController extends BaseController
 
 
     public function checkPhone(Request $request)
-{
-    try {
+    {
+        try {
+            $request->validate([
+                'phone' => 'required|string'
+            ]);
+
+            $exists = User::where('phone', $request->phone)->exists();
+
+            if ($exists) {
+                return JsonResponse::respondSuccess('Phone number already exists', ['exists' => true]);
+            } else {
+                return JsonResponse::respondSuccess('Phone number not found', ['exists' => false]);
+            }
+        } catch (Exception $e) {
+            return JsonResponse::respondError($e->getMessage());
+        }
+    }
+
+
+
+    public function sendOtp(Request $request)
+    {
         $request->validate([
-            'phone' => 'required|string'
+            'email' => 'required|email'
         ]);
 
-        $exists = User::where('phone', $request->phone)->exists();
+        $user = User::where('email', $request->email)->first();
 
-        if ($exists) {
-            return JsonResponse::respondSuccess('Phone number already exists', ['exists' => true]);
-        } else {
-            return JsonResponse::respondSuccess('Phone number not found', ['exists' => false]);
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email not found',
+                'user' => null,
+                'token' => null
+            ], 404);
         }
-    } catch (Exception $e) {
-        return JsonResponse::respondError($e->getMessage());
-    }
-}
 
-}   
+        $otp = rand(100000, 999999);
+        $user->update(['otp' => $otp]);
+
+        Mail::raw("Your OTP code is: $otp", function ($m) use ($user) {
+            $m->to($user->email)->subject('Password Reset OTP');
+        });
+
+        return response()->json([
+            'result' => true,
+            'status' => 200,
+            'message' => 'OTP sent successfully',
+            'user' => new UserResource($user),
+        ]);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required'
+        ]);
+
+        $user = User::where([
+            'email' => $request->email,
+            'otp' => $request->otp
+        ])->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid OTP',
+                'user' => null,
+                'token' => null
+            ], 400);
+        }
+
+        $user->otp = null;
+        $user->save();
+
+        $token = $user->createToken('reset-password-token')->plainTextToken;
+
+        return response()->json([
+            'result' => true,
+            'status' => 200,
+            'message' => 'OTP verified successfully',
+            'user' => new UserResource($user),
+            'token' => $token
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|min:6|confirmed'
+        ]);
+
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'user' => null,
+                'token' => null
+            ], 401);
+        }
+
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+        return response()->json([
+            'result' => true,
+            'status' => 200,
+            'message' => 'Password reset successfully',
+            'user' => new UserResource($user),
+        ]);
+    }
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:6|confirmed'
+        ]);
+
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'user' => null,
+                'token' => null
+            ], 401);
+        }
+
+         if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Current password is incorrect',
+                'user' => null,
+                'token' => null
+            ], 400);
+        }
+
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+        return response()->json([
+            'result' => true,
+            'status' => 200,
+            'message' => 'Password updated successfully',
+            'user' => new UserResource($user),
+        ]);
+    }
+
+
+    public function deleteAccount(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'user' => null,
+                'token' => null
+            ], 401);
+        }
+
+        $user->delete();
+
+        return response()->json([
+            'result' => true,
+            'status' => 200,
+            'message' => 'Account deleted successfully',
+            'user' => null,
+        ]);
+    }
+
+    public function checkAuth(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'user' => null,
+                'token' => null
+            ], 401);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User is authenticated',
+            'user' => new UserResource($user),
+            'token' => null
+        ]);
+    }
+
+
+}

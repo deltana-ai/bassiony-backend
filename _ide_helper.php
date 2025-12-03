@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 11.46.1.
+ * Generated for Laravel 11.47.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -1617,11 +1617,15 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * {@inheritdoc}
+         * Finds an entry of the container by its identifier and returns it.
          *
          * @template TClass of object
          * @param string|class-string<TClass> $id
          * @return ($id is class-string<TClass> ? TClass : mixed)
+         * @param string $id Identifier of the entry to look for.
+         * @throws NotFoundExceptionInterface  No entry was found for **this** identifier.
+         * @throws ContainerExceptionInterface Error while retrieving the entry.
+         * @return mixed Entry.
          * @static
          */
         public static function get($id)
@@ -12830,89 +12834,6 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Release a reserved job back onto the queue after (n) seconds.
-         *
-         * @param string $queue
-         * @param \Illuminate\Queue\Jobs\DatabaseJobRecord $job
-         * @param int $delay
-         * @return mixed
-         * @static
-         */
-        public static function release($queue, $job, $delay)
-        {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
-            return $instance->release($queue, $job, $delay);
-        }
-
-        /**
-         * Delete a reserved job from the queue.
-         *
-         * @param string $queue
-         * @param string $id
-         * @return void
-         * @throws \Throwable
-         * @static
-         */
-        public static function deleteReserved($queue, $id)
-        {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
-            $instance->deleteReserved($queue, $id);
-        }
-
-        /**
-         * Delete a reserved job from the reserved queue and release it.
-         *
-         * @param string $queue
-         * @param \Illuminate\Queue\Jobs\DatabaseJob $job
-         * @param int $delay
-         * @return void
-         * @static
-         */
-        public static function deleteAndRelease($queue, $job, $delay)
-        {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
-            $instance->deleteAndRelease($queue, $job, $delay);
-        }
-
-        /**
-         * Delete all of the jobs from the queue.
-         *
-         * @param string $queue
-         * @return int
-         * @static
-         */
-        public static function clear($queue)
-        {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
-            return $instance->clear($queue);
-        }
-
-        /**
-         * Get the queue or return the default.
-         *
-         * @param string|null $queue
-         * @return string
-         * @static
-         */
-        public static function getQueue($queue)
-        {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
-            return $instance->getQueue($queue);
-        }
-
-        /**
-         * Get the underlying database instance.
-         *
-         * @return \Illuminate\Database\Connection
-         * @static
-         */
-        public static function getDatabase()
-        {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
-            return $instance->getDatabase();
-        }
-
-        /**
          * Get the maximum number of attempts for an object-based queue handler.
          *
          * @param mixed $job
@@ -12922,7 +12843,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobTries($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Illuminate\Queue\SyncQueue $instance */
             return $instance->getJobTries($job);
         }
 
@@ -12936,7 +12857,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobBackoff($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Illuminate\Queue\SyncQueue $instance */
             return $instance->getJobBackoff($job);
         }
 
@@ -12950,7 +12871,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobExpiration($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Illuminate\Queue\SyncQueue $instance */
             return $instance->getJobExpiration($job);
         }
 
@@ -12964,7 +12885,7 @@ namespace Illuminate\Support\Facades {
         public static function createPayloadUsing($callback)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            \Illuminate\Queue\DatabaseQueue::createPayloadUsing($callback);
+            \Illuminate\Queue\SyncQueue::createPayloadUsing($callback);
         }
 
         /**
@@ -12976,7 +12897,7 @@ namespace Illuminate\Support\Facades {
         public static function getContainer()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Illuminate\Queue\SyncQueue $instance */
             return $instance->getContainer();
         }
 
@@ -12990,7 +12911,7 @@ namespace Illuminate\Support\Facades {
         public static function setContainer($container)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Illuminate\Queue\SyncQueue $instance */
             $instance->setContainer($container);
         }
 
@@ -14349,6 +14270,34 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Sets the list of HTTP methods that can be overridden.
+         * 
+         * Set to null to allow all methods to be overridden (default). Set to an
+         * empty array to disallow overrides entirely. Otherwise, provide the list
+         * of uppercased method names that are allowed.
+         *
+         * @param \Symfony\Component\HttpFoundation\uppercase-string[]|null $methods
+         * @static
+         */
+        public static function setAllowedHttpMethodOverride($methods)
+        {
+            //Method inherited from \Symfony\Component\HttpFoundation\Request 
+            return \Illuminate\Http\Request::setAllowedHttpMethodOverride($methods);
+        }
+
+        /**
+         * Gets the list of HTTP methods that can be overridden.
+         *
+         * @return \Symfony\Component\HttpFoundation\uppercase-string[]|null
+         * @static
+         */
+        public static function getAllowedHttpMethodOverride()
+        {
+            //Method inherited from \Symfony\Component\HttpFoundation\Request 
+            return \Illuminate\Http\Request::getAllowedHttpMethodOverride();
+        }
+
+        /**
          * Whether the request contains a Session which was started in one of the
          * previous requests.
          *
@@ -14779,7 +14728,18 @@ namespace Illuminate\Support\Facades {
 
         /**
          * Gets the format associated with the mime type.
+         * 
+         * Resolution order:
+         *   1) Exact match on the full MIME type (e.g. "application/json").
+         *   2) Match on the canonical MIME type (i.e. before the first ";" parameter).
+         *   3) If the type is "application/*+suffix", use the structured syntax suffix
+         *      mapping (e.g. "application/foo+json" → "json"), when available.
+         *   4) If $subtypeFallback is true and no match was found:
+         *      - return the MIME subtype (without "x-" prefix), provided it does not
+         *        contain a "+" (e.g. "application/x-yaml" → "yaml", "text/csv" → "csv").
          *
+         * @param string|null $mimeType The mime type to check
+         * @param bool $subtypeFallback Whether to fall back to the subtype if no exact match is found
          * @static
          */
         public static function getFormat($mimeType)
@@ -14792,6 +14752,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Associates a format with mime types.
          *
+         * @param string $format The format to set
          * @param string|string[] $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
          * @static
          */

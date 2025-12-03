@@ -21,6 +21,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 Route::post('contact-us-public', [ContactUsController::class, 'store']);
 Route::post('publicsss', [ContactUsController::class, 'aaaa']);
 //////////////////////////////////////// User ////////////////////////////////
+Route::middleware('auth:sanctum')->get('/check-auth', [UserController::class, 'checkAuth']);
 
 Route::middleware(['auth:admins'])->group(function () {
     Route::post('/user/index', [UserController::class, 'index']);
@@ -36,6 +37,15 @@ Route::prefix('user')->middleware('throttle:20')->group(function () {
     Route::post('login', [UserController::class, 'login']);
     Route::post('change-password', [UserController::class, 'changePassword']);
     Route::post('logout', [UserController::class, 'logout'])->middleware('auth:users');
+
+    Route::post('send-otp', [UserController::class, 'sendOtp']);
+    Route::post('verify-otp', [UserController::class, 'verifyOtp']);
+    Route::middleware('auth:sanctum')->post('/reset-password', [UserController::class, 'resetPassword']);
+    Route::middleware('auth:sanctum')->post('/update-password', [UserController::class, 'updatePassword']);
+    Route::middleware('auth:sanctum')->post('/delete-account', [UserController::class, 'deleteAccount']);
+
+
+
 });
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
 

@@ -25,7 +25,6 @@ class CardController extends Controller
     }
 
 
-    // إضافة كارت جديد
     public function store(Request $request)
     {
         try {
