@@ -132,70 +132,88 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
 ///////////////////////////////////////////////////////////////////////////////////////////////
     public function getCompanyProducts(int $companyId)
     {
+        // Validate and sanitize inputs
         $filters = request(Constants::FILTERS) ?? [];
-        $perPage = request(Constants::PER_PAGE) ?? 15;
-        $paginate = request(Constants::PAGINATE) ?? true;
-        $sortOrder = request(Constants::ORDER_By_DIRECTION) ?? "asc";
-        $sortBy = request(Constants::ORDER_BY) ?? "products.id";
+        $perPage = min((int) (request(Constants::PER_PAGE) ?? 15), 100); // Max 100 items
+        $paginate = filter_var(request(Constants::PAGINATE) ?? true, FILTER_VALIDATE_BOOLEAN);
+        $sortOrder = in_array(strtolower(request(Constants::ORDER_By_DIRECTION)), ['asc', 'desc']) 
+            ? strtolower(request(Constants::ORDER_By_DIRECTION)) 
+            : 'asc';
+        
+        // Whitelist allowed sort columns for security
+        $allowedSortColumns = [
+            'products.id',
+            'products.name_ar',
+            'products.name_en',
+            'products.price',
+            'products.active',
+            'products.rating',
+            'total_stock'
+        ];
+        $sortBy = in_array(request(Constants::ORDER_BY), $allowedSortColumns) 
+            ? request(Constants::ORDER_BY) 
+            : 'products.id';
 
         $query = Product::query()
             ->select([
                 'products.id',
                 'products.name_ar',
                 'products.name_en',
-                'products.description',
-                'products.price AS price_without_tax',
-                'products.tax',
-                DB::raw('(products.price + (products.price * products.tax / 100)) AS price'),
+                // 'products.description',
+                // 'products.price AS price_without_tax',
+                // 'products.tax',
+                DB::raw('ROUND(products.price + (products.price * products.tax / 100), 2) AS price'),
                 'products.active',
-                'products.rating',
+                // 'products.rating',
                 'products.bar_code',
                 'products.qr_code',
                 'products.gtin',
                 'products.scientific_name',
-                'products.active_ingredients',
-                'products.dosage_form',
-                'products.category_id',
-                'products.brand_id',
-                'categories.name as category_name',
-                'brands.name as brand_name',
-                DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name"),
-                DB::raw('COALESCE(SUM(warehouse_product.reserved_stock), 0) as total_reserved_stock'),
-                DB::raw('COALESCE(SUM(warehouse_product_batches.stock), 0) as total_stock'),
-                DB::raw('COUNT(DISTINCT warehouse_product_batches.id) as total_batches'),
-                DB::raw('COUNT(DISTINCT warehouses.id) as total_warehouses')
+                // 'products.active_ingredients',
+                // 'products.dosage_form',
+                // 'products.category_id',
+                // 'products.brand_id',
+              //  'categories.name as category_name',
+               // 'brands.name as brand_name',
+                DB::raw("CONCAT(products.name_ar, ' - ', products.name_en) AS name")
             ])
-            ->with(['media']) // Load product images
-            ->join('warehouse_product', 'products.id', '=', 'warehouse_product.product_id')
-            ->join('warehouses', function($join) use ($companyId) {
-                $join->on('warehouse_product.warehouse_id', '=', 'warehouses.id')
-                     ->where('warehouses.company_id', '=', $companyId);
+            // Eager load media to avoid N+1 queries
+            ->with(['media'])
+            // Only get products that exist in this company's warehouses
+            ->whereExists(function($subquery) use ($companyId) {
+                $subquery->select(DB::raw(1))
+                    ->from('warehouse_product')
+                    ->join('warehouses', 'warehouse_product.warehouse_id', '=', 'warehouses.id')
+                    ->whereColumn('warehouse_product.product_id', 'products.id')
+                    ->where('warehouses.company_id', '=', $companyId);
             })
-            ->leftJoin('warehouse_product_batches', function($join) {
-                $join->on('products.id', '=', 'warehouse_product_batches.product_id')
-                     ->on('warehouses.id', '=', 'warehouse_product_batches.warehouse_id');
-            })
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
-            ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
-            ->groupBy([
-                'products.id',
-                'products.name_ar',
-                'products.name_en',
-                'products.description',
-                'products.price',
-                'products.tax',
-                'products.active',
-                'products.rating',
-                'products.bar_code',
-                'products.qr_code',
-                'products.gtin',
-                'products.scientific_name',
-                'products.active_ingredients',
-                'products.dosage_form',
-                'products.category_id',
-                'products.brand_id',
-                'categories.name',
-                'brands.name'
+            // ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            // ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
+            // Add subqueries for aggregated data (more efficient than GROUP BY with joins)
+            ->addSelect([
+                'total_reserved_stock' => DB::table('warehouse_product')
+                    ->selectRaw('COALESCE(SUM(warehouse_product.reserved_stock), 0)')
+                    ->join('warehouses', 'warehouse_product.warehouse_id', '=', 'warehouses.id')
+                    ->whereColumn('warehouse_product.product_id', 'products.id')
+                    ->where('warehouses.company_id', '=', $companyId),
+                
+                'total_stock' => DB::table('warehouse_product_batches')
+                    ->selectRaw('COALESCE(SUM(warehouse_product_batches.stock), 0)')
+                    ->join('warehouses', 'warehouse_product_batches.warehouse_id', '=', 'warehouses.id')
+                    ->whereColumn('warehouse_product_batches.product_id', 'products.id')
+                    ->where('warehouses.company_id', '=', $companyId),
+                
+                'total_batches' => DB::table('warehouse_product_batches')
+                    ->selectRaw('COUNT(DISTINCT warehouse_product_batches.id)')
+                    ->join('warehouses', 'warehouse_product_batches.warehouse_id', '=', 'warehouses.id')
+                    ->whereColumn('warehouse_product_batches.product_id', 'products.id')
+                    ->where('warehouses.company_id', '=', $companyId),
+                
+                'total_warehouses' => DB::table('warehouse_product')
+                    ->selectRaw('COUNT(DISTINCT warehouse_product.warehouse_id)')
+                    ->join('warehouses', 'warehouse_product.warehouse_id', '=', 'warehouses.id')
+                    ->whereColumn('warehouse_product.product_id', 'products.id')
+                    ->where('warehouses.company_id', '=', $companyId)
             ]);
 
         // Apply all filters
@@ -205,9 +223,6 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
         $query->orderBy($sortBy, $sortOrder);
 
         return $paginate ? $query->paginate($perPage) : $query->get();
-
-    
-        
     }
 
 
@@ -257,72 +272,72 @@ class CompanyRepository extends CrudRepository implements CompanyRepositoryInter
                
 
                 // Price filters
-                case 'min_price':
-                    $query->where('products.price', '>=', $value);
-                    break;
+                // case 'min_price':
+                //     $query->where('products.price', '>=', $value);
+                //     break;
 
-                case 'max_price':
-                    $query->where('products.price', '<=', $value);
-                    break;
+                // case 'max_price':
+                //     $query->where('products.price', '<=', $value);
+                //     break;
 
-                case 'price_range':
-                    if (is_array($value) && count($value) == 2) {
-                        $query->whereBetween('products.price', [$value[0], $value[1]]);
-                    }
-                    break;
+                // case 'price_range':
+                //     if (is_array($value) && count($value) == 2) {
+                //         $query->whereBetween('products.price', [$value[0], $value[1]]);
+                //     }
+                //     break;
 
                 // Rating filters
-                case 'min_rating':
-                    $query->where('products.rating', '>=', $value);
-                    break;
+                // case 'min_rating':
+                //     $query->where('products.rating', '>=', $value);
+                //     break;
 
-                case 'max_rating':
-                    $query->where('products.rating', '<=', $value);
-                    break;
+                // case 'max_rating':
+                //     $query->where('products.rating', '<=', $value);
+                //     break;
 
                 // ========== CATEGORY FILTERS ==========
                 
-                case 'category_id':
-                    if (is_array($value)) {
-                        $query->whereIn('products.category_id', $value);
-                    } else {
-                        $query->where('products.category_id', $value);
-                    }
-                    break;
+                // case 'category_id':
+                //     if (is_array($value)) {
+                //         $query->whereIn('products.category_id', $value);
+                //     } else {
+                //         $query->where('products.category_id', $value);
+                //     }
+                //     break;
 
-                case 'category_name':
-                    $query->where('categories.name', 'LIKE', '%' . $value . '%');
-                    break;
+                // case 'category_name':
+                //     $query->where('categories.name', 'LIKE', '%' . $value . '%');
+                //     break;
 
-                case 'has_category':
-                    if ($value) {
-                        $query->whereNotNull('products.category_id');
-                    } else {
-                        $query->whereNull('products.category_id');
-                    }
-                    break;
+                // case 'has_category':
+                //     if ($value) {
+                //         $query->whereNotNull('products.category_id');
+                //     } else {
+                //         $query->whereNull('products.category_id');
+                //     }
+                //     break;
 
                 // ========== BRAND FILTERS ==========
                 
-                case 'brand_id':
-                    if (is_array($value)) {
-                        $query->whereIn('products.brand_id', $value);
-                    } else {
-                        $query->where('products.brand_id', $value);
-                    }
-                    break;
+                // case 'brand_id':
+                //     if (is_array($value)) {
+                //         $query->whereIn('products.brand_id', $value);
+                //     } else {
+                //         $query->where('products.brand_id', $value);
+                //     }
+                //     break;
 
-                case 'brand_name':
-                    $query->where('brands.name', 'LIKE', '%' . $value . '%');
-                    break;
+                // case 'brand_name':
+                //     $query->where('brands.name', 'LIKE', '%' . $value . '%');
+                //     break;
 
-                case 'has_brand':
-                    if ($value) {
-                        $query->whereNotNull('products.brand_id');
-                    } else {
-                        $query->whereNull('products.brand_id');
-                    }
-                    break;
+                // case 'has_brand':
+                //     if ($value) {
+                //         $query->whereNotNull('products.brand_id');
+                //     } else {
+                //         $query->whereNull('products.brand_id');
+                //     }
+                //     break;
 
                 // ========== WAREHOUSE FILTERS ==========
                 
