@@ -161,8 +161,10 @@ class CrudRepository implements ICrudRepository
 
     // remove record from the database
 
-    public function find($id)
+    public function find($id , $with = [])
     {
+        if (!empty($with))
+            return $this->model->with($with)->findOrFail($id);
         return $this->model->findOrFail($id);
     }
 

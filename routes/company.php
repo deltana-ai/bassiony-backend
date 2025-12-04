@@ -7,6 +7,8 @@ use App\Http\Controllers\Dashboard\EmployeeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
+use App\Http\Controllers\OrderPharmacyController;
+
 Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('company.')->group(function () {
 
 
@@ -152,6 +154,33 @@ Route::middleware(['auth:employees'])->prefix('company/dashboard')->name('compan
 
 
 
+
+        Route::prefix('pharmacy-orders')->group(function () {
+        
+        // Create order from cart
+        
+        // Get single order
+        Route::get('/{id}', [OrderPharmacyController::class, 'show']);
+        
+        // Get pharmacy orders
+        Route::get('/pharmacy/{pharmacyId}', [OrderPharmacyController::class, 'getPharmacyOrders']);
+        
+        // Get company orders
+        Route::get('/company/{companyId}', [OrderPharmacyController::class, 'getCompanyOrders']);
+        
+        // Get available warehouses for order
+        Route::get('/{orderId}/warehouses', [OrderPharmacyController::class, 'getWarehousesForOrder']);
+        
+        // Order status management
+        Route::patch('/{id}/approve', [OrderPharmacyController::class, 'approve']);
+        Route::patch('/{id}/reject', [OrderPharmacyController::class, 'reject']);
+        Route::patch('/{id}/delivered', [OrderPharmacyController::class, 'markAsDelivered']);
+        
+        // Return management
+        Route::get('/returns/company/{companyId}', [OrderPharmacyController::class, 'getCompanyReturns']);
+        Route::patch('/returns/{returnId}/approve', [OrderPharmacyController::class, 'approveReturn']);
+        Route::patch('/returns/{returnId}/reject', [OrderPharmacyController::class, 'rejectReturn']);
+    });
 
 
     

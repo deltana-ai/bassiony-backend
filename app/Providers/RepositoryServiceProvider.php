@@ -17,9 +17,9 @@ use App\Repositories\UserRepository;
 use App\Repositories\{BranchRepository, BrandRepository, CategoryRepository, ProductRepository,FavoriteRepository, OrderRepository, PharmacistRepository, PillReminderRepository, RateRepository};
 use App\Repositories\{CompanyRepository,WarehouseRepository,PharmacyRepository};
 use Illuminate\Support\ServiceProvider;
-use App\Interfaces\{CompanyOfferRepositoryInterface, EmployeeRepositoryInterface, ResponseOfferRepositoryInterface, RoleRepositoryInterface, WarehouseProductRepositoryInterface,WarehouseRouteRepositoryInterface};
+use App\Interfaces\{CompanyOfferRepositoryInterface, EmployeeRepositoryInterface, PharmacyOrderRepositoryInterface, ResponseOfferRepositoryInterface, RoleRepositoryInterface, WarehouseProductRepositoryInterface,WarehouseRouteRepositoryInterface};
 
-use App\Repositories\{CompanyOfferRepository, EmployeeRepository, ResponseOfferRepository, RoleRepository };
+use App\Repositories\{CompanyOfferRepository, EmployeeRepository, PharmacyOrderRepository, ResponseOfferRepository, RoleRepository };
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -49,6 +49,7 @@ class RepositoryServiceProvider extends ServiceProvider
 
         $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
         $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
+        $this->app->bind(PharmacyOrderRepositoryInterface::class, PharmacyOrderRepository::class);
 
 
     }

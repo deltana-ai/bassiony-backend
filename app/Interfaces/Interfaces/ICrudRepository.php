@@ -21,7 +21,7 @@ interface ICrudRepository
     public function findTrashed($id);
 
 
-    public function find($id);
+    public function find($id ,$with =[]);
 
     public function restore($model);
 

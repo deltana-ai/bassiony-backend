@@ -33,8 +33,7 @@ class Product extends BaseModel
 
     public function companyPrice()
     {
-        return $this->hasOne(CompanyPrice::class)
-                    ;
+        return $this->hasOne(CompanyPrice::class) ;
     }
     public function scopeSearch($query, $term)
     {

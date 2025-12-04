@@ -16,8 +16,10 @@ use App\Http\Controllers\Dashboard\{
 
 use App\Http\Controllers\{
     OrderController,
+    OrderPharmacyController,
     ProductController,
-    PharmacistController
+    PharmacistController,
+    PharmacyCartController
 };
 use App\Http\Controllers\Dashboard\BrandController as AdminBrandController;
 use App\Http\Controllers\Dashboard\CategoryController as AdminCategoryController;
@@ -146,7 +148,30 @@ Route::middleware(['auth:pharmacists'])->prefix('pharmacy/dashboard')->name('pha
     Route::apiResource('user-orders', CompanyOfferController::class)->only(['show',"update",'destroy']);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
+    Route::prefix('pharmacy-cart')->group(function () {
+        
+        Route::get('/', [PharmacyCartController::class, 'index']);
+        Route::post('/items', [PharmacyCartController::class, 'addItem']);
+        Route::patch('/items/{cartItemId}', [PharmacyCartController::class, 'updateItem']);
+        Route::delete('/items/{cartItemId}', [PharmacyCartController::class, 'removeItem']);
+        Route::delete('/clear', [PharmacyCartController::class, 'clearCart']);
+    });
 
+
+    Route::prefix('pharmacy-orders')->group(function () {
+        
+        // Create order from cart
+        Route::post('/create-from-cart', [OrderPharmacyController::class, 'createFromCart']);
+        
+        // Get single order
+        Route::get('/{id}', [OrderPharmacyController::class, 'show']);
+        
+        // Get pharmacy orders
+        Route::get('/pharmacy/{pharmacyId}', [OrderPharmacyController::class, 'getPharmacyOrders']);
+    
+        // Return management
+        Route::post('/returns', [OrderPharmacyController::class, 'createReturn']);
+    });
 
 
 
